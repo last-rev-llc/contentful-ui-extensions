@@ -1,0 +1,33 @@
+{
+  "name": "contentful-ui-extensions",
+  "version": "1.0.0",
+  "description": "Useful UI Extensions we use at Last Rev for customer projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/last-rev-llc/contentful-ui-extensions.git"
+  },
+  "keywords": [
+    "contentful",
+    "ui-extension"
+  ],
+  "author": "bradtaylorsf",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/last-rev-llc/contentful-ui-extensions/issues"
+  },
+  "homepage": "https://github.com/last-rev-llc/contentful-ui-extensions#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-loader": "^2.1.2",
+    "eslint-plugin-import": "^2.17.3"
+  }
+}
