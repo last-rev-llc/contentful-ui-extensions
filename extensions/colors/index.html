@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Colors</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="https://contentful.github.io/ui-extensions-sdk/cf-extension.css">
+  <style>
+    .card {
+      width: 200px;
+      height: 80px;
+      margin: 10px 20px;
+      display: inline-block;
+    }
+
+    h4 {
+      margin: auto;
+      display: table-cell;
+      vertical-align:middle;
+    }
+
+    .card:hover {
+      border: 2px dotted blue;
+      border-style: outset;
+      cursor: pointer;
+    }
+
+    .selected { 
+      border: 2px solid blue;
+      border-style: outset;
+    }
+
+    .selected h4 {
+      font-weight: 900;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="colors">
+  </div>
+
+  <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
+  <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js'></script>
+  <script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/contentful-ui-extensions-sdk@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/contentful@latest/dist/contentful.min.js"></script>
+  <script type='text/javascript'>
+    const createCard = (hex) => {
+      return `
+        <div class="card" style="background-color: #${hex}" data-hex="${hex}">
+          <h4>#${hex}</h4>
+        </div>
+      `;
+    }
+
+    window.contentfulExtension.init(function (extension) {
+      const loadColorCards = () => {
+        // Loop through the validations and create a card for each hex
+        // Check for the value of the field and add the selected class to it if they match
+        const value = extension.field.getValue();
+        const validations = extension.field.validations;
+        _.each(validations, (val) => {
+          if (_.has(val, 'in') && _.isArray(_.get(val, 'in'))) {
+            _.each(_.get(val, 'in'), (hex) => {
+              $('#colors').append(createCard(hex));
+            });
+          }
+        });
+      }
+
+      const selectValue = () => {
+        const currentValue = extension.field.getValue();
+        const colorBoxes = $('#colors').children;
+        $('#colors').find('div').removeClass('selected');
+        if (currentValue) {
+          $('#colors').find(`[data-hex='${currentValue}']`).addClass('selected');
+        }
+      }
+
+      extension.window.startAutoResizer();
+      loadColorCards();
+      selectValue();
+
+      $('.card').on('click', (ev) => {
+        // Add the selected class to the color picker and change the value of the field
+        const card = $(ev.currentTarget);
+        extension.field.setValue($(card).data('hex'));
+        selectValue();
+      });
+    });
+  </script>
+</body>
+</html>
