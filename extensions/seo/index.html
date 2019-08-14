@@ -39,9 +39,15 @@
     <div id="extra-metadata-fields"></div>
   </form>
 
-  <button class="cf-btn-primary" id="add-metadata">Add Metadata</button>
+  <select class="cf-form-input" id="field-selector"></select><button class="cf-btn-primary" id="add-metadata">Add Metadata</button>
   <script>
     window.contentfulExtension.init(function(extension) {
+      const setAvailableOptions = (newOption = '') => {
+        const currentValue = extension.field.getValue();
+        const availableOptions = metadataOptions.filter(meta => currentValue.findIndex(v => v.name === meta.value) < 0 && meta.value !== newOption);
+        $('#field-selector').empty().append(availableOptions.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
+      };
+
       const init = () => {
         const value = extension.field.getValue();
 
@@ -55,8 +61,9 @@
           }
         });
 
+        setAvailableOptions();
         bind();
-        $('#add-metadata').on('click', () => addMetadataField());
+        $('#add-metadata').on('click', () => addMetadataField($('#field-selector').val()));
       };
 
       const updateValues = (name, value) => {
@@ -76,7 +83,6 @@
         }
 
         extension.field.setValue(updatedValue);
-        console.log(extension.field.getValue());
       };
 
       const metadataOptions = [
@@ -108,52 +114,56 @@
         }
       ];
 
-      const addMetadataField = (name = '', initialValue = '') => {
-        const labelSelector = $('<select class="cf-form-input"><option>-- Select --</option></select>');
-        let inputField = $('<input type="text" class="cf-form-input">');
+      const deleteMetadataField = (el) => (event) => {
+        event.preventDefault();
+        const input = el.find('input, select');
+        const name = input.attr('name');
+
+        const currentValue = extension.field.getValue();
+        const index = currentValue.findIndex(v => v.name === name);
+
+        if (index >= 0) {
+          extension.field.setValue([
+            ...currentValue.slice(0, index),
+            ...currentValue.slice(index + 1)
+          ]);
+        }
+
+        el.remove();
+        setAvailableOptions();
+      };
+
+      const addMetadataField = (name, initialValue = '') => {
+        const metaOption = metadataOptions.find(meta => meta.value === name);
+        const labelSelector = $(`<label>${metaOption.label} <a href="#">&times;</a></label>`);
+        let inputField = $(`<input type="text" name="${name}" class="cf-form-input">`);
         let helpBlock = $('<div class="cf-form-hint"></div>');
         const field = $('<div class="cf-form-field"></div>');
 
-        labelSelector.append(metadataOptions.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
+        if (metaOption.options) {
+          inputField = $(`<select class="cf-form-input" name="${name}"></select>`);
+          inputField.append(metaOption.options.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
+        }
 
-        labelSelector.change(() => {
-          const value = labelSelector.val();
-          const metaOption = metadataOptions.find(o => o.value === value);
-          inputField.remove();
-
-          if (metaOption.options) {
-            helpBlock.remove();
-            inputField = $(`<select name="${metaOption.value}" class="cf-form-input"></select>`);
-            inputField.append(metaOption.options.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
-          } else {
-            inputField = $(`<input name="${metaOption.value}" type="text" class="cf-form-input">`);
-          }
-
-          debugger;
-          // Remove previous metadata from entry value
-          const entryValue = extension.field.getValue();
-          const previousFieldIndex = entryValue.findIndex(v => v.name === value);
-          if (previousFieldIndex >= 0) {
-            extension.field.setValue([
-              ...entryValue.slice(0, previousFieldIndex),
-              ...entryValue.slice(previousFieldIndex + 1)
-            ]);
-            console.log(extension.field.getValue());
-          }
-
-          helpBlock.html(metaOption.help);
-          field.append(inputField, helpBlock);
-          rebind();
-        });
-
-        if (name && initialValue) {
-          labelSelector.val(name);
-          inputField.attr('name', name);
+        if (initialValue) {
           inputField.val(initialValue);
         }
 
+        helpBlock.html(metaOption.help);
+
         field.append(labelSelector, inputField, helpBlock);
         $('#extra-metadata-fields').append(field);
+
+        const currentValue = extension.field.getValue();
+        extension.field.setValue([
+          ...currentValue,
+          { name, value: initialValue }
+        ]);
+
+        // Filter out existing meta values from the add field selector
+        setAvailableOptions(name);
+        labelSelector.find('a').click(deleteMetadataField(field));
+        rebind();
       };
 
       const bind = () => {
@@ -161,7 +171,7 @@
       };
 
       const unbind = () => {
-        $('#add-metadata').unbind();
+        $('#seo-extension').find('[name].cf-form-input').unbind();
       };
 
       const rebind = () => {
