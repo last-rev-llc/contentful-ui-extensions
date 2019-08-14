@@ -29,10 +29,10 @@
       </div>
     </div>
     <div class="cf-form-field">
-      <label>Social Sharing Image</label>
-      <input type="text" name="og:image" class="cf-form-input">
+      <label>Social Sharing Image <a href="#" id="social-select">Select image</a></label>
+      <input type="text" name="og:image" class="cf-form-input" readonly>
       <div class="cf-form-hint">
-        This is used by social networks when users share content.
+        This is used by social networks when users share content. The image must have been uploaded previously. <a href="#" id="social-upload">Click here</a> if you wish to upload an image now.
       </div>
     </div>
 
@@ -64,6 +64,8 @@
         setAvailableOptions();
         bind();
         $('#add-metadata').on('click', () => addMetadataField($('#field-selector').val()));
+        $('#social-select').on('click', openMediaDialog($('[name="og:image"]')));
+        $('#social-upload').on('click', uploadImage);
       };
 
       const updateValues = (name, value) => {
@@ -133,23 +135,50 @@
         setAvailableOptions();
       };
 
+      const openMediaDialog = (inputField) => (event) => {
+        event.preventDefault();
+        extension.dialogs.selectSingleAsset()
+          .then((selectedAsset) => {
+            inputField.val(selectedAsset.fields.file['en-US'].url);
+            inputField.change();
+          });
+      };
+
+      const uploadImage = (event) => {
+        event.preventDefault();
+        extension.navigator.openNewAsset({ slideIn: true });
+      };
+
       const addMetadataField = (name, initialValue = '') => {
         const metaOption = metadataOptions.find(meta => meta.value === name);
-        const labelSelector = $(`<label>${metaOption.label} <a href="#">&times;</a></label>`);
+        const labelSelector = $(`<label>${metaOption.label} <a href="#" data-action="delete">&times;</a>&nbsp;</label>`);
         let inputField = $(`<input type="text" name="${name}" class="cf-form-input">`);
         let helpBlock = $('<div class="cf-form-hint"></div>');
         const field = $('<div class="cf-form-field"></div>');
+
+        helpBlock.html(metaOption.help);
 
         if (metaOption.options) {
           inputField = $(`<select class="cf-form-input" name="${name}"></select>`);
           inputField.append(metaOption.options.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
         }
 
+        if (metaOption.value.match('image')) {
+          inputField.prop('readOnly', true);
+          const selectorLink = $('<a href="#">Select image</a>');
+          const uploadLink = $('<a href="#">Click here</a>');
+
+          selectorLink.on('click', openMediaDialog(inputField));
+          uploadLink.on('click', uploadImage);
+
+          labelSelector.append(selectorLink);
+          helpBlock.append(uploadLink);
+          helpBlock.html(`${helpBlock.html()} if you wish to upload an image now.`);
+        }
+
         if (initialValue) {
           inputField.val(initialValue);
         }
-
-        helpBlock.html(metaOption.help);
 
         field.append(labelSelector, inputField, helpBlock);
         $('#extra-metadata-fields').append(field);
@@ -162,7 +191,7 @@
 
         // Filter out existing meta values from the add field selector
         setAvailableOptions(name);
-        labelSelector.find('a').click(deleteMetadataField(field));
+        labelSelector.find('a[data-action="delete"]').click(deleteMetadataField(field));
         rebind();
       };
 
