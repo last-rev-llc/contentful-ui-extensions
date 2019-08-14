@@ -41,69 +41,26 @@
 
   <button class="cf-btn-primary" id="add-metadata">Add Metadata</button>
   <script>
-    const metadataOptions = [
-      {
-        value: 'keywords',
-        label: 'Meta Keywords',
-        help: 'These are the keywords for search engines to take into account.'
-      },
-      {
-        value: 'og:title',
-        label: 'Social Sharing Title',
-        help: 'This is the title that will appear when users share this content in social networks.'
-      },
-      {
-        value: 'og:description',
-        label: 'Social Sharing Description',
-        help: 'This is the description snippet that appears when users share to social networks.'
-      },
-      {
-        value: 'twitter:image',
-        label: 'Twitter Sharing Image',
-        help: 'This is the picture that will appear on the thumbnail when users share to Twitter.'
-      },
-      {
-        value: 'robots',
-        label: 'Search Engine Visibility',
-        help: 'This sets whether this content will be visible to search engines.',
-        options: [{ value: 'index,follow', label: 'Yes' }, { value: 'noindex,nofollow', label: 'No' }]
-      }
-    ];
-
-    const addMetadataField = () => {
-      const labelSelector = $('<select class="cf-form-input"><option>-- Select --</option></select>');
-      let inputField = $('<input type="text" class="cf-form-input">');
-      let helpBlock = $('<div class="cf-form-hint"></div>');
-      const field = $('<div class="cf-form-field"></div>');
-
-      labelSelector.append(metadataOptions.map(({ value, label }) => $(`<option value=${value}>${label}</option>`)));
-      labelSelector.change(({ target: { value } }) => {
-        debugger;
-        const metaOption = metadataOptions.find(o => o.value === value);
-        inputField.remove();
-
-        if (metaOption.options) {
-          helpBlock.remove();
-          inputField = $(`<select name="${metaOption.value}" class="cf-form-input"></select>`);
-          inputField.append(metaOption.options.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
-        } else {
-          inputField = $(`<input name="${metaOption.value}" type="text" class="cf-form-input">`);
-        }
-
-        helpBlock.html(metaOption.help);
-        field.append(inputField, helpBlock);
-      });
-
-      field.append(labelSelector, inputField, helpBlock);
-      $('#extra-metadata-fields').append(field);
-    };
-
-    $('#add-metadata').on('click', addMetadataField);
-
     window.contentfulExtension.init(function(extension) {
+      const init = () => {
+        const value = extension.field.getValue();
+
+        value.forEach(meta => {
+          const input = $(`[name="${meta.name}"].cf-form-input`);
+
+          if (input.length) {
+            input.val(meta.value);
+          } else {
+            addMetadataField(meta.name, meta.value);
+          }
+        });
+
+        bind();
+        $('#add-metadata').on('click', () => addMetadataField());
+      };
+
       const updateValues = (name, value) => {
         const fieldValue = extension.field.getValue() || [];
-        console.log(fieldValue, name, value, extension);
         let updatedValue = [];
 
         const index = fieldValue.findIndex(v => v.name === name);
@@ -119,9 +76,101 @@
         }
 
         extension.field.setValue(updatedValue);
+        console.log(extension.field.getValue());
       };
 
-      $('#seo-extension').find('input[name].cf-form-field').on('change', ({ target: { name, value }}) => updateValues(name, value));
+      const metadataOptions = [
+        {
+          value: 'keywords',
+          label: 'Meta Keywords',
+          help: 'These are the keywords for search engines to take into account.'
+        },
+        {
+          value: 'og:title',
+          label: 'Social Sharing Title',
+          help: 'This is the title that will appear when users share this content in social networks.'
+        },
+        {
+          value: 'og:description',
+          label: 'Social Sharing Description',
+          help: 'This is the description snippet that appears when users share to social networks.'
+        },
+        {
+          value: 'twitter:image',
+          label: 'Twitter Sharing Image',
+          help: 'This is the picture that will appear on the thumbnail when users share to Twitter.'
+        },
+        {
+          value: 'robots',
+          label: 'Search Engine Visibility',
+          help: 'This sets whether this content will be visible to search engines.',
+          options: [{ value: 'index,follow', label: 'Yes' }, { value: 'noindex,nofollow', label: 'No' }]
+        }
+      ];
+
+      const addMetadataField = (name = '', initialValue = '') => {
+        const labelSelector = $('<select class="cf-form-input"><option>-- Select --</option></select>');
+        let inputField = $('<input type="text" class="cf-form-input">');
+        let helpBlock = $('<div class="cf-form-hint"></div>');
+        const field = $('<div class="cf-form-field"></div>');
+
+        labelSelector.append(metadataOptions.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
+
+        labelSelector.change(() => {
+          const value = labelSelector.val();
+          const metaOption = metadataOptions.find(o => o.value === value);
+          inputField.remove();
+
+          if (metaOption.options) {
+            helpBlock.remove();
+            inputField = $(`<select name="${metaOption.value}" class="cf-form-input"></select>`);
+            inputField.append(metaOption.options.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
+          } else {
+            inputField = $(`<input name="${metaOption.value}" type="text" class="cf-form-input">`);
+          }
+
+          debugger;
+          // Remove previous metadata from entry value
+          const entryValue = extension.field.getValue();
+          const previousFieldIndex = entryValue.findIndex(v => v.name === value);
+          if (previousFieldIndex >= 0) {
+            extension.field.setValue([
+              ...entryValue.slice(0, previousFieldIndex),
+              ...entryValue.slice(previousFieldIndex + 1)
+            ]);
+            console.log(extension.field.getValue());
+          }
+
+          helpBlock.html(metaOption.help);
+          field.append(inputField, helpBlock);
+          rebind();
+        });
+
+        if (name && initialValue) {
+          labelSelector.val(name);
+          inputField.attr('name', name);
+          inputField.val(initialValue);
+        }
+
+        field.append(labelSelector, inputField, helpBlock);
+        $('#extra-metadata-fields').append(field);
+      };
+
+      const bind = () => {
+        $('#seo-extension').find('[name].cf-form-input').change(({ target: { name, value }}) => updateValues(name, value));
+      };
+
+      const unbind = () => {
+        $('#add-metadata').unbind();
+      };
+
+      const rebind = () => {
+        unbind();
+        bind();
+      };
+
+      init();
+      extension.window.startAutoResizer();
     });
   </script>
 </body>
