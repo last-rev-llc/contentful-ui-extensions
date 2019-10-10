@@ -3,6 +3,7 @@ Useful UI Extensions we use at Last Rev for customer projects
 
 - Conversations: A simple workflow tool for having conversations around content
 - Category Tree: Make selecting categories easier when they are defined as referenced entries
+- SEO: Creates additional SEO related fields to store in a JSON object within a contentful content item
 
 Run Locally:
 - Clone Repo

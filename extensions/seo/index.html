@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="https://contentful.github.io/ui-extensions-sdk/cf-extension.css">
+  <script src="https://unpkg.com/contentful-ui-extensions-sdk@3"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <title>SEO Extension</title>
+
+  <style>
+    .d-flex {
+      display: flex;
+    }
+
+    #btn-add-metadata {
+      line-height: 18px;
+    }
+
+    #metadata-fields {
+      display: flex;
+      flex-direction: column;
+      margin-top: 3rem;
+    }
+
+    .cf-form-field {
+      padding-left: 1em;
+      border-left: 2px solid #c5d2d8;
+      -webkit-transition: border-color 0.18s linear;
+      transition: border-color 0.18s linear;
+    }
+
+    .cf-form-field:focus-within {
+      border-left-color: #4a90e2;
+    }
+
+    textarea.cf-form-input {
+      height: 2em;
+    }
+
+    input.cf-form-input[type=text] {
+      outline: none;
+      background-color: #fff;
+      border: 1px solid #d3dce0;
+      max-height: 2.5rem;
+      color: #536171;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+      font-size: .875rem;
+      padding: .65625rem;
+      margin: 0;
+      width: 100%;
+      height: 40px;
+    }
+
+    .cf-form-image-wrap {
+      height: 200px;
+      width: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .cf-form-image-wrap span {
+      position: absolute;
+      height: 100px;
+      width: 200px;
+      color: rgb(255, 178, 57);
+      font-weight: bold;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      display: none;
+    }
+
+    .cf-form-image-wrap span.select-image {
+      top: 0;
+    }
+
+    .cf-form-image-wrap span.upload-image {
+      top: 100px;
+    }
+
+    .cf-form-image-wrap:hover span:hover {
+      background-color: rgba(25, 37, 50, .95);
+    }
+
+    .cf-form-image-wrap:hover span {
+      display: flex;
+      background-color: rgba(38, 53, 69, .95);
+    }
+
+    .cf-form-image {
+      max-width: 100%;
+      width: auto;
+    }
+
+    [data-action=delete] {
+      padding: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      display: none;
+      height: 40px;
+      width: 40px;
+      align-content: center;
+      justify-content: center;
+    }
+
+    .input-field-wrap {
+      position: relative;
+      padding-right: 40px;
+    }
+
+    .cf-form-field:hover [data-action=delete],
+    .cf-form-field *:focus [data-action=delete],
+    .cf-form-field *:focus-within [data-action=delete] {
+      display: flex;
+    }
+
+    select.cf-form-input {
+      width: 100%;
+      display: block;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      padding: .625rem 2.4375rem .625rem .625rem;
+      background-color: #fff;
+      color: #536171;
+      font-size: .875rem;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+      border: 1px solid #d3dce0;
+      border-radius: 0;
+      height: 2.5rem;
+    }
+
+    select.cf-form-input.cf-btn-primary {
+      -webkit-appearance: button;
+      -webkit-writing-mode: horizontal-tb !important;
+      text-rendering: auto;
+      color: buttontext;
+      letter-spacing: normal;
+      word-spacing: normal;
+      text-transform: none;
+      text-indent: 0px;
+      text-shadow: none;
+      display: inline-block;
+      text-align: center;
+      align-items: flex-start;
+      cursor: default;
+      background-color: buttonface;
+      box-sizing: border-box;
+      margin: 0em;
+      font: 400 11px system-ui;
+      padding: 1px 7px 2px;
+      border-width: 1px;
+      border-style: solid;
+      border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
+      border-image: initial;
+      display: inline-block;
+      padding: 0.625rem 1.5rem;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 500;
+      white-space: nowrap;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      line-height: 18px;
+      color: #fff;
+      background: -webkit-linear-gradient(bottom, #3c80cf, #5b9fef);
+      background: -moz-linear-gradient(bottom, #3c80cf, #5b9fef);
+      background: -o-linear-gradient(bottom, #3c80cf, #5b9fef);
+      background: -ms-linear-gradient(bottom, #3c80cf, #5b9fef);
+      background: linear-gradient(to top, #3c80cf, #5b9fef);
+      -webkit-background-size: 100% 200%;
+      -moz-background-size: 100% 200%;
+      background-size: 100% 200%;
+      -webkit-transition-property: all;
+      -moz-transition-property: all;
+      -o-transition-property: all;
+      -ms-transition-property: all;
+      transition-property: all;
+      -webkit-transition-timing-function: ease-in-out;
+      -moz-transition-timing-function: ease-in-out;
+      -o-transition-timing-function: ease-in-out;
+      -ms-transition-timing-function: ease-in-out;
+      transition-timing-function: ease-in-out;
+      -webkit-transition-duration: 0.1s;
+      -moz-transition-duration: 0.1s;
+      -o-transition-duration: 0.1s;
+      -ms-transition-duration: 0.1s;
+      transition-duration: 0.1s;
+      border-color: #3c80cf;
+    }
+
+    label {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      font-size: 14px;
+      line-height: 24px;
+      color: #8091a5;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    select.cf-form-input.cf-btn-primary:hover {
+      border-color: #3072be;
+      background-position: 0 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <form id="seo-extension">
+    <div class="cf-form-field">
+      <div class='d-flex'>
+        <select class="cf-form-input cf-btn-primary" id="field-selector"></select>
+      </div>
+    </div>
+    <div id='metadata-fields'></div>
+  </form>
+
+  <script>
+    $(document).ready(() => {
+      window.contentfulExtension.init(function (extension) {
+        window.category_browser = extension;
+        extension.window.startAutoResizer();
+
+        const metadataOptions = [
+          {
+            tag: 'select',
+            value: 'robots',
+            label: 'Search Engine Visibility',
+            cssClass: 'data-default',
+            help: 'Should search engines index this content?',
+            options: [{ value: 'index,follow', label: 'Index' }, { value: 'noindex,nofollow', label: 'Don\'t Index' }]
+          },
+          {
+            tag: 'input',
+            value: 'title',
+            label: 'Page Title',
+            cssClass: 'data-default',
+            help: 'Browser tab and search engine result display.',
+          },
+          {
+            tag: 'textarea',
+            value: 'description',
+            label: 'Meta Description',
+            cssClass: 'data-default',
+            help: 'The short description in search engine result display.',
+          },
+          {
+            tag: 'textarea',
+            value: 'keywords',
+            label: 'Meta Keywords',
+            help: 'Keywords used for search engine indexing.',
+          },
+          {
+            tag: 'input',
+            value: 'og:title',
+            label: 'Social Sharing Title',
+            help: 'Used as the title when the content is shared on social networks.'
+          },
+          {
+            tag: 'textarea',
+            value: 'og:description',
+            label: 'Social Sharing Description',
+            help: 'Used as the description when the content is shared on social networks.'
+          },
+          {
+            tag: 'image',
+            value: 'og:image',
+            label: 'Social Sharing Image',
+            help: 'Used as the thumbnail when the content is shared on social networks.'
+          },
+          {
+            tag: 'image',
+            value: 'twitter:image',
+            label: 'Twitter Sharing Image',
+            help: 'Used as the thumbnail when the content is shared on Twitter.'
+          }
+
+        ];
+
+        const updateAddFieldDropdown = () => {
+          const currentValue = extension.field.getValue();
+          const availableOptions = metadataOptions.filter(meta => !currentValue.find(v => v.name === meta.value));
+          const $fieldSelectorEl = $('#field-selector');
+          $fieldSelectorEl.empty().append(`<option value=''>Add field</option>`);
+          availableOptions.forEach((v) => {
+            $fieldSelectorEl.append(`<option value="${v.value}">${v.label}</option>`);
+          });
+        };
+
+        const updateValues = (name, value = '') => {
+          let fieldValue = extension.field.getValue();
+          fieldValue = fieldValue.filter((v) => v.name && v.value && v.name !== name && v.value.trim() !== '');
+
+          if (name && value.trim() !== '') fieldValue.push({ name, value });
+          extension.field.setValue([
+            ...fieldValue,
+          ]);
+        };
+
+        const deleteMetadataField = ($cfFormField) => {
+          const $inputEl = $cfFormField.find('.cf-form-input');
+          const inputElName = $inputEl.attr('name');
+
+          updateValues(inputElName, '');
+
+          $cfFormField.remove();
+          updateAddFieldDropdown();
+        };
+
+        const updateAsset = (inputField, asset) => {
+          let url = '';
+          let assetObj = '';
+          if (asset && typeof asset.fields !== 'undefined') {
+            assetObj = JSON.stringify(asset);
+            url = `${asset.fields.file['en-US'].url}?fit=crop&h=200&w=200`;
+          }
+
+          inputField
+            .val(assetObj)
+            .trigger('change')
+            .closest('.cf-form-field')
+            .find('.cf-form-image').attr('src', url);
+        }
+
+        const openMediaDialog = (inputField) => {
+          extension.dialogs.selectSingleAsset()
+            .then(asset => updateAsset(inputField, asset));
+        };
+
+        const uploadImage = (inputField) => {
+          extension.navigator.openNewAsset({ slideIn: true })
+            .then(({ entity }) => extension.space.getAsset(entity.sys.id))
+            .then(entity => extension.space.waitUntilAssetProcessed(entity.sys.id, 'en-US'))
+            .then(asset => updateAsset(inputField, asset));
+        };
+
+        $('body').on('click', '.select-image', (e) => {
+          e.preventDefault();
+          openMediaDialog($(e.currentTarget).closest('.cf-form-field').find('.cf-form-input'));
+          return false;
+        }).on('click', '.upload-image', (e) => {
+          e.preventDefault();
+          uploadImage($(e.currentTarget).closest('.cf-form-field').find('.cf-form-input'));
+          return false;
+        }).on('click', '[data-action=delete]', (e) => {
+          e.preventDefault();
+          deleteMetadataField($(e.currentTarget).closest('.cf-form-field'));
+          return false;
+        }).on('change', '#field-selector', (e) => {
+          e.preventDefault();
+          const $fieldSelectorEl = $('#field-selector');
+          if ($fieldSelectorEl.val().trim() === '') return false;
+
+          addMetadataField($fieldSelectorEl.val(), '', true);
+          updateAddFieldDropdown();
+          return false;
+        }).on('change keyup paste', '.cf-form-input[name]', (e) => {
+          const $targetEl = $(e.currentTarget);
+          updateValues($targetEl.attr('name'), $targetEl.val());
+        });
+
+        const addMetadataField = (name, initialValue = '', isNew) => {
+          if (!name) return;
+          const metaOption = metadataOptions.find(meta => meta.value === name);
+          const metaOptionIndex = metadataOptions.findIndex(meta => meta.value === name);
+
+          if (initialValue || (metaOption.cssClass && metaOption.cssClass.indexOf('data-default') > -1) || isNew) {
+            if (!metaOption.label) metaOption.label = name;
+
+            if (!metaOption.tag) metaOption.tag = 'input';
+
+            const labelSelector = $('<label>').html(metaOption.label);
+
+            let inputField;
+            let imgField = false;
+            let helpBlock = $('<div>').addClass('cf-form-hint').html(metaOption.help);
+
+            if (metaOption.tag === 'input') {
+              inputField = $('<input>').attr('type', 'text');
+            } else if (metaOption.tag === 'textarea') {
+              inputField = $('<textarea>');
+            } else if (metaOption.tag === 'image') {
+              inputField = $('<textarea>').attr('readonly', true).hide();
+              let imageSrc = '';
+              if (initialValue) {
+                const asset = JSON.parse(initialValue);
+
+                if (asset && typeof asset.fields !== 'undefined') {
+                  imageSrc = `${asset.fields.file['en-US'].url}?fit=crop&h=200&w=200`;
+                }
+              }
+              imgField = $('<div>')
+                .addClass('cf-form-image-wrap')
+                .append(
+                  $('<span>').addClass('select-image').text('Select an image'),
+                  $('<img>').attr('src', imageSrc).addClass('cf-form-image'),
+                  $('<span>').addClass('upload-image').text('Upload an image'),
+                );
+            } else if (metaOption.options) {
+              inputField = $('<select>')
+                .append(metaOption.options.map(({ value, label }) => $(`<option value="${value}">${label}</option>`)));
+              initialValue = metaOption.options[0].value;
+            }
+
+            inputField.addClass('cf-form-input').attr('name', name);
+            inputField.val(initialValue).trigger('change');
+
+            const field = $('<div>').addClass('cf-form-field').css('order', metaOptionIndex);
+
+            if (metaOption.cssClass && metaOption.cssClass.indexOf('data-default') > -1) {
+              field.addClass(metaOption.cssClass);
+            }
+
+            const inputFieldWrap = $('<div>')
+              .addClass('input-field-wrap')
+              .append(
+                inputField,
+                $('<button>').html('&times;').addClass('cf-btn-primary').attr('data-action', 'delete'),
+              );
+
+            field.append(labelSelector, inputFieldWrap);
+            if (imgField) field.append(imgField);
+            field.append(helpBlock);
+
+            $('#metadata-fields').append(field);
+            if (isNew) {
+              inputField.focus();
+            }
+            updateValues(metaOption.value, initialValue);
+          }
+        };
+
+        const init = () => {
+          const value = extension.field.getValue();
+
+          value.forEach((meta) => {
+            addMetadataField(meta.name, meta.value);
+          });
+
+          updateAddFieldDropdown();
+        };
+
+        init();
+      });
+    });
+  </script>
+</body>
+
+</html>
