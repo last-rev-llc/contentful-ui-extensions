@@ -1,33 +1,48 @@
 {
-  "name": "contentful-ui-extensions",
-  "version": "1.0.0",
-  "description": "Useful UI Extensions we use at Last Rev for customer projects",
-  "main": "index.js",
+  "name": "gatsby-starter-default",
+  "private": true,
+  "description": "A simple starter to get up and developing quickly with Gatsby",
+  "version": "0.1.0",
+  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
+  "dependencies": {
+    "@contentful/forma-36-react-components": "^3.21.0",
+    "contentful-ui-extensions-sdk": "^3.10.0",
+    "gatsby": "^2.16.1",
+    "gatsby-image": "^2.2.29",
+    "gatsby-plugin-manifest": "^2.2.23",
+    "gatsby-plugin-offline": "^3.0.16",
+    "gatsby-plugin-react-helmet": "^3.1.13",
+    "gatsby-plugin-sharp": "^2.2.31",
+    "gatsby-source-filesystem": "^2.1.33",
+    "gatsby-transformer-sharp": "^2.2.23",
+    "lodash": "^4.17.15",
+    "prop-types": "^15.7.2",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "react-helmet": "^5.2.1"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "prettier": "^1.18.2"
+  },
+  "keywords": [
+    "gatsby"
+  ],
+  "license": "MIT",
   "scripts": {
-    "test": "test",
-    "start": "node index.js"
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
+    "start": "npm run develop",
+    "serve": "gatsby serve",
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing \""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/last-rev-llc/contentful-ui-extensions.git"
+    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
   },
-  "keywords": [
-    "contentful",
-    "ui-extension"
-  ],
-  "author": "bradtaylorsf",
-  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/last-rev-llc/contentful-ui-extensions/issues"
-  },
-  "homepage": "https://github.com/last-rev-llc/contentful-ui-extensions#readme",
-  "dependencies": {
-    "express": "^4.17.1"
-  },
-  "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-loader": "^2.1.2",
-    "eslint-plugin-import": "^2.17.3"
+    "url": "https://github.com/gatsbyjs/gatsby/issues"
   }
 }
