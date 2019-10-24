@@ -17,7 +17,7 @@ class Colors extends React.Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     initContentfulExtension((api) => {
       this.setState({
         value: api.field.getValue(),

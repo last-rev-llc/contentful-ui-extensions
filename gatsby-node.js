@@ -1,5 +1,4 @@
 const path = require('path');
-const { union } = require('lodash');
 const fs = require('fs');
 
 require('dotenv').config({
@@ -33,9 +32,7 @@ const pagesBuilder = async ({ actions }) => {
     ));
 
   versionsFolders.map((folderPath) => {
-    console.log(folderPath);
     const slug = folderPath.replace(extensionsFolder, '').toLowerCase();
-    console.log(slug);
     createPage({
       path: slug,
       component: `${folderPath}/index.js`,
@@ -44,35 +41,21 @@ const pagesBuilder = async ({ actions }) => {
       },
     });
   });
-
-
-  // fs.readdir(extensionsFolder, (err, files) => {
-  //   if (err) {
-  //     console.error('Could not list the directory.', err);
-  //     process.exit(1);
-  //   }
-
-  //   // Loop over folders
-  //   files.forEach((componentFolder) => {
-  //     const fullComponentFolderPath = path.join(extensionsFolder, componentFolder);
-
-  //     fs.stat(fullComponentFolderPath, (errorStat, stat) => {
-  //       if (stat.isDirectory()) {
-  //         // Loop through versions and create pages
-  //         fs.readdir(componentFolder, (errorVersion, versionFolders) => [
-  //           versionFolders.forEach((versionFolder) => {
-  //             fs.stat(versionFolder, (error, vStat) => {
-  //               if (vStat.isDirectory()) {
-  //                 console.log('VERSIONS', versionFolder);
-  //               }
-  //             });
-  //           }),
-  //         ]);
-  //       }
-  //       console.log('IS DIRECTORY', stat.isDirectory());
-  //     });
-  //   });
-  // });
 };
 
 exports.createPages = pagesBuilder;
+
+exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
+  if (stage === 'build-html') {
+    actions.setWebpackConfig({
+      module: {
+        rules: [
+          {
+            test: /contentful-ui-extensions-sdk/,
+            use: loaders.null(),
+          },
+        ],
+      },
+    });
+  }
+};
