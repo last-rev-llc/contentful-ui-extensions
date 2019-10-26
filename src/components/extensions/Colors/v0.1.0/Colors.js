@@ -28,7 +28,6 @@ class Colors extends React.Component {
     });
   }
 
-
   getHexOptions = (api) => {
     const { validations } = api.field;
     const hexOptions = [];
@@ -53,26 +52,24 @@ class Colors extends React.Component {
 
   render() {
     const { value, hexs } = this.state;
-    const dark = ['#000000', '#6B7C8D', '#445669'];
     return (
-      <div id="colors">
+      <ul class="color-choice-list">
         {hexs.map((hex, index) => (
-          <div
-            className={`card ${dark.includes(hex) ? 'dark' : ''} ${value === hex ? 'selected' : ''}`}
-            style={{ backgroundColor: hex }}
-            data-hex={hex}
-            onClick={this.handleColorChange}
-            onKeyDown={this.handleColorChange}
-            role="button"
-            tabIndex={index}
-            key={hex}
-          >
-            <h4>
-              {hex}
-            </h4>
-          </div>
-        ))}
-      </div>
+          <li className='color-choice-wrap'
+              style={{ backgroundColor: hex }}>
+            <button
+              className={`color-choice btn btn-lg ${value === hex ? 'active' : ''}`}
+              title={hex}
+              data-hex={hex}
+              onClick={this.handleColorChange}
+              onKeyDown={this.handleColorChange}
+              role="button"
+              tabIndex={index}
+              key={hex}
+            ></button>
+          </li>
+          ))}
+      </ul>
     );
   }
 }
