@@ -27,9 +27,13 @@ function Templates() {
 
   const handModalOpen = () => {
     // TODO: Change this to be itself ID
+    console.log('HANDLE OPEN', api.entry.fields.templates.getValue());
     api.dialogs.openExtension({
       id: '54j2jBSmPiNdUzF22TnER2',
-      parameters: { test: true },
+      parameters: {
+        openDialog: true,
+        entries: api.entry.fields.templates.getValue(),
+      },
       shouldCloseOnOverlayClick: true,
       shouldCloseOnEscapePress: true,
       position: 'center',
@@ -70,39 +74,38 @@ function Templates() {
 
   const WithTemplateCreateDialog = ({ entries }) => (
     <div className="create-new">
+      {console.log(entries)}
       <h1>Create new template</h1>
       <table>
-        <tr>
-          <td>ByRef</td>
-          <td>New</td>
-          <td>Module Name</td>
-        </tr>
-        <tr>
-          <td><input type="checkbox" /></td>
-          <td><input type="checkbox" /></td>
-          <td>Some Cards</td>
-        </tr>
-        <tr>
-          <td><input type="checkbox" /></td>
-          <td><input type="checkbox" /></td>
-          <td>Some Callout</td>
-        </tr>
-        <tr>
-          <td><input type="checkbox" /></td>
-          <td><input type="checkbox" /></td>
-          <td>Some thing</td>
-        </tr>
+        <thead>
+
+          <tr>
+            <td>ByRef</td>
+            <td>New</td>
+            <td>Module Name</td>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map(() => (
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td>Some Cards</td>
+            </tr>
+          ),
+          )}
+        </tbody>
       </table>
     </div>
   );
 
   return (
     <div id="templates">
-      {(get(api, 'parameters.invocation'))
+      {(get(api, 'parameters.invocation.openDialog'))
         ? (
 
-          <WithTemplateCreateDialog entries={get(api, 'entry.fields.templates')}>
-            {console.log('ENTRY', get(api, 'entry.fields.templates'))}
+          <WithTemplateCreateDialog entries={(get(api, 'parameters.invocation.entries'))}>
+            {console.log('ENTRies', (get(api, 'parameters.invocation.entries')))}
           </WithTemplateCreateDialog>
         ) : (
           (hasEntries) ? (
