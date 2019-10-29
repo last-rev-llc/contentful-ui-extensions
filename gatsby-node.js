@@ -33,6 +33,7 @@ const pagesBuilder = async ({ actions }) => {
 
   versionsFolders.map((folderPath) => {
     const slug = folderPath.replace(extensionsFolder, '').toLowerCase();
+    console.log(`http://localhost:8000${slug}`);
     createPage({
       path: slug,
       component: `${folderPath}/index.js`,
