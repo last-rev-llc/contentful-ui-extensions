@@ -29,7 +29,7 @@ function Templates() {
       id: api.ids.extension,
       parameters: {
         openDialog: true,
-        entries: api.entry.fields.sections.getValue(),
+        entries: api.entry.fields.sections.getValue(), // TODO: Need to make field name an instance valriable
       },
       shouldCloseOnOverlayClick: true,
       shouldCloseOnEscapePress: true,
@@ -52,7 +52,10 @@ function Templates() {
       cancelLabel: 'No...',
     })
       .then((result) => {
-        console.log(result);
+        if (result) {
+          const entries = api.entry.fields.sections.getValue();
+          api.entry.fields.sections.setValue(entries.concat(fakeEntries));
+        }
       });
   };
 
