@@ -48,8 +48,8 @@ function Templates() {
       title: `${e.target.value} Template`,
       message: `Do you want to add the ${e.target.value} template to the "sections" field?`,
       intent: 'positive',
-      confirmLabel: 'Yes!',
-      cancelLabel: 'No...',
+      confirmLabel: 'Continue',
+      cancelLabel: 'Cancel',
     })
       .then((result) => {
         if (result) {
@@ -72,17 +72,25 @@ function Templates() {
             <Button
               buttonType="positive"
               data-testid="template-new-button"
+              className="w-100 mb-4"
+
               onClick={() => {
                 handModalOpen(true);
               }}
-            >Create New Template
+            >
+              Save as New Template
             </Button>
-            <div>Please Select a Template to use</div>
+
             <Select
               data-testid="template-select-field"
+              dropdownType="positive"
               onChange={handleTemplateSelectChange}
             >
-              <option name="none">Select a Template</option>
+              <option
+                isTitle
+                name="none"
+              >Load Template
+              </option>
               {templates.map((template) => (
                 <option
                   data-testid="template-select-option"

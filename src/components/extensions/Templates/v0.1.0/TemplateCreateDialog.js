@@ -1,8 +1,10 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { get, set } from 'lodash';
-import { Button, TextField } from '@contentful/forma-36-react-components';
+import { get, set, startCase } from 'lodash';
+import {
+  Heading, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell,
+} from '@contentful/forma-36-react-components';
 import resolveEntries from '../../../../global/scripts/resolveEntries';
 import './Templates.scss';
 
@@ -59,31 +61,36 @@ function TemplateCreateDialog({ entries, api }) {
   };
   return (
     <div className="create-new">
-      <h3>New template</h3>
+      <Heading>Create New Template</Heading>
+      <hr />
       <TextField
         type="text"
+        placeholder="Enter Template Name"
         name="template-name"
         labelText="Template Name"
+        helpText="Enter a descriptive name for your template for use at a later date."
+        formLabelProps={{ requiredText: 'This field is required' }}
+        required
         onChange={handleTemplateNameChange}
         value={templateName}
       />
       <hr />
-      <table>
-        <thead>
-          <tr>
-            <td className="option">ByRef</td>
-            <td className="option">New</td>
-            <td className="sysId">ID</td>
-            <td className="name">Name</td>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell className="option">ByRef</TableCell>
+            <TableCell className="option">New</TableCell>
+            <TableCell className="sysId">ID</TableCell>
+            <TableCell className="name">Name</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {fullEntries.map((entry, index) => (
-            <tr
+            <TableRow
               key={Math.random()}
               className="entry"
             >
-              <td>
+              <TableCell>
                 <input
                   type="radio"
                   name={entry.sys.id}
@@ -92,8 +99,8 @@ function TemplateCreateDialog({ entries, api }) {
                   onChange={handleRadioChange}
                   checked={isChecked(index, 'byref')}
                 />
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <input
                   type="radio"
                   name={entry.sys.id}
@@ -102,13 +109,13 @@ function TemplateCreateDialog({ entries, api }) {
                   onChange={handleRadioChange}
                   checked={isChecked(index, 'new')}
                 />
-              </td>
-              <td>{entry.sys.contentType.sys.id}</td>
-              <td>{get(entry, 'fields.headline.en-US')}</td>
-            </tr>
+              </TableCell>
+              <TableCell>{startCase(entry.sys.contentType.sys.id)}</TableCell>
+              <TableCell>{get(entry, 'fields.headline.en-US')}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       <Button
         onClick={handleTemplateCreate}
         buttonType="positive"
