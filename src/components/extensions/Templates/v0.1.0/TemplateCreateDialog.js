@@ -10,8 +10,8 @@ function TemplateCreateDialog({ entries, api }) {
   const [fullEntries, setFullEntries] = useState([]);
   const [templateOptions, setTemplateOptions] = useState([]);
   const [templateName, setTemplateName] = useState('');
-
-  const GLOBALSETTINGS_ID = '6sRmfqaqo4OD3E05ooNViv';
+  // TODO: Make this an instance variable
+  const GLOBALSETTINGS_ID = '6AODsEr22eGLqXlvSEyJb3';
 
   useEffect(() => {
     const getFullEntries = async () => {
