@@ -6,6 +6,7 @@
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "dependencies": {
     "@contentful/forma-36-react-components": "^3.21.0",
+    "@contentful/forma-36-fcss": "^0.0.31",
     "@testing-library/jest-dom": "^4.2.0",
     "@testing-library/react": "^9.3.0",
     "bootstrap": "^4.3.1",
