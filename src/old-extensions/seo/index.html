@@ -285,17 +285,17 @@
         ];
 
         const updateAddFieldDropdown = () => {
-          const currentValue = extension.field.getValue();
+          const currentValue = extension.field.getValue() || [];
           const availableOptions = metadataOptions.filter(meta => !currentValue.find(v => v.name === meta.value));
           const $fieldSelectorEl = $('#field-selector');
-          $fieldSelectorEl.empty().append(`<option value=''>Add field</option>`);
+          $fieldSelectorEl.empty().append(`<option value=''>Create Metadata field</option>`);
           availableOptions.forEach((v) => {
             $fieldSelectorEl.append(`<option value="${v.value}">${v.label}</option>`);
           });
         };
 
         const updateValues = (name, value = '') => {
-          let fieldValue = extension.field.getValue();
+          let fieldValue = extension.field.getValue() || [];
           fieldValue = fieldValue.filter((v) => v.name && v.value && v.name !== name && v.value.trim() !== '');
 
           if (name && value.trim() !== '') fieldValue.push({ name, value });
@@ -438,8 +438,7 @@
         };
 
         const init = () => {
-          const value = extension.field.getValue();
-
+          const value = extension.field.getValue() || [];
           value.forEach((meta) => {
             addMetadataField(meta.name, meta.value);
           });
