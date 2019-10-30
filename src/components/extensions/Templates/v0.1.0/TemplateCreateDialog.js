@@ -111,7 +111,7 @@ function TemplateCreateDialog({ entries, api }) {
                 />
               </TableCell>
               <TableCell>{startCase(entry.sys.contentType.sys.id)}</TableCell>
-              <TableCell>{get(entry, 'fields.headline.en-US')}</TableCell>
+              <TableCell>{get(entry, 'fields.internalTitle.en-US')}</TableCell>
             </TableRow>
           ))}
         </TableBody>
