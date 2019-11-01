@@ -53,7 +53,7 @@ function Templates() {
     })
       .then((result) => {
         if (result) {
-          const entries = api.entry.fields.sections.getValue();
+          const entries = api.entry.fields.sections.getValue() || [];
           api.entry.fields.sections.setValue(entries.concat(fakeEntries));
         }
       });
