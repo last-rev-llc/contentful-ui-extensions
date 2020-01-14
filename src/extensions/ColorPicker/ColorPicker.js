@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import PropTypes from 'prop-types';
 import { each, has, isArray, get } from 'lodash';
-import './Colors.scss';
+import './ColorPicker.scss';
+import sdkProps from '../../sdkPropTypes';
 
-const Colors = ({ sdk }) => {
+const ColorPicker = ({ sdk }) => {
   const [fieldValue, setFieldValue] = useState('');
 
   useEffect(() => {
@@ -44,7 +44,8 @@ const Colors = ({ sdk }) => {
               data-hex={hex}
               onClick={handleColorChange}
               onKeyDown={handleColorChange}
-              tabIndex={index}/>
+              tabIndex={index}
+              data-testid="ColorPicker-button" />
           </li>
         ))}
       </ul>
@@ -52,16 +53,8 @@ const Colors = ({ sdk }) => {
   )
 }
 
-Colors.propTypes = {
-  sdk: PropTypes.shape({
-    field: PropTypes.shape({
-      getValue: PropTypes.func.isRequired,
-      setValue: PropTypes.func.isRequired,
-      validations: PropTypes.arrayOf(PropTypes.shape({
-        in: PropTypes.array,
-      }))
-    })
-  }).isRequired,
+ColorPicker.propTypes = {
+  sdk: sdkProps.isRequired,
 }
 
-export default Colors;
+export default ColorPicker;

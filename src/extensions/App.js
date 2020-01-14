@@ -1,10 +1,11 @@
 import React from 'react';
 import {Router, Route, Switch} from 'react-router-dom';
-import Colors from './Colors/Colors';
+import ColorPicker from './ColorPicker';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
+import sdkProps from '../sdkPropTypes';
 
-export default function App({ sdk }) {
+const App = ({ sdk }) => {
   return (
     <Router history={history}>
       <Switch>
@@ -13,8 +14,14 @@ export default function App({ sdk }) {
                component={ExtensionsList} />
         <Route path="/colors"
                exact
-               component={() => <Colors sdk={sdk} />} />
+               component={() => <ColorPicker sdk={sdk} />} />
       </Switch>
     </Router>
   )
 };
+
+App.propTypes = {
+  sdk: sdkProps.isRequired,
+};
+
+export default App;
