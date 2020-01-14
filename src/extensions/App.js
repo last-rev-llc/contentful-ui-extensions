@@ -5,6 +5,8 @@ import ExtensionsList from './ExtensionsList';
 import history from '../history';
 import sdkProps from '../sdkPropTypes';
 
+import mockSdk from './ColorPicker/mockSdk';
+
 const App = ({ sdk }) => {
   return (
     <Router history={history}>
@@ -12,9 +14,12 @@ const App = ({ sdk }) => {
         <Route path="/"
                exact
                component={ExtensionsList} />
-        <Route path="/colors"
+        <Route path="/color-picker"
                exact
-               component={() => <ColorPicker sdk={sdk} />} />
+               component={() => <ColorPicker sdk={sdk || mockSdk} />} />
+        <Route path="/seo"
+               exact
+               component={() => <ColorPicker sdk={sdk || mockSdk} />} />
       </Switch>
     </Router>
   )

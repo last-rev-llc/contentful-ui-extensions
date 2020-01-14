@@ -3,9 +3,11 @@ import {Link} from 'react-router-dom';
 
 export default function ExtensionsList() {
   return (
-      <div>
-          <Link to="/colors"
-                className="">Color</Link>
-      </div>
+    <div>
+      <Link to="/color-picker"
+            className="">Color</Link>
+      <Link to="/seo"
+            className="">Seo</Link>
+    </div>
   )
 }

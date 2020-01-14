@@ -4,25 +4,7 @@ import _ from 'lodash';
 import { render, cleanup, fireEvent } from '@testing-library/react';
 import ColorPicker from './ColorPicker';
 
-const SDK_MOCK = {
-  field: {
-    validations: [
-      {
-        in: [
-          'FFFFFF',
-          '000000',
-          '333333'
-        ]
-      }
-    ],
-    getValue: () => {
-      return 'FFFFFF';
-    },
-    setValue: () => {
-      return null;
-    }
-  },
-}
+import mockSdk from './mockSdk';
 
 afterEach(() => {
   cleanup();
@@ -34,7 +16,7 @@ describe('<ColorPicker />', () => {
   test.todo('shows error message when sdk not present');
 
   test('buttons have the required attributes', () => {
-    const { container } = render(<ColorPicker sdk={SDK_MOCK} />);
+    const { container } = render(<ColorPicker sdk={mockSdk} />);
     const button = container.firstChild.querySelector('button');
     expect(button.getAttribute('type'))
       .toEqual('button');
@@ -43,23 +25,23 @@ describe('<ColorPicker />', () => {
   });
 
   test('render the same number of buttons as validations', () => {
-    const { getAllByTestId } = render(<ColorPicker sdk={SDK_MOCK} />);
+    const { getAllByTestId } = render(<ColorPicker sdk={mockSdk} />);
     expect(getAllByTestId('ColorPicker-button').length)
-      .toBe(SDK_MOCK.field.validations[0].in.length);
+      .toBe(mockSdk.field.validations[0].in.length);
   });
 
   test('add the class active if the value matches the hex', () => {
-    const { container } = render(<ColorPicker sdk={SDK_MOCK} />);
+    const { container } = render(<ColorPicker sdk={mockSdk} />);
     expect(container.firstChild.querySelectorAll('.active').length)
       .toBe(1);
     expect(container.firstChild.querySelector('.active').getAttribute('data-hex'))
-      .toEqual(SDK_MOCK.field.getValue())
+      .toEqual(mockSdk.field.getValue())
   });
 
   test('no button with active class if there is not a value for the field', () => {
     const sdk = {
       field: {
-        ...SDK_MOCK.field,
+        ...mockSdk.field,
         getValue: () => '',
       }
     };
@@ -72,7 +54,7 @@ describe('<ColorPicker />', () => {
     const handleColorChange = jest.fn();
     const sdk = {
       field: {
-        ...SDK_MOCK.field,
+        ...mockSdk.field,
         setValue: handleColorChange,
       }
     };
@@ -92,7 +74,7 @@ describe('<ColorPicker />', () => {
     const handleColorChange = jest.fn();
     const sdk = {
       field: {
-        ...SDK_MOCK.field,
+        ...mockSdk.field,
         setValue: handleColorChange,
       }
     };
