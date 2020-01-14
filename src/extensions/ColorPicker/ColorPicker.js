@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { each, has, isArray, get } from 'lodash';
 import './ColorPicker.scss';
-import sdkProps from '../../sdkPropTypes';
+import PropTypes from 'prop-types';
 
 const ColorPicker = ({ sdk }) => {
   const [fieldValue, setFieldValue] = useState('');
@@ -12,22 +12,22 @@ const ColorPicker = ({ sdk }) => {
 
   const getColorOptions = () => {
     const { validations } = sdk.field;
-      const hexOptions = [];
-      each(validations, (val) => {
-        if (has(val, 'in') && isArray(get(val, 'in'))) {
-          each(get(val, 'in'), (hex) => {
-            hexOptions.push(hex);
-          });
-        }
-      });
-      return hexOptions;
-  }
+    const hexOptions = [];
+    each(validations, (val) => {
+      if (has(val, 'in') && isArray(get(val, 'in'))) {
+        each(get(val, 'in'), (hex) => {
+          hexOptions.push(hex);
+        });
+      }
+    });
+    return hexOptions;
+  };
 
   const handleColorChange = (e) => {
     const hex = e.currentTarget.getAttribute('data-hex');
     sdk.field.setValue(hex);
     setFieldValue(hex);
-  }
+  };
 
   return (
     <div>
@@ -50,11 +50,19 @@ const ColorPicker = ({ sdk }) => {
         ))}
       </ul>
     </div>
-  )
-}
+  );
+};
 
 ColorPicker.propTypes = {
-  sdk: sdkProps.isRequired,
-}
+  sdk: PropTypes.shape({
+    field: PropTypes.shape({
+      getValue: PropTypes.func.isRequired,
+      setValue: PropTypes.func.isRequired,
+      validations: PropTypes.arrayOf(PropTypes.shape({
+        in: PropTypes.array,
+      }))
+    })
+  }).isRequired
+};
 
 export default ColorPicker;

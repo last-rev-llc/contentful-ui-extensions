@@ -15,7 +15,6 @@ import App from './extensions/App';
     });
   } else {
     // Loaded locally
-    const sdk = {}; // Create empty object for component use later
     ReactDOM.render(
       <App />,
       document.querySelector('#root')

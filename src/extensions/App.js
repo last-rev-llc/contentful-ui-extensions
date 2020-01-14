@@ -12,17 +12,17 @@ const App = ({ sdk }) => {
     <Router history={history}>
       <Switch>
         <Route path="/"
-               exact
-               component={ExtensionsList} />
+          exact
+          component={ExtensionsList} />
         <Route path="/color-picker"
-               exact
-               component={() => <ColorPicker sdk={sdk || mockSdk} />} />
+          exact
+          component={() => <ColorPicker sdk={sdk || mockSdk} />} />
         <Route path="/seo"
-               exact
-               component={() => <ColorPicker sdk={sdk || mockSdk} />} />
+          exact
+          component={() => <ColorPicker sdk={sdk || mockSdk} />} />
       </Switch>
     </Router>
-  )
+  );
 };
 
 App.propTypes = {

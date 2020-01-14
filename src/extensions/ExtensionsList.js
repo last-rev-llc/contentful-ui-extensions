@@ -5,9 +5,9 @@ export default function ExtensionsList() {
   return (
     <div>
       <Link to="/color-picker"
-            className="">Color</Link>
+        className="">Color</Link>
       <Link to="/seo"
-            className="">Seo</Link>
+        className="">Seo</Link>
     </div>
-  )
+  );
 }

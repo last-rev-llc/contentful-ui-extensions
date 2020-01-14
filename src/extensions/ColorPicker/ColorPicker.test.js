@@ -1,22 +1,20 @@
 /* eslint-disable no-console */
 import React from 'react';
-import _ from 'lodash';
 import { render, cleanup, fireEvent } from '@testing-library/react';
 import ColorPicker from './ColorPicker';
 
-import mockSdk from './mockSdk';
+import sdk from './mockSdk';
 
 afterEach(() => {
   cleanup();
 });
-
 
 describe('<ColorPicker />', () => {
   // Ensure the component fails correctly
   test.todo('shows error message when sdk not present');
 
   test('buttons have the required attributes', () => {
-    const { container } = render(<ColorPicker sdk={mockSdk} />);
+    const { container } = render(<ColorPicker sdk={sdk} />);
     const button = container.firstChild.querySelector('button');
     expect(button.getAttribute('type'))
       .toEqual('button');
@@ -25,40 +23,39 @@ describe('<ColorPicker />', () => {
   });
 
   test('render the same number of buttons as validations', () => {
-    const { getAllByTestId } = render(<ColorPicker sdk={mockSdk} />);
+    const { getAllByTestId } = render(<ColorPicker sdk={sdk} />);
     expect(getAllByTestId('ColorPicker-button').length)
-      .toBe(mockSdk.field.validations[0].in.length);
+      .toBe(sdk.field.validations[0].in.length);
   });
 
   test('add the class active if the value matches the hex', () => {
-    const { container } = render(<ColorPicker sdk={mockSdk} />);
+    const { container } = render(<ColorPicker sdk={sdk} />);
     expect(container.firstChild.querySelectorAll('.active').length)
       .toBe(1);
     expect(container.firstChild.querySelector('.active').getAttribute('data-hex'))
-      .toEqual(mockSdk.field.getValue())
+      .toEqual(sdk.field.getValue());
   });
 
   test('no button with active class if there is not a value for the field', () => {
-    const sdk = {
+    const { container } = render(<ColorPicker sdk={{
       field: {
-        ...mockSdk.field,
+        ...sdk.field,
         getValue: () => '',
       }
-    };
-    const { container } = render(<ColorPicker sdk={sdk} />);
+    }} />);
     expect(container.firstChild.querySelectorAll('.active').length)
       .toBe(0);
-  })
+  });
 
   test('adds active class to correct button on click event', () => {
     const handleColorChange = jest.fn();
-    const sdk = {
-      field: {
-        ...mockSdk.field,
-        setValue: handleColorChange,
-      }
-    };
-    const { container, getAllByTestId } = render(<ColorPicker sdk={sdk} />);
+    const { container, getAllByTestId } = render(
+      <ColorPicker sdk={{
+        field: {
+          ...sdk.field,
+          setValue: handleColorChange,
+        }
+      }}/>);
     
     fireEvent.click(getAllByTestId('ColorPicker-button')[1]);
     expect(handleColorChange)
@@ -72,13 +69,12 @@ describe('<ColorPicker />', () => {
 
   test('adds active class to correct button on keydown event', () => {
     const handleColorChange = jest.fn();
-    const sdk = {
+    const { container, getAllByTestId } = render(<ColorPicker sdk={{
       field: {
-        ...mockSdk.field,
+        ...sdk.field,
         setValue: handleColorChange,
       }
-    };
-    const { container, getAllByTestId } = render(<ColorPicker sdk={sdk} />);
+    }} />);
     
     fireEvent.keyDown(getAllByTestId('ColorPicker-button')[1]);
     expect(handleColorChange)

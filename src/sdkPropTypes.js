@@ -8,6 +8,6 @@ const sdkProps = PropTypes.shape({
       in: PropTypes.array,
     }))
   })
-})
+});
 
 export default sdkProps;
