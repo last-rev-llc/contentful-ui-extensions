@@ -15,8 +15,28 @@ const sdk = {
     },
     setValue: () => {
       return null;
-    }
+    },
+    locale: 'en-US',
   },
+  dialogs: {
+    selectSingleAsset: (options) => new Promise((resolve, reject) => {
+      resolve({
+        sys: {
+          id: '1213456',
+        },
+        fields: {
+          file: {
+            'en-US': {
+              url: '//placehold.it/600x315'
+            }
+          },
+          title: {
+            'en-US': 'The is the placeholder image'
+          }
+        }
+      });
+    })
+  }
 };
 
 export default sdk;

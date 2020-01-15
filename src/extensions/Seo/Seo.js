@@ -29,26 +29,6 @@ const Seo = ({ sdk }) => {
     return get(seoObject, 'robots.value', '') === 'index,follow';
   };
 
-  const renderGooglePreview = () => {
-    return (
-      <TabPanel id="preview"
-        className="tab-panel">
-        <div className="search-preview">
-          <a href="#">
-            <h3 className="">{get(seoObject, 'title.value', 'Please enter a page Title')}</h3>
-            <br />
-            <div className="cite">
-              <cite className="">https://www.linkedin.com › company › contentful</cite>
-            </div>
-            <div className="description">
-              {get(seoObject, 'description.value', 'Please enter a meta description that is between 100 and 250 characters long')}
-            </div>
-          </a>
-        </div>
-      </TabPanel>
-    );
-  };
-
   const renderTabs = () => {
     return (
       <Tabs withDivider>
@@ -65,6 +45,26 @@ const Seo = ({ sdk }) => {
           selected={selected === 'twitter'}
           onSelect={() => setSelected('twitter')}>Twitter</Tab>
       </Tabs>
+    );
+  };
+
+  const renderPreview = () => {
+    return (
+      <TabPanel id="preview"
+        className="tab-panel">
+        <div className="search-preview">
+          <a href="#">
+            <h3 className="">{get(seoObject, 'title.value', 'Please enter a page Title')}</h3>
+            <br />
+            <div className="cite">
+              <cite className="">https://www.linkedin.com › company › contentful</cite>
+            </div>
+            <div className="description">
+              {get(seoObject, 'description.value', 'Please enter a meta description that is between 100 and 250 characters long')}
+            </div>
+          </a>
+        </div>
+      </TabPanel>
     );
   };
 
@@ -144,7 +144,9 @@ const Seo = ({ sdk }) => {
   };
 
   const handleAssetSelection = async (metaTagName) => {
-    const asset = await sdk.dialogs.selectSingleAsset(sdk.field.locale);
+    const asset = await sdk.dialogs.selectSingleAsset({
+      locale: sdk.field.locale,
+    });
     // TODO: add status https://www.contentful.com/developers/docs/tutorials/general/determine-entry-asset-state/
     onFieldChange({
       name: metaTagName,
@@ -234,7 +236,7 @@ const Seo = ({ sdk }) => {
     <>
       {renderTabs()}
       {selected === 'preview' && (
-        renderGooglePreview()
+        renderPreview()
       )}
       {selected === 'general' && (
         renderGeneralTab()
