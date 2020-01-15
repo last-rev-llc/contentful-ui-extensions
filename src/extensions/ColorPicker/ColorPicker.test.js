@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import { render, cleanup, fireEvent } from '@testing-library/react';
 import ColorPicker from './ColorPicker';

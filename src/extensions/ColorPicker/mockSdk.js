@@ -3,14 +3,14 @@ const sdk = {
     validations: [
       {
         in: [
-          '#FFFFFF',
+          '#BBBBBB',
           '#000000',
           '#333333'
         ]
       }
     ],
     getValue: () => {
-      return '#FFFFFF';
+      return '#BBBBBB';
     },
     setValue: () => {
       return null;

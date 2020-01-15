@@ -1,4 +1,4 @@
-const options = [
+const metaDataOptions = [
   {
     tag: 'select',
     value: 'robots',
@@ -53,4 +53,4 @@ const options = [
   }
 ];
 
-export default options;
+export default metaDataOptions;

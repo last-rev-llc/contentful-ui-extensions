@@ -1,200 +1,44 @@
-.d-flex {
-  display: flex;
+.tab-panel {
+  padding: 10px;
 }
 
-#btn-add-metadata {
-  line-height: 18px;
+.fieldset {
+  margin-top: 10px;
 }
 
-#metadata-fields {
-  display: flex;
-  flex-direction: column;
-  margin-top: 3rem;
-}
-
-.cf-form-field {
-  padding-left: 1em;
-  border-left: 2px solid #c5d2d8;
-  -webkit-transition: border-color 0.18s linear;
-  transition: border-color 0.18s linear;
-}
-
-.cf-form-field:focus-within {
-  border-left-color: #4a90e2;
-}
-
-textarea.cf-form-input {
-  height: 2em;
-}
-
-input.cf-form-input[type=text] {
-  outline: none;
-  background-color: #fff;
-  border: 1px solid #d3dce0;
-  max-height: 2.5rem;
-  color: #536171;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
-  font-size: .875rem;
-  padding: .65625rem;
+.search-preview {
+  font-family: arial,sans-serif;
+  line-height: 1.57;
+  font-size: small;
+  font-weight: normal;
   margin: 0;
-  width: 100%;
-  height: 40px;
+  & a {
+    text-decoration: none;
+  }
+  & h3 {
+    font-size: 20px;
+    line-height: 1.3;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    color: #1a0dab;
+  }
+  & .cite {
+    padding-bottom: 0px;
+    padding-top: 1px;
+    display: inline-block;
+    & cite {
+      font-size: 16px;
+      padding-top: 1px;
+      line-height: 1.5;
+      color: #006621;
+      font-style: normal;
+    }
+  }
+  & .description {
+    color: #545454;
+    max-width: 48em;
+    font-size: 14px;
+  }
 }
 
-.cf-form-image-wrap {
-  height: 200px;
-  width: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.cf-form-image-wrap span {
-  position: absolute;
-  height: 100px;
-  width: 200px;
-  color: rgb(255, 178, 57);
-  font-weight: bold;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  display: none;
-}
-
-.cf-form-image-wrap span.select-image {
-  top: 0;
-}
-
-.cf-form-image-wrap span.upload-image {
-  top: 100px;
-}
-
-.cf-form-image-wrap:hover span:hover {
-  background-color: rgba(25, 37, 50, .95);
-}
-
-.cf-form-image-wrap:hover span {
-  display: flex;
-  background-color: rgba(38, 53, 69, .95);
-}
-
-.cf-form-image {
-  max-width: 100%;
-  width: auto;
-}
-
-[data-action=delete] {
-  padding: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  display: none;
-  height: 40px;
-  width: 40px;
-  align-content: center;
-  justify-content: center;
-}
-
-.input-field-wrap {
-  position: relative;
-  padding-right: 40px;
-}
-
-.cf-form-field:hover [data-action=delete],
-.cf-form-field *:focus [data-action=delete],
-.cf-form-field *:focus-within [data-action=delete] {
-  display: flex;
-}
-
-select.cf-form-input {
-  width: 100%;
-  display: block;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  padding: .625rem 2.4375rem .625rem .625rem;
-  background-color: #fff;
-  color: #536171;
-  font-size: .875rem;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
-  border: 1px solid #d3dce0;
-  border-radius: 0;
-  height: 2.5rem;
-}
-
-select.cf-form-input.cf-btn-primary {
-  -webkit-appearance: button;
-  -webkit-writing-mode: horizontal-tb !important;
-  text-rendering: auto;
-  color: buttontext;
-  letter-spacing: normal;
-  word-spacing: normal;
-  text-transform: none;
-  text-indent: 0px;
-  text-shadow: none;
-  display: inline-block;
-  text-align: center;
-  align-items: flex-start;
-  cursor: default;
-  background-color: buttonface;
-  box-sizing: border-box;
-  margin: 0em;
-  font: 400 11px system-ui;
-  padding: 1px 7px 2px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
-  border-image: initial;
-  display: inline-block;
-  padding: 0.625rem 1.5rem;
-  cursor: pointer;
-  text-align: center;
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  border: 1px solid transparent;
-  border-radius: 2px;
-  line-height: 18px;
-  color: #fff;
-  background: -webkit-linear-gradient(bottom, #3c80cf, #5b9fef);
-  background: -moz-linear-gradient(bottom, #3c80cf, #5b9fef);
-  background: -o-linear-gradient(bottom, #3c80cf, #5b9fef);
-  background: -ms-linear-gradient(bottom, #3c80cf, #5b9fef);
-  background: linear-gradient(to top, #3c80cf, #5b9fef);
-  -webkit-background-size: 100% 200%;
-  -moz-background-size: 100% 200%;
-  background-size: 100% 200%;
-  -webkit-transition-property: all;
-  -moz-transition-property: all;
-  -o-transition-property: all;
-  -ms-transition-property: all;
-  transition-property: all;
-  -webkit-transition-timing-function: ease-in-out;
-  -moz-transition-timing-function: ease-in-out;
-  -o-transition-timing-function: ease-in-out;
-  -ms-transition-timing-function: ease-in-out;
-  transition-timing-function: ease-in-out;
-  -webkit-transition-duration: 0.1s;
-  -moz-transition-duration: 0.1s;
-  -o-transition-duration: 0.1s;
-  -ms-transition-duration: 0.1s;
-  transition-duration: 0.1s;
-  border-color: #3c80cf;
-}
-
-label {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  font-size: 14px;
-  line-height: 24px;
-  color: #8091a5;
-  width: 100%;
-  max-width: 800px;
-}
-
-select.cf-form-input.cf-btn-primary:hover {
-  border-color: #3072be;
-  background-position: 0 100%;
-}
