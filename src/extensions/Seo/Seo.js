@@ -57,7 +57,7 @@ const Seo = ({ sdk }) => {
             <h3 className="">{get(seoObject, 'title.value', 'Please enter a page Title')}</h3>
             <br />
             <div className="cite">
-              <cite className="">https://www.linkedin.com › company › contentful</cite>
+              <cite className="">https://www.lastrev.com › company › about</cite>
             </div>
             <div className="description">
               {get(seoObject, 'description.value', 'Please enter a meta description that is between 100 and 250 characters long')}

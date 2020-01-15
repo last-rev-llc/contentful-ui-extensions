@@ -1,7 +1,7 @@
 const mockSeoJson = {
   "title":{"name":"title","value":"Last Rev: Connecting the Modern Web"},
   "robots":{"name":"robots","value":"index,follow"},
-  "description":{"name":"description","value":"This is my metta description"},
+  "description":{"name":"description","value":"Me non paenitet nullum festiviorem excogitasse ad hoc. Unam incolunt Belgae, aliam Aquitani, tertiam. Inmensae subtilitatis, obscuris et malesuada fames."},
   "keywords":{"name":"keywords","value":"These, are my, keywords"},
   "og:title":{"name":"og:title","value":"Social Sharing Title"},
   "og:description":{"name":"og:description","value":"Social Sharing Description"},
