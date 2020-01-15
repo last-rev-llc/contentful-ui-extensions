@@ -15,14 +15,6 @@ const Seo = ({ sdk }) => {
   }, [sdk.field]);  
 
   const onFieldChange = (field) => {
-    console.log('field updating', field);
-    console.log('field values',{
-      ...seoObject,
-      [field.name]: {
-        name: field.name,
-        value: field.value
-      },
-    });
     setSeoObject({
       ...seoObject,
       [field.name]: {
@@ -30,7 +22,6 @@ const Seo = ({ sdk }) => {
         value: field.value
       },
     });
-    console.log('seoObject: After state change', seoObject);
     sdk.field.setValue(seoObject);
   };
 
@@ -154,7 +145,6 @@ const Seo = ({ sdk }) => {
 
   const handleAssetSelection = async (metaTagName) => {
     const asset = await sdk.dialogs.selectSingleAsset(sdk.field.locale);
-    console.log(asset);
     // TODO: add status https://www.contentful.com/developers/docs/tutorials/general/determine-entry-asset-state/
     onFieldChange({
       name: metaTagName,
@@ -166,9 +156,7 @@ const Seo = ({ sdk }) => {
   };
 
   const renderSocialImage = (metaTag) => {
-    console.log('seoObject', seoObject);
     const image = get(seoObject, metaTag);
-    console.log(image);
 
     if(image && image.value) {
       return (
@@ -266,7 +254,11 @@ Seo.propTypes = {
     field: PropTypes.shape({
       getValue: PropTypes.func.isRequired,
       setValue: PropTypes.func.isRequired,
-    })
+      locale: PropTypes.string.isRequired,
+    }),
+    dialogs: PropTypes.shape({
+      selectSingleAsset: PropTypes.func.isRequired,
+    }).isRequired
   }).isRequired
 };
 
