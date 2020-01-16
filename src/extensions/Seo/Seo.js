@@ -5,7 +5,6 @@ import { get } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './Seo.scss';
 import PropTypes from 'prop-types';
-import SeoConfig from './SeoConfig';
 
 const Seo = ({ sdk }) => {
   const [seoObject, setSeoObject] = useState({});
@@ -255,7 +254,7 @@ const Seo = ({ sdk }) => {
 
   return (
     <>
-      <SeoConfig sdk={sdk} />
+      {renderUiExtension()}
       {console.log(sdk)}
     </>
   );

@@ -12,7 +12,7 @@ import ExtensionsList from './ExtensionsList';
 import history from '../history';
 
 import {default as colorPickerMockSdk} from './ColorPicker/mockSdk';
-import {default as seoColorPickerMockSdk} from './Seo/mockSdk';
+import {default as seoMockSdk} from './Seo/mockSdk';
 import {default as animalAppMockSdk} from './AnimalApp/mockSdk';
 
 const App = ({ sdk, locations }) => {
@@ -28,8 +28,17 @@ const App = ({ sdk, locations }) => {
             locations={locations} />} />
         <Route path="/seo"
           exact
-          component={() => <SeoConfig sdk={sdk || seoColorPickerMockSdk}
-            locations={locations} />} />
+          // component={() => <AnimalApp sdk={sdk || seoMockSdk}
+          //   locations={locations} />} />
+          component={() => {
+            const usedSdk = sdk || seoMockSdk;
+            if(usedSdk.location.is(locations.LOCATION_APP)) {
+              return <SeoConfig sdk={usedSdk}
+                locations={locations} />;
+            }
+            return <Seo sdk={sdk || usedSdk}
+              locations={locations} />;
+          }}/>
         <Route path="/animal"
           exact
           component={() => <AnimalApp sdk={sdk || animalAppMockSdk}
@@ -40,7 +49,7 @@ const App = ({ sdk, locations }) => {
 };
 
 App.propTypes = {
-  sdk: PropTypes.object.isRequired,
+  sdk: PropTypes.object,
   locations: PropTypes.shape({
     LOCATION_ENTRY_FIELD: PropTypes.string.isRequired,
     LOCATION_ENTRY_FIELD_SIDEBAR: PropTypes.string.isRequired,
