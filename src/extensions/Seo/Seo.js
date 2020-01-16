@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './Seo.scss';
 import PropTypes from 'prop-types';
+import SeoConfig from './SeoConfig';
 
 const Seo = ({ sdk }) => {
   const [seoObject, setSeoObject] = useState({});
@@ -232,23 +233,34 @@ const Seo = ({ sdk }) => {
     );
   };
 
+  const renderUiExtension = () => {
+    return (
+      <>
+        {renderTabs()}
+        {selected === 'preview' && (
+          renderPreview()
+        )}
+        {selected === 'general' && (
+          renderGeneralTab()
+        )}
+        {selected === 'facebook' && (
+          renderFacebookTab()
+        )}
+        {selected === 'twitter' && (
+          renderTwitterTab()
+        )}
+      </>
+    );
+  };
+
   return (
     <>
-      {renderTabs()}
-      {selected === 'preview' && (
-        renderPreview()
-      )}
-      {selected === 'general' && (
-        renderGeneralTab()
-      )}
-      {selected === 'facebook' && (
-        renderFacebookTab()
-      )}
-      {selected === 'twitter' && (
-        renderTwitterTab()
-      )}
+      <SeoConfig sdk={sdk} />
+      {console.log(sdk)}
     </>
   );
+
+  
 };
 
 Seo.propTypes = {
