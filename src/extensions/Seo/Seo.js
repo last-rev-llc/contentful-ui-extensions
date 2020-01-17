@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, {useState, useEffect} from 'react';
 import {Tabs, Tab, TabPanel, TextField, FieldGroup, RadioButtonField, FormLabel, Note, AssetCard, HelpText, Button} from '@contentful/forma-36-react-components';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './Seo.scss';
 import PropTypes from 'prop-types';
@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 const Seo = ({ sdk }) => {
   const [seoObject, setSeoObject] = useState({});
   const [selected, setSelected] = useState('preview');
+  const [pageTitleValue, setPageTitleValue] = useState('');
 
   useEffect(() => {
     setSeoObject(sdk.field.getValue());
@@ -68,10 +69,23 @@ const Seo = ({ sdk }) => {
     );
   };
 
+  // sdk.entry.fields.title.onValueChanged((value) => {
+  //   console.log('VALUE', value);
+  //   if(value && value !== pageTitleValue) {
+  //     console.log('will change');
+  //     onFieldChange({
+  //       name: 'title',
+  //       value: `${get(sdk, 'parameters.installation.siteName', '')} | ${value}`
+  //     });
+  //   }
+  // });
+
+
   const renderGeneralTab = () => {
     return (
       <TabPanel id="general"
         className="tab-panel">
+        {console.log('CURRENT TITLE', get(seoObject, 'title.value'))}
         <TextField id="title"
           testid="Seo-title"
           name="title"
@@ -82,7 +96,11 @@ const Seo = ({ sdk }) => {
             onKeyPress: (e) => onFieldChange(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
           }}
-          value={get(seoObject, 'title.value' || '')}
+          value={
+            isEmpty(get(seoObject, 'title.value')) ?
+              get(sdk, 'parameters.installation.siteName', '') :
+              get(seoObject, 'title.value')
+          }
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
