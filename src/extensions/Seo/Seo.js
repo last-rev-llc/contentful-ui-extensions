@@ -35,16 +35,20 @@ const Seo = ({ sdk }) => {
       <Tabs withDivider>
         <Tab id="preview"
           selected={selected === 'preview'}
-          onSelect={() => setSelected('preview')}>Preview</Tab>
+          onSelect={() => setSelected('preview')}
+          data-testid="Seo-tab-preview">Preview</Tab>
         <Tab id="general"
           selected={selected === 'general'}
-          onSelect={() => setSelected('general')}>General</Tab>
+          onSelect={() => setSelected('general')}
+          data-testid="Seo-tab-general">General</Tab>
         <Tab id="facebook"
           selected={selected === 'facebook'}
-          onSelect={() => setSelected('facebook')}>Facebook</Tab>
+          onSelect={() => setSelected('facebook')}
+          data-testid="Seo-tab-facebook">Facebook</Tab>
         <Tab id="twitter"
           selected={selected === 'twitter'}
-          onSelect={() => setSelected('twitter')}>Twitter</Tab>
+          onSelect={() => setSelected('twitter')}
+          data-testid="Seo-tab-twitter">Twitter</Tab>
       </Tabs>
     );
   };
@@ -52,15 +56,19 @@ const Seo = ({ sdk }) => {
   const renderPreview = () => {
     return (
       <TabPanel id="preview"
-        className="tab-panel">
+        className="tab-panel"
+        data-testid="Seo-tabpanel-preview">
         <div className="search-preview">
           <a href="#">
-            <h3 className="">{get(seoObject, 'title.value', 'Please enter a page Title')}</h3>
+            <h3 className=""
+              data-testid="Seo-tabpanel-preview-pageTitle">{get(seoObject, 'title.value', 'Please enter a page Title')}</h3>
             <br />
             <div className="cite">
-              <cite className="">https://www.lastrev.com › company › about</cite>
+              <cite className=""
+                data-testid="Seo-tabpanel-preview-cite">https://www.lastrev.com › company › about</cite>
             </div>
-            <div className="description">
+            <div className="description"
+              data-testid="Seo-tabpanel-preview-description">
               {get(seoObject, 'description.value', 'Please enter a meta description that is between 100 and 250 characters long')}
             </div>
           </a>
@@ -69,22 +77,23 @@ const Seo = ({ sdk }) => {
     );
   };
 
-  // sdk.entry.fields.title.onValueChanged((value) => {
-  //   console.log('VALUE', value);
-  //   if(value && value !== pageTitleValue) {
-  //     console.log('will change');
-  //     onFieldChange({
-  //       name: 'title',
-  //       value: `${get(sdk, 'parameters.installation.siteName', '')} | ${value}`
-  //     });
-  //   }
-  // });
+  sdk.entry.fields.title.onValueChanged((value) => {
+    console.log('VALUE', value);
+    if(value && value !== pageTitleValue) {
+      console.log('will change');
+      onFieldChange({
+        name: 'title',
+        value: `${get(sdk, 'parameters.installation.siteName', '')} | ${value}`
+      });
+    }
+  });
 
 
   const renderGeneralTab = () => {
     return (
       <TabPanel id="general"
-        className="tab-panel">
+        className="tab-panel"
+        data-testid="Seo-tabpanel-general">
         {console.log('CURRENT TITLE', get(seoObject, 'title.value'))}
         <TextField id="title"
           testid="Seo-title"
@@ -104,7 +113,8 @@ const Seo = ({ sdk }) => {
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
-          className="fieldset" />
+          className="fieldset"
+          data-testid="Seo-tabpanel-general-title"/>
         <TextField id="description"
           textarea
           testid="Seo-description"
@@ -118,7 +128,8 @@ const Seo = ({ sdk }) => {
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
-          className="fieldset" />
+          className="fieldset"
+          data-testid="Seo-tabpanel-general-description"/>
         <TextField id="keywords"
           testid="Seo-keywords"
           name="keywords"
@@ -131,7 +142,8 @@ const Seo = ({ sdk }) => {
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
-          className="fieldset" />
+          className="fieldset"
+          data-testid="Seo-tabpanel-general-keywords"/>
         <FieldGroup className="fieldset">
           <FormLabel className="fieldset"
             htmlFor="robots">Would you like this content to be indexed by search engines?</FormLabel>
@@ -144,7 +156,8 @@ const Seo = ({ sdk }) => {
             id="robots1"
             inputProps={{
               onBlur: (e) => onFieldChange(e.currentTarget)
-            }}/>
+            }}
+            data-testid="Seo-tabpanel-general-noindex-true"/>
           <RadioButtonField
             labelText="No"
             name="robots"
@@ -154,9 +167,11 @@ const Seo = ({ sdk }) => {
             id="robots2"
             inputProps={{
               onBlur: (e) => onFieldChange(e.currentTarget)
-            }}/>
+            }}
+            data-testid="Seo-tabpanel-general-noindex-false"/>
         </FieldGroup>
-        {isSearchVisible() ?  null : <Note noteType="warning">Your content is not being indexed</Note>}
+        {isSearchVisible() ?  null : <Note noteType="warning"
+          data-testid="Seo-tabpanel-general-noindex-note">Your content is not being indexed</Note>}
       </TabPanel>
     );
   };
@@ -188,7 +203,8 @@ const Seo = ({ sdk }) => {
             isLoading={false}
             src={image.value.url}
             title={image.value.title}
-            size="default" />
+            size="default"
+            data-testid="Seo-socialImage-assetCard"/>
         </div>
       );
 
@@ -196,7 +212,8 @@ const Seo = ({ sdk }) => {
     return (
       <div>
         <Button buttonType="positive"
-          onClick={() => handleAssetSelection('og:image')}>Select an Image</Button>
+          onClick={() => handleAssetSelection('og:image')}
+          data-testid="Seo-socialImage-button">Select an Image</Button>
       </div>
     );
   };
@@ -205,7 +222,8 @@ const Seo = ({ sdk }) => {
     // TODO: Add a preview for facebook https://github.com/hugodias/facebook-post-preview/blob/master/src/components/facebook-mobile-post/FacebookMobilePost.js
     return (
       <TabPanel id="facebook"
-        className="tab-panel">        
+        className="tab-panel"
+        data-testid="Seo-tabpanel-facebook">        
         <TextField id="og:title"
           testid="Seo-facebook-og:title"
           name="og:title"
@@ -219,7 +237,8 @@ const Seo = ({ sdk }) => {
           value={get(seoObject, 'og:title.value' || '')}
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)} />
+          onBlur={(e) => onFieldChange(e.currentTarget)}
+          data-testid="Seo-tabpanel-og:title"/>
         <TextField id="og:description"
           textarea
           testid="Seo-og:description"
@@ -233,7 +252,8 @@ const Seo = ({ sdk }) => {
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
-          className="fieldset" />
+          className="fieldset"
+          data-testid="Seo-tabpanel-og:description"/>
         <FormLabel className="fieldset"
           htmlFor="robots">Post Image</FormLabel>
         {renderSocialImage('og:image')}

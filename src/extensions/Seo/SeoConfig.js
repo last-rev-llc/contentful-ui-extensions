@@ -95,13 +95,15 @@ class SeoConfig extends Component {
         labelText="Chose your Content Types to configure SEO"
         onChange={(e) => this.handleContentTypeFieldChange(e.currentTarget)}
         name="contentType"
-        id="contentType">
+        id="contentType"
+        data-testid="SeoConfig-select-contentType">
         <Option value="0"
           key="0">Please select a Content Type</Option>
         {contentTypeDropdownOptions.map((contentType) => {
           return (
             <Option value={contentType.sys.id}
-              key={contentType.sys.id}>
+              key={contentType.sys.id}
+              data-testid="SeoConfig-option-contentType">
               {contentType.name}
             </Option>
           );
@@ -148,14 +150,17 @@ class SeoConfig extends Component {
       <Select className="fieldset"
         onChange={(e) => this.handleDefaultFieldChange(e.currentTarget, contentTypeId)}
         name={fieldPath}
-        value={currentValue}>
+        value={currentValue}
+        data-testid="SeoConfig-select-fields">
         <Option value="0"
-          key="0">--</Option>
+          key="0"
+          data-testid="SeoConfig-option-fields-default">--</Option>
         {validFields.map((field) => {
           return (
             // TODO: Show a link to edit the content type if no valid one exists for the dropdown
             <Option value={field.id}
-              key={field.id}>
+              key={field.id}
+              data-testid="SeoConfig-option-fields">
               {field.name}
             </Option>
           );
@@ -177,7 +182,8 @@ class SeoConfig extends Component {
     if(!isEmpty(contentTypeConfig) && get(contentTypeConfig, contentType.sys.id)) {
       // TODO: get teh full content type
       return (
-        <TableRow key={Math.random()}>
+        <TableRow key={Math.random()}
+          data-testid="SeoConfig-tablerow-contentType">
           <TableCell>
             <IconButton
               iconProps={{
@@ -185,14 +191,15 @@ class SeoConfig extends Component {
               }}
               buttonType="negative"
               label="Delete Row"
-              onClick={() => this.handleRemoveButton(contentType.sys.id)}/>
+              onClick={() => this.handleRemoveButton(contentType.sys.id)}
+              data-testid="SeoConfig-button-contentType-delete"/>
           </TableCell>
-          <TableCell>{contentType.name}</TableCell>
-          <TableCell>{this.renderDefaultFieldConfig('fieldId', contentType.fields, 'Object', contentType.sys.id)}</TableCell>
-          <TableCell>yes/no</TableCell>
-          <TableCell>{this.renderDefaultFieldConfig('settings.defaultPageTitleField', contentType.fields, 'Symbol', contentType.sys.id)}</TableCell>
-          <TableCell>{this.renderDefaultFieldConfig('settings.defaultDescriptionField', contentType.fields, 'Symbol', contentType.sys.id)}</TableCell>
-          <TableCell>{this.renderDefaultFieldConfig('settings.defaultSocialImageField', contentType.fields, 'Asset', contentType.sys.id)}</TableCell>
+          <TableCell data-testid="SeoConfig-tablecell-contentType-name">{contentType.name}</TableCell>
+          <TableCell data-testid="SeoConfig-tablecell-contentType-seo">{this.renderDefaultFieldConfig('fieldId', contentType.fields, 'Object', contentType.sys.id)}</TableCell>
+          <TableCell data-testid="SeoConfig-tablecell-contentType-noindex">yes/no</TableCell>
+          <TableCell data-testid="SeoConfig-tablecell-contentType-defaultPageTitleField">{this.renderDefaultFieldConfig('settings.defaultPageTitleField', contentType.fields, 'Symbol', contentType.sys.id)}</TableCell>
+          <TableCell data-testid="SeoConfig-tablecell-contentType-defaultDescriptionField">{this.renderDefaultFieldConfig('settings.defaultDescriptionField', contentType.fields, 'Symbol', contentType.sys.id)}</TableCell>
+          <TableCell data-testid="SeoConfig-tablecell-contentType-defaultSocialImageField">{this.renderDefaultFieldConfig('settings.defaultSocialImageField', contentType.fields, 'Asset', contentType.sys.id)}</TableCell>
         </TableRow>
       );
     }
@@ -207,16 +214,16 @@ class SeoConfig extends Component {
       <Table className="fieldset">
         <TableHead>
           <TableRow>
-            <TableCell />
-            <TableCell>Content Type</TableCell>
-            <TableCell>SEO Field</TableCell>
-            <TableCell>No Index</TableCell>
-            <TableCell>Page Title Field</TableCell>
-            <TableCell>Description Field</TableCell>
-            <TableCell>Image Field</TableCell>
+            <TableCell data-testid="SeoConfig-tablehead-contentType-delete"/>
+            <TableCell data-testid="SeoConfig-tablehead-contentType-name">Content Type</TableCell>
+            <TableCell data-testid="SeoConfig-tablehead-contentType-seo">SEO Field</TableCell>
+            <TableCell data-testid="SeoConfig-tablehead-contentType-noindex">No Index</TableCell>
+            <TableCell data-testid="SeoConfig-tablehead-contentType-defaultPageTitleField">Page Title Field</TableCell>
+            <TableCell data-testid="SeoConfig-tablehead-contentType-defaultDescriptionField">Description Field</TableCell>
+            <TableCell data-testid="SeoConfig-tablehead-contentType-defaultSocialImageField">Image Field</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody data-testid="SeoConfig-tablebody-contentType">
           {isEmpty(contentTypeConfig) ?
             this.renderContentTypeConfigRow() :
             keys(contentTypeConfig).map((contentTypeId) => {
@@ -232,6 +239,10 @@ class SeoConfig extends Component {
     
   }
 
+  handleFieldChange = (field) => {
+
+  };
+
   render () {
     const {parameters} = this.state;
     return (
@@ -244,7 +255,8 @@ class SeoConfig extends Component {
           descriptionProps={{
             text:
             'Fabio vel iudice vincam, sunt in culpa qui officia. Me non paenitet nullum festiviorem excogitasse ad hoc. Cum sociis natoque penatibus et magnis dis parturient.',
-          }}/>
+          }}
+          data-testid="SeoConfig-intro"/>
         <div className="fields">
           <TextField id="siteName"
             testid="SeoConfig-siteName"
@@ -253,13 +265,14 @@ class SeoConfig extends Component {
             helpText="The title of your website that is appended to the end of your page title"
             textInputProps={{
               maxLength: 10,
-              onKeyPress: (e) => this.handleFieldChange(e.currentTarget),
-              onBlur: (e) => this.handleFieldChange(e.currentTarget),
+              onKeyPress: (e) => this.handleDefaultFieldChange(e.currentTarget),
+              onBlur: (e) => this.handleDefaultFieldChange(e.currentTarget),
             }}
             value={get(parameters, 'siteName' || '')}
             countCharacters
-            onChange={(e) => this.handleFieldChange(e.currentTarget)}
-            onBlur={(e) => this.handleFieldChange(e.currentTarget)} />
+            onChange={(e) => this.handleDefaultFieldChange(e.currentTarget)}
+            onBlur={(e) => this.handleDefaultFieldChange(e.currentTarget)}
+            data-testid="SeoConfig-siteName"/>
         </div>
         {this.renderContentTypeDropdown()}
         {this.renderContentTypeConfigTable()}

@@ -8,23 +8,34 @@ afterEach(() => {
 });
 
 describe('<SeoConfig />', () => {
-  describe('site title input field', () => {
+  describe('initialize with componentDidMount()', () => {
     test.todo('');
   });
 
-  describe('global default image', () => {
-    test.todo('');
-  });
-
-  describe('content type dropdown', () => {
+  describe('renderContentTypeDropdown()', () => {
     test.todo('content types that are already selected should not show up in the dropdown');
-  });
-
-  describe('content type rows', () => {
     test.todo('');
   });
 
-  describe('default fields for content type dropdown', () => {
+  describe('renderDefaultFieldConfig()', () => {
+    test.todo('');
+  });
+
+  describe('renderContentTypeConfigRow()', () => {
+  });
+
+  describe('renderContentTypeConfigTable()', () => {
+    test.todo('');
+  });
+
+  describe('handleRemoveButton()', () => {
+    test.todo('');
+  });
+
+  describe('handleDefaultFieldChange()', () => {
+    test.todo('');
+  });
+  describe('handleContentTypeFieldChange()', () => {
     test.todo('');
   });
 });
