@@ -28,8 +28,6 @@ const App = ({ sdk, locations }) => {
             locations={locations} />} />
         <Route path="/seo"
           exact
-          // component={() => <AnimalApp sdk={sdk || seoMockSdk}
-          //   locations={locations} />} />
           component={() => {
             const usedSdk = sdk || seoMockSdk;
             if(usedSdk.location.is(locations.LOCATION_APP)) {

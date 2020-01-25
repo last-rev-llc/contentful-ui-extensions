@@ -22,6 +22,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "testfull": "react-scripts test --verbose --collectCoverage",
     "eject": "react-scripts eject",
     "lint": "eslint . --fix"
   },

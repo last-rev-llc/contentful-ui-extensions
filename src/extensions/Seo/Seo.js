@@ -1,10 +1,11 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, {useState, useEffect} from 'react';
-import {Tabs, Tab, TabPanel, TextField, FieldGroup, RadioButtonField, FormLabel, Note, AssetCard, HelpText, Button} from '@contentful/forma-36-react-components';
-import { get, isEmpty } from 'lodash';
+import {Tabs, Tab, TabPanel, TextField, FieldGroup, RadioButtonField, FormLabel, Note, HelpText } from '@contentful/forma-36-react-components';
+import { get, isEmpty, omit } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './Seo.scss';
 import PropTypes from 'prop-types';
+import SingleAssetWithButton from '../../shared/components/SingleAssetWithButton';
 
 const Seo = ({ sdk }) => {
   const [seoObject, setSeoObject] = useState({});
@@ -16,39 +17,59 @@ const Seo = ({ sdk }) => {
   }, [sdk.field]);  
 
   const onFieldChange = (field) => {
-    setSeoObject({
+    sdk.field.setValue({
       ...seoObject,
       [field.name]: {
         name: field.name,
         value: field.value
       },
+    }).then((response) => {
+      setSeoObject(response);
     });
-    sdk.field.setValue(seoObject);
+  };
+
+  const removeFieldProperty = (metaTagName) => {
+    sdk.field.setValue(omit(seoObject, metaTagName))
+      .then((response) => {
+        setSeoObject(response);
+      });
+  };
+
+  const handleAssetFieldChange = (metaTagName, asset) => {
+    // TODO: add status https://www.contentful.com/developers/docs/tutorials/general/determine-entry-asset-state/
+    onFieldChange({
+      name: metaTagName,
+      value: {
+        url: `https:${get(asset, `fields.file.${get(sdk, 'field.locale')}.url`)}`,
+        id: get(asset, 'sys.id'),
+        title: get(asset, `fields.title.${get(sdk, 'field.locale')}`),
+      }});
   };
 
   const isSearchVisible = () => {
-    return get(seoObject, 'robots.value', '') === 'index,follow';
+    return get(seoObject, 'robots.value', 'index,follow') === 'index,follow';
   };
 
   const renderTabs = () => {
     return (
-      <Tabs withDivider>
+      <Tabs withDivider
+        testId="Seo-tabs">
         <Tab id="preview"
           selected={selected === 'preview'}
           onSelect={() => setSelected('preview')}
-          data-testid="Seo-tab-preview">Preview</Tab>
+          testId="Seo-tab-preview">Preview</Tab>
         <Tab id="general"
           selected={selected === 'general'}
           onSelect={() => setSelected('general')}
-          data-testid="Seo-tab-general">General</Tab>
+          testId="Seo-tab-general">General</Tab>
         <Tab id="facebook"
           selected={selected === 'facebook'}
           onSelect={() => setSelected('facebook')}
-          data-testid="Seo-tab-facebook">Facebook</Tab>
+          testId="Seo-tab-facebook">Facebook</Tab>
         <Tab id="twitter"
           selected={selected === 'twitter'}
           onSelect={() => setSelected('twitter')}
-          data-testid="Seo-tab-twitter">Twitter</Tab>
+          testId="Seo-tab-twitter">Twitter</Tab>
       </Tabs>
     );
   };
@@ -57,18 +78,18 @@ const Seo = ({ sdk }) => {
     return (
       <TabPanel id="preview"
         className="tab-panel"
-        data-testid="Seo-tabpanel-preview">
+        testId="Seo-tabpanel-preview">
         <div className="search-preview">
           <a href="#">
             <h3 className=""
-              data-testid="Seo-tabpanel-preview-pageTitle">{get(seoObject, 'title.value', 'Please enter a page Title')}</h3>
+              data-test-id="Seo-tabpanel-preview-title">{get(seoObject, 'title.value', 'Please enter a page title')}</h3>
             <br />
             <div className="cite">
               <cite className=""
-                data-testid="Seo-tabpanel-preview-cite">https://www.lastrev.com › company › about</cite>
+                data-test-id="Seo-tabpanel-preview-cite">https://www.lastrev.com › company › about</cite>
             </div>
             <div className="description"
-              data-testid="Seo-tabpanel-preview-description">
+              data-test-id="Seo-tabpanel-preview-description">
               {get(seoObject, 'description.value', 'Please enter a meta description that is between 100 and 250 characters long')}
             </div>
           </a>
@@ -77,26 +98,25 @@ const Seo = ({ sdk }) => {
     );
   };
 
-  sdk.entry.fields.title.onValueChanged((value) => {
-    console.log('VALUE', value);
-    if(value && value !== pageTitleValue) {
-      console.log('will change');
-      onFieldChange({
-        name: 'title',
-        value: `${get(sdk, 'parameters.installation.siteName', '')} | ${value}`
-      });
-    }
-  });
+  // sdk.entry.fields.title.onValueChanged((value) => {
+  //   console.log('VALUE', value);
+  //   if(value && value !== pageTitleValue) {
+  //     console.log('will change');
+  //     onFieldChange({
+  //       name: 'title',
+  //       value: `${get(sdk, 'parameters.installation.siteName', '')} | ${value}`
+  //     });
+  //   }
+  // });
 
 
   const renderGeneralTab = () => {
     return (
       <TabPanel id="general"
         className="tab-panel"
-        data-testid="Seo-tabpanel-general">
-        {console.log('CURRENT TITLE', get(seoObject, 'title.value'))}
+        testId="Seo-tabpanel-general">
         <TextField id="title"
-          testid="Seo-title"
+          testId="Seo-tabpanel-general-title"
           name="title"
           labelText="Page Title"
           helpText="Browser tab and search engine result display."
@@ -113,11 +133,10 @@ const Seo = ({ sdk }) => {
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
-          className="fieldset"
-          data-testid="Seo-tabpanel-general-title"/>
+          className="fieldset" />
         <TextField id="description"
           textarea
-          testid="Seo-description"
+          testId="Seo-tabpanel-general-description"
           name="description"
           labelText="Description"
           value={get(seoObject, 'description.value') || ''}
@@ -128,10 +147,9 @@ const Seo = ({ sdk }) => {
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
-          className="fieldset"
-          data-testid="Seo-tabpanel-general-description"/>
+          className="fieldset" />
         <TextField id="keywords"
-          testid="Seo-keywords"
+          testId="Seo-tabpanel-general-keywords"
           name="keywords"
           labelText="Keywords"
           value={get(seoObject, 'keywords.value') || ''}
@@ -142,8 +160,7 @@ const Seo = ({ sdk }) => {
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
-          className="fieldset"
-          data-testid="Seo-tabpanel-general-keywords"/>
+          className="fieldset" />
         <FieldGroup className="fieldset">
           <FormLabel className="fieldset"
             htmlFor="robots">Would you like this content to be indexed by search engines?</FormLabel>
@@ -157,7 +174,7 @@ const Seo = ({ sdk }) => {
             inputProps={{
               onBlur: (e) => onFieldChange(e.currentTarget)
             }}
-            data-testid="Seo-tabpanel-general-noindex-true"/>
+            testId="Seo-tabpanel-general-noindex-true"/>
           <RadioButtonField
             labelText="No"
             name="robots"
@@ -168,64 +185,22 @@ const Seo = ({ sdk }) => {
             inputProps={{
               onBlur: (e) => onFieldChange(e.currentTarget)
             }}
-            data-testid="Seo-tabpanel-general-noindex-false"/>
+            testId="Seo-tabpanel-general-noindex-false"/>
         </FieldGroup>
         {isSearchVisible() ?  null : <Note noteType="warning"
-          data-testid="Seo-tabpanel-general-noindex-note">Your content is not being indexed</Note>}
+          testId="Seo-tabpanel-general-noindex-note">Your content is not being indexed</Note>}
       </TabPanel>
     );
   };
 
-  const handleAssetSelection = async (metaTagName) => {
-    const asset = await sdk.dialogs.selectSingleAsset({
-      locale: sdk.field.locale,
-    });
-    // TODO: add status https://www.contentful.com/developers/docs/tutorials/general/determine-entry-asset-state/
-    onFieldChange({
-      name: metaTagName,
-      value: {
-        url: `https:${get(asset, `fields.file.${get(sdk, 'field.locale')}.url`)}`,
-        id: get(asset, 'sys.id'),
-        title: get(asset, `fields.title.${get(sdk, 'field.locale')}`),
-      }});
-  };
-
-  const renderSocialImage = (metaTag) => {
-    const image = get(seoObject, metaTag);
-
-    if(image && image.value) {
-      return (
-        <div>
-          <AssetCard
-            className="social-image"
-            status="published"
-            type="image"
-            isLoading={false}
-            src={image.value.url}
-            title={image.value.title}
-            size="default"
-            data-testid="Seo-socialImage-assetCard"/>
-        </div>
-      );
-
-    }
-    return (
-      <div>
-        <Button buttonType="positive"
-          onClick={() => handleAssetSelection('og:image')}
-          data-testid="Seo-socialImage-button">Select an Image</Button>
-      </div>
-    );
-  };
-
   const renderFacebookTab = () => {
-    // TODO: Add a preview for facebook https://github.com/hugodias/facebook-post-preview/blob/master/src/components/facebook-mobile-post/FacebookMobilePost.js
+    // IDEA: Add a preview for facebook https://github.com/hugodias/facebook-post-preview/blob/master/src/components/facebook-mobile-post/FacebookMobilePost.js
     return (
       <TabPanel id="facebook"
         className="tab-panel"
-        data-testid="Seo-tabpanel-facebook">        
+        testId="Seo-tabpanel-facebook">        
         <TextField id="og:title"
-          testid="Seo-facebook-og:title"
+          testId="Seo-tabpanel-og:title"
           name="og:title"
           labelText="Post Title"
           helpText="The title of your article without any branding such as your site name."
@@ -234,17 +209,16 @@ const Seo = ({ sdk }) => {
             onKeyPress: (e) => onFieldChange(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
           }}
-          value={get(seoObject, 'og:title.value' || '')}
+          value={get(seoObject, 'og:title.value', get(seoObject, 'title.value'))}
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)}
-          data-testid="Seo-tabpanel-og:title"/>
+          onBlur={(e) => onFieldChange(e.currentTarget)} />
         <TextField id="og:description"
           textarea
-          testid="Seo-og:description"
+          testId="Seo-tabpanel-og:description"
           name="og:description"
           labelText="Description"
-          value={get(seoObject, 'og:description.value') || ''}
+          value={get(seoObject, 'og:description.value', get(seoObject, 'description.value'))}
           helpText="A brief description of the content, usually between 2 and 4 sentences. This will displayed below the title of the post on Facebook."
           textInputProps={{
             maxLength: 255
@@ -252,11 +226,13 @@ const Seo = ({ sdk }) => {
           countCharacters
           onChange={(e) => onFieldChange(e.currentTarget)}
           onBlur={(e) => onFieldChange(e.currentTarget)}
-          className="fieldset"
-          data-testid="Seo-tabpanel-og:description"/>
+          className="fieldset" />
         <FormLabel className="fieldset"
-          htmlFor="robots">Post Image</FormLabel>
-        {renderSocialImage('og:image')}
+          htmlFor="og:image">Post Image</FormLabel>
+        <SingleAssetWithButton sdk={sdk}
+          assetId={get(seoObject, 'og:image.value.id')}
+          handleFieldChange={(asset) => handleAssetFieldChange('og:image', asset)}
+          handleRemoveImage={() => removeFieldProperty('og:image')} />
         <HelpText>Use images that are at least 1200 x 630 pixels for the best display on high resolution devices. At the minimum, you should use images that are 600 x 315 pixels to display link page posts with larger images.</HelpText>
 
       </TabPanel>
@@ -265,39 +241,65 @@ const Seo = ({ sdk }) => {
 
   const renderTwitterTab = () => {
     return (
-      <TabPanel id="facebook"
-        className="tab-panel">Twitter</TabPanel>
-    );
-  };
-
-  const renderUiExtension = () => {
-    return (
-      <>
-        {renderTabs()}
-        {selected === 'preview' && (
-          renderPreview()
-        )}
-        {selected === 'general' && (
-          renderGeneralTab()
-        )}
-        {selected === 'facebook' && (
-          renderFacebookTab()
-        )}
-        {selected === 'twitter' && (
-          renderTwitterTab()
-        )}
-      </>
+      <TabPanel id="twitter"
+        className="tab-panel"
+        testId="Seo-tabpanel-twitter">
+        <TextField id="twitter:title"
+          testId="Seo-tabpanel-twitter:title"
+          name="twitter:title"
+          labelText="Post Title"
+          helpText="The title of your article without any branding such as your site name."
+          textInputProps={{
+            maxLength: 60,
+            onKeyPress: (e) => onFieldChange(e.currentTarget),
+            onBlur: (e) => onFieldChange(e.currentTarget),
+          }}
+          value={get(seoObject, 'twitter:title.value', get(seoObject, 'title.value'))}
+          countCharacters
+          onChange={(e) => onFieldChange(e.currentTarget)}
+          onBlur={(e) => onFieldChange(e.currentTarget)} />
+        <TextField id="twitter:description"
+          textarea
+          testId="Seo-tabpanel-twitter:description"
+          name="twitter:description"
+          labelText="Description"
+          value={get(seoObject, 'twitter:description.value', get(seoObject, 'description.value'))}
+          helpText="A description that concisely summarizes the content as appropriate for presentation within a Tweet. You should not re-use the title as the description or use this field to describe the general services provided by the website."
+          textInputProps={{
+            maxLength: 255
+          }}
+          countCharacters
+          onChange={(e) => onFieldChange(e.currentTarget)}
+          onBlur={(e) => onFieldChange(e.currentTarget)}
+          className="fieldset" />
+        <FormLabel className="fieldset"
+          htmlFor="twitter:image">Post Image</FormLabel>
+        <SingleAssetWithButton sdk={sdk}
+          assetId={get(seoObject, 'twitter:image.value.id')}
+          handleFieldChange={(asset) => handleAssetFieldChange('twitter:image', asset)}
+          handleRemoveImage={() => removeFieldProperty('twitter:image')} />
+        <HelpText>Use images that are at least 1200 x 630 pixels for the best display on high resolution devices. At the minimum, you should use images that are 600 x 315 pixels to display link page posts with larger images.</HelpText>
+      </TabPanel>
     );
   };
 
   return (
     <>
-      {renderUiExtension()}
-      {console.log(sdk)}
+      {renderTabs()}
+      {selected === 'preview' && (
+        renderPreview()
+      )}
+      {selected === 'general' && (
+        renderGeneralTab()
+      )}
+      {selected === 'facebook' && (
+        renderFacebookTab()
+      )}
+      {selected === 'twitter' && (
+        renderTwitterTab()
+      )}
     </>
   );
-
-  
 };
 
 Seo.propTypes = {
@@ -307,9 +309,6 @@ Seo.propTypes = {
       setValue: PropTypes.func.isRequired,
       locale: PropTypes.string.isRequired,
     }),
-    dialogs: PropTypes.shape({
-      selectSingleAsset: PropTypes.func.isRequired,
-    }).isRequired
   }).isRequired
 };
 
