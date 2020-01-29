@@ -11,9 +11,9 @@ import AnimalApp from './AnimalApp';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
 
-import {default as colorPickerMockSdk} from './ColorPicker/mockSdk';
-import {default as seoMockSdk} from './Seo/mockSdk';
-import {default as animalAppMockSdk} from './AnimalApp/mockSdk';
+import colorPickerMockSdk from './ColorPicker/mockSdk';
+// import seoMockSdk from './Seo/mockSdk';
+import animalAppMockSdk from './AnimalApp/mockSdk';
 
 const App = ({ sdk, locations }) => {
   return (
@@ -29,7 +29,7 @@ const App = ({ sdk, locations }) => {
         <Route path="/seo"
           exact
           component={() => {
-            const usedSdk = sdk || seoMockSdk;
+            const usedSdk = sdk;
             if(usedSdk.location.is(locations.LOCATION_APP)) {
               return <SeoConfig sdk={usedSdk}
                 locations={locations} />;

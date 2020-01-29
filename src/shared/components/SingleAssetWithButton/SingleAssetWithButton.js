@@ -2,17 +2,22 @@
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import {AssetCard, Button, DropdownList, DropdownListItem} from '@contentful/forma-36-react-components';
+import {AssetCard, Button, DropdownList, DropdownListItem, Note} from '@contentful/forma-36-react-components';
 import { getWorkflowState } from '../../modules/getWorkflowState';
 
 const SingleAssetWithButton = ({ sdk, assetId, handleFieldChange, handleRemoveImage, handleChangeImage }) => {
   const [asset, setAsset] = useState({});
-
+  const [errorMessage, setErrorMessage] = useState('');
   useEffect(() => {
     if(assetId) {
       (async () => {
         const fullAsset = await sdk.space.getAsset(assetId);
-        setAsset(fullAsset);
+        // console.log('fullASset', fullAsset);
+        if(fullAsset.sys.type === 'Error' && fullAsset.message) {
+          setErrorMessage(fullAsset.message);
+        } else {
+          setAsset(fullAsset);
+        }
       })();
     }
   }, [assetId]);
@@ -33,20 +38,35 @@ const SingleAssetWithButton = ({ sdk, assetId, handleFieldChange, handleRemoveIm
     return (
       <DropdownList>
         <DropdownListItem isTitle>Actions</DropdownListItem>
-        <DropdownListItem onClick={() => {
-          handleRemoveImage();
-          setAsset({});
-        }}>
+        <DropdownListItem testId="SingleAssetWithButton-RemoveImage"
+          onClick={() => {
+            handleRemoveImage();
+            setAsset({});
+          }}>
           Remove Image
         </DropdownListItem>
-        <DropdownListItem onClick={() => handleChangeImage ? handleChangeImage() : handleAssetSelection()}>
+        <DropdownListItem testId="SingleAssetWithButton-ChangeImage"
+          onClick={() => handleChangeImage ? handleChangeImage() : handleAssetSelection()}>
           Change Image
         </DropdownListItem>
       </DropdownList>
     );
   };
 
-  if(!_.isEmpty(asset)) {
+  const renderErrorMessage = () => {
+    if(errorMessage) {
+      return (
+        <Note noteType="negative"
+          testId="SingleAssetWithButton-ErrorNote"
+          title="There was an error loading the image.">
+          Please choose the image again. This usually happens when the data has been updated from an external source. Please review our documenation for more information and how to prevent this to happen in the future.
+        </Note>
+      );
+    }
+    return null;
+  };
+
+  if(!_.isEmpty(asset) && _.isEmpty(errorMessage)) {
     return (
       <div>
         <AssetCard
@@ -64,6 +84,7 @@ const SingleAssetWithButton = ({ sdk, assetId, handleFieldChange, handleRemoveIm
   }
   return (
     <div>
+      {renderErrorMessage()}
       <Button buttonType="positive"
         onClick={() => handleAssetSelection()}
         testId="SingleAssetWithButton-Button">Select an Image</Button>
@@ -72,21 +93,11 @@ const SingleAssetWithButton = ({ sdk, assetId, handleFieldChange, handleRemoveIm
 };
 
 SingleAssetWithButton.propTypes = {
+  sdk: PropTypes.object.isRequired,
   assetId: PropTypes.string,
   handleFieldChange: PropTypes.func,
   handleChangeImage: PropTypes.func,
   handleRemoveImage: PropTypes.func,
-  sdk: PropTypes.shape({
-    field: PropTypes.shape({
-      locale: PropTypes.string.isRequired,
-    }),
-    dialogs: PropTypes.shape({
-      selectSingleAsset: PropTypes.func.isRequired,
-    }).isRequired,
-    space: PropTypes.shape({
-      getAsset: PropTypes.func.isRequired,
-    }).isRequired
-  }).isRequired
 };
 
 SingleAssetWithButton.defaultProps = {
