@@ -5,7 +5,7 @@ import Seo from './Seo';
 
 import mockContentfulSdk from '../../__mocks__/mockContentfulSdk';
 import mockContentfulAsset from '../../__mocks__/mockContentfulAsset';
-import mockFieldValue from './mockFieldValue';
+import mockFieldValue from './__mocks__/mockFieldValue';
 
 let sdk;
 

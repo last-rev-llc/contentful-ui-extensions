@@ -30,13 +30,9 @@ class SeoConfig = ({ sdk }) => {
   });
   const [spaceContentTypes, setSpaceContentTypes] = useState([]);
 
-  console.log(('hello world'));
-
-  
-
   
   useEffect(() => {
-    console.log('useEffect', appParameters);
+    //console.log('useEffect', appParameters);
     const fetchData = async (setAppReady) => {
       const result = await app.getParameters();
       const { items: contentTypes } = await sdk.space.getContentTypes();
@@ -46,7 +42,7 @@ class SeoConfig = ({ sdk }) => {
     };
     fetchData(() => {
       app.onConfigure(() => {
-        console.log('appParameters: onConfigure()', appParameters);
+        //console.log('appParameters: onConfigure()', appParameters);
         return {
           parameters: appParameters,
           targetState: {
