@@ -3,19 +3,49 @@ A collection of UI Extensions for Contentful like a Color picker, SEO, Categorie
 
 ## Getting Started
 
-> git clone https://github.com/last-rev-llc/contentful-ui-extensions.git
-
-### Prerequisites
-
-What things you need to install the software and how to install them
-
+##### Clone the repository
 ```
-Give examples
+git clone git@github.com:last-rev-llc/contentful-ui-extensions.git
 ```
+##### Install Dependencies
+```
+npm install 
+```
+OR
+```
+yarn install
+```
+
+##### Start the application
+```
+npm start
+```
+
+### Running Locally
+In order to help streamline the process of development we have created a mock SDK that allows you to run the extensions locally with hot reload. You can also use this to see mock examples of the expected response from Contentful and data structure or objects.
+
+#### Open the browser
+> http://localhost:3000/
+
+This will be a list of all available UI Extensions.
+
+##### Individual Extensions
+- [Color Picker](http://localhost:3000/color-picker)
+- [SEO](http://localhost:3000/seo)
+
+### Using in Contentful
+To see the extension in your Contentful instance follow the directions below for each extension
+#### Prerequisites
+You need an account for Contentful to use these extensions. 
+- Go to [www.contentful.com](https://www.contentful.com/sign-up/?utm_campaign=lastrev-ui-extension)
+- Fill out the form and you will go to your first space
+- Please Follow the instructions for [Installing and using Extensions](https://www.contentful.com/developers/docs/extensibility/ui-extensions/managing-a-ui-extension-with-webapp/)
+
+[ ] TODO: SEO Needs to add docs for adding an app [Using Apps Alpha](https://www.contentful.com/developers/docs/extensibility/apps/building-apps/)
 
 ### Installing
+[ ] TODO: Step by Step instructions to setup a UI extension and App
 
-A step by step series of examples that tell you how to get a development env running
 
 Say what the step will be
 
@@ -28,12 +58,42 @@ And repeat
 ```
 until finished
 ```
+## Application Structure
+.
+├── public                   # Compiled files (alternatively `dist`)
+├── src                    # Documentation files (alternatively `doc`)
+│   ├── __mocks__ 
+│   ├── extensions
+│   ├── shared                    # Source files (alternatively `lib` or `app`)
+├── history.js                    # Automated tests (alternatively `spec` or `tests`)
+├── index.js                   # Tools and utilities
+├── .env.local
+├── .eslintrc.js
+├── .gitignore
+├── .nvmrc
+└── README.md
 
-End with an example of getting some data out of the system or using it for a little demo
+## Testing
+We use Jest and React Testing Library for all integration testing.
+##### Running Tests
+Normal watch mode
+```
+npm test
+```
 
-## Running the tests
+Runs in verbose and gives coverage report
+```
+npm run fulltest
+```
 
-Explain how to run the automated tests for this system
+### Testing Structure
+.
+├── __mocks__                    # Test files (alternatively `spec` or `tests`)
+│   ├── mockContentfulAsset.js          # Load and stress tests
+│   ├── mockContentfulContentType.js         # End-to-end, integration tests (alternatively `e2e`)
+│   └── mockContentfulSdk.js                # Unit tests
+└── ...
+
 
 ### Break down into end to end tests
 
