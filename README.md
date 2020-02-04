@@ -1,68 +1,146 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Last Rev UI Extension Library
+A collection of UI Extensions for Contentful like a Color picker, SEO, Categories and more.
 
-## Available Scripts
+## Getting Started
 
-In the project directory, you can run:
+##### Clone the repository
+```
+git clone git@github.com:last-rev-llc/contentful-ui-extensions.git
+```
+##### Install Dependencies
+```
+npm install 
+```
+OR
+```
+yarn install
+```
 
-### `yarn start`
+##### Start the application
+```
+npm start
+```
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Running Locally
+In order to help streamline the process of development we have created a mock SDK that allows you to run the extensions locally with hot reload. You can also use this to see mock examples of the expected response from Contentful and data structure or objects.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+#### Open the browser
+> http://localhost:3000/
 
-### `yarn test`
+This will be a list of all available UI Extensions.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+##### Individual Extensions
+- [Color Picker](http://localhost:3000/color-picker)
+- [SEO](http://localhost:3000/seo)
 
-### `yarn build`
+### Using in Contentful
+To see the extension in your Contentful instance follow the directions below for each extension
+#### Prerequisites
+You need an account for Contentful to use these extensions. 
+- Go to [www.contentful.com](https://www.contentful.com/sign-up/?utm_campaign=lastrev-ui-extension)
+- Fill out the form and you will go to your first space
+- Please Follow the instructions for [Installing and using Extensions](https://www.contentful.com/developers/docs/extensibility/ui-extensions/managing-a-ui-extension-with-webapp/)
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+[ ] TODO: SEO Needs to add docs for adding an app [Using Apps Alpha](https://www.contentful.com/developers/docs/extensibility/apps/building-apps/)
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+### Installing
+[ ] TODO: Step by Step instructions to setup a UI extension and App
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `yarn eject`
+Say what the step will be
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+Give the example
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+And repeat
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
+until finished
+```
+## Application Structure
+.
+├── public                   # Compiled files (alternatively `dist`)
+├── src                    # Documentation files (alternatively `doc`)
+│   ├── __mocks__ 
+│   ├── extensions
+│   ├── shared                    # Source files (alternatively `lib` or `app`)
+├── history.js                    # Automated tests (alternatively `spec` or `tests`)
+├── index.js                   # Tools and utilities
+├── .env.local
+├── .eslintrc.js
+├── .gitignore
+├── .nvmrc
+└── README.md
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Testing
+We use Jest and React Testing Library for all integration testing.
+##### Running Tests
+Normal watch mode
+```
+npm test
+```
 
-## Learn More
+Runs in verbose and gives coverage report
+```
+npm run fulltest
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Testing Structure
+.
+├── __mocks__                    # Test files (alternatively `spec` or `tests`)
+│   ├── mockContentfulAsset.js          # Load and stress tests
+│   ├── mockContentfulContentType.js         # End-to-end, integration tests (alternatively `e2e`)
+│   └── mockContentfulSdk.js                # Unit tests
+└── ...
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+### Break down into end to end tests
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+Explain what these tests test and why
 
-### Analyzing the Bundle Size
+```
+Give an example
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+### And coding style tests
 
-### Making a Progressive Web App
+Explain what these tests test and why
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+```
+Give an example
+```
 
-### Advanced Configuration
+## Deployment
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+Add additional notes about how to deploy this on a live system
 
-### Deployment
+## Built With
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
+* [Maven](https://maven.apache.org/) - Dependency Management
+* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
 
-### `yarn build` fails to minify
+## Contributing
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+
+## Authors
+
+* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+
+See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+* Hat tip to anyone whose code was used
+* Inspiration
+* etc

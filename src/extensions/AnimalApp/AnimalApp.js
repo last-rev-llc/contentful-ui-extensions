@@ -27,17 +27,18 @@ class Config extends Component {
   
 
   async onConfigure () {
-    const { items: contentTypes } = await this.props.sdk.space.getContentTypes();
-    const contentTypeIds = contentTypes.map(ct => ct.sys.id);
+    console.log('state', this.state);
+    // const { items: contentTypes } = await this.props.sdk.space.getContentTypes();
+    // const contentTypeIds = contentTypes.map(ct => ct.sys.id);
 
-    return {
-      parameters: this.state.parameters,
-      targetState: {
-        EditorInterface: contentTypeIds.reduce((acc, id) => {
-          return { ...acc, [id]: { sidebar: { position: 0 } } };
-        }, {})
-      }
-    };
+    // return {
+    //   parameters: this.state.parameters,
+    //   targetState: {
+    //     EditorInterface: contentTypeIds.reduce((acc, id) => {
+    //       return { ...acc, [id]: { sidebar: { position: 0 } } };
+    //     }, {})
+    //   }
+    // };
   }
 
   render () {
@@ -58,6 +59,7 @@ class Config extends Component {
           <Option value={DEFAULT_ANIMAL}>Cat</Option>
           <Option value="dog">Dog</Option>
           <Option value="owl">Owl</Option>
+          {console.log('state render', this.state)}
         </SelectField>
       </Form>
     );
