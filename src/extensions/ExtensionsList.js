@@ -9,8 +9,6 @@ export default function ExtensionsList() {
           className="">Color</Link></li>
         <li><Link to="/seo"
           className="">Seo</Link></li>
-        <li><Link to="/animal"
-          className="">Animal</Link></li>
       </ul>
     </div>
   );

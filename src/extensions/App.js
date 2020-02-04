@@ -7,13 +7,10 @@ import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
 import Seo from './Seo';
 import SeoConfig from './Seo/SeoConfig';
-import AnimalApp from './AnimalApp';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
 
 import colorPickerMockSdk from './ColorPicker/mockSdk';
-// import seoMockSdk from './Seo/mockSdk';
-import animalAppMockSdk from './AnimalApp/mockSdk';
 
 const App = ({ sdk, locations }) => {
   return (
@@ -37,10 +34,6 @@ const App = ({ sdk, locations }) => {
             return <Seo sdk={sdk || usedSdk}
               locations={locations} />;
           }}/>
-        <Route path="/animal"
-          exact
-          component={() => <AnimalApp sdk={sdk || animalAppMockSdk}
-            locations={locations} />} />
       </Switch>
     </Router>
   );

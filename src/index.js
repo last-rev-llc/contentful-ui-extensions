@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { init, locations } from 'contentful-ui-extensions-sdk';
 import App from './extensions/App';
-import mockLocations from './mockLocations';
+import mockLocations from './__mocks__/mockLocations';
 
 (()=> {
   if(window.self !== window.top) {

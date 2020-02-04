@@ -35,6 +35,7 @@ This will be a list of all available UI Extensions.
 
 ### Using in Contentful
 To see the extension in your Contentful instance follow the directions below for each extension
+
 #### Prerequisites
 You need an account for Contentful to use these extensions. 
 - Go to [www.contentful.com](https://www.contentful.com/sign-up/?utm_campaign=lastrev-ui-extension)
@@ -46,35 +47,26 @@ You need an account for Contentful to use these extensions.
 ### Installing
 [ ] TODO: Step by Step instructions to setup a UI extension and App
 
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
 ## Application Structure
+```
 .
-├── public                   # Compiled files (alternatively `dist`)
-├── src                    # Documentation files (alternatively `doc`)
-│   ├── __mocks__ 
+├── public
+├── src
+│   ├── __mocks__
 │   ├── extensions
-│   ├── shared                    # Source files (alternatively `lib` or `app`)
-├── history.js                    # Automated tests (alternatively `spec` or `tests`)
-├── index.js                   # Tools and utilities
+│   ├── shared
+├── history.js
+├── index.js
 ├── .env.local
 ├── .eslintrc.js
 ├── .gitignore
 ├── .nvmrc
 └── README.md
+```
 
 ## Testing
-We use Jest and React Testing Library for all integration testing.
+We use [Jest](https://jestjs.io/) and [React Testing Library](https://github.com/testing-library/react-testing-library) for all integration testing.
+
 ##### Running Tests
 Normal watch mode
 ```
@@ -87,43 +79,28 @@ npm run fulltest
 ```
 
 ### Testing Structure
+```
 .
-├── __mocks__                    # Test files (alternatively `spec` or `tests`)
-│   ├── mockContentfulAsset.js          # Load and stress tests
-│   ├── mockContentfulContentType.js         # End-to-end, integration tests (alternatively `e2e`)
-│   └── mockContentfulSdk.js                # Unit tests
+├── __mocks__
+│   ├── mockContentfulAsset.js          # Mock Asset response from Contentful
+│   ├── mockContentfulContentType.js    # Mock Content Type Response from Contentful
+│   └── mockContentfulSdk.js            # Mock SDK used for mocking functions and data returned by Contentful
 └── ...
-
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
 ```
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+[ ] TODO
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Create Ract App](https://github.com/facebook/create-react-app)
+* [Contentful Management API](https://www.contentful.com/developers/docs/references/content-management-api/)
+* [Contentful UI Extensions](https://www.contentful.com/developers/docs/extensibility/ui-extensions/)
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+[ ] TODO
 
 ## Versioning
 
@@ -131,16 +108,10 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Brad Taylor** - *Initial work* - [bradtaylorsf](https://github.com/bradtaylorsf)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/last-rev-llc/contentful-ui-extensions/contributors) who participated in this project.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
