@@ -297,9 +297,22 @@ class SeoConfig extends Component {
               onBlur: (e) => this.handleGlobalParameterChange(e.currentTarget),
             }}
             value={parameters.siteName || ''}
-            countCharacters
-            onChange={(e) => this.handleDefaultFieldChange(e.currentTarget)}
-            onBlur={(e) => this.handleDefaultFieldChange(e.currentTarget)} />
+            countCharacters />
+          <Select className="fieldset"
+            onChange={(e) => this.handleGlobalParameterChange(e.currentTarget)}
+            name="pageTitleDelimiter"
+            value={parameters.pageTitleDelimiter || '|'}
+            testId="SeoConfig-select-pageTitleDelimiter">
+            <Option value="|"
+              key="|"
+              testId="SeoConfig-option-pageTitleDelimiter">|</Option>
+            <Option value="/"
+              key="/"
+              testId="SeoConfig-option-pageTitleDelimiter">/</Option>
+            <Option value=">"
+              key=">"
+              testId="SeoConfig-option-pageTitleDelimiter">&gt;</Option>
+          </Select>
           <SingleAssetWithButton sdk={sdk}
             assetId={parameters.defaultSocialImageId}
             handleFieldChange={(asset) => this.handleDefaultImageChange(asset)} 

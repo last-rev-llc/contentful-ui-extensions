@@ -205,6 +205,21 @@ describe('<SeoConfig />', () => {
     });
   });
 
+  describe('pageTitleDelimiter select field', () => {
+    test('value should change when user selects new value', async () => {
+      const { getByTestId } = render(<SeoConfig sdk={sdk} />);
+      await wait();
+      expect(getByTestId('SeoConfig-select-pageTitleDelimiter').value).toEqual(mockAppConfig.pageTitleDelimiter);
+      fireEvent.change(getByTestId('SeoConfig-select-pageTitleDelimiter'), {
+        target: {
+          value: '>',
+        }
+      });
+      await wait();
+      expect(getByTestId('SeoConfig-select-pageTitleDelimiter').value).toEqual('>');
+    });
+  });
+
   describe('onConfigure()', () => {
     const mockOnConfigure = jest.fn();
     SeoConfig.prototype.onConfigure = mockOnConfigure;
