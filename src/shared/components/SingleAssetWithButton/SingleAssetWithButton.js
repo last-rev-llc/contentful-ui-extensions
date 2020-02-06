@@ -8,6 +8,7 @@ import { getWorkflowState } from '../../modules/getWorkflowState';
 const SingleAssetWithButton = ({ sdk, assetId, handleFieldChange, handleRemoveImage, handleChangeImage }) => {
   const [asset, setAsset] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
+  
   useEffect(() => {
     if(assetId) {
       (async () => {
@@ -22,9 +23,13 @@ const SingleAssetWithButton = ({ sdk, assetId, handleFieldChange, handleRemoveIm
     }
   }, [assetId]);
 
+  const getLocale = () => {
+    return _.get(sdk, 'field.locale', _.get(sdk, 'locales.default'));
+  };
+
   const handleAssetSelection = async () => {
     const contentfulAsset = await sdk.dialogs.selectSingleAsset({
-      locale: sdk.field.locale,
+      locale: getLocale(),
     });
 
     setAsset(contentfulAsset);
@@ -67,6 +72,7 @@ const SingleAssetWithButton = ({ sdk, assetId, handleFieldChange, handleRemoveIm
   };
 
   if(!_.isEmpty(asset) && _.isEmpty(errorMessage)) {
+    
     return (
       <div>
         <AssetCard
@@ -74,8 +80,8 @@ const SingleAssetWithButton = ({ sdk, assetId, handleFieldChange, handleRemoveIm
           status={getWorkflowState(asset)}
           type="image"
           isLoading={false}
-          src={_.get(asset, `fields.file.${sdk.field.locale}.url`)}
-          title={_.get(asset, `fields.title.${sdk.field.locale}`)}
+          src={_.get(asset, `fields.file.${getLocale()}.url`)}
+          title={_.get(asset, `fields.title.${getLocale()}`)}
           size="default"
           dropdownListElements={renderDropdownOptions()}
           testId="SingleAssetWithButton-AssetCard"/>

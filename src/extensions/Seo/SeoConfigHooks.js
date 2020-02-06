@@ -61,10 +61,6 @@ class SeoConfig = ({ sdk }) => {
   }, [app]);
 
   const handleFieldChange = (field) => {
-    console.log({
-      ...appParameters,
-      [field.name]: field.value,
-    });
     setAppParameters({
       ...appParameters,
       [field.name]: field.value,
@@ -99,7 +95,6 @@ class SeoConfig = ({ sdk }) => {
           onBlur={(e) => handleFieldChange(e.currentTarget)} />
         <Button onClick={() => app.onConfigure()}>Save</Button>
       </div>
-      {console.log('appParameters state', appParameters)}
     </div>
   );
 };

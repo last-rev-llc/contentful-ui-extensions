@@ -16,32 +16,36 @@ import {
   TableRow,
   TextField} from '@contentful/forma-36-react-components';
 import './Seo.scss';
-
 import PropTypes from 'prop-types';
+import SingleAssetWithButton from '../../shared/components/SingleAssetWithButton';
+
 
 
 class SeoConfig extends Component {
   constructor (props) {
     super(props);
+    const { sdk } = this.props; 
     this.state = {
       parameters: {
         siteName: '',
+        defaultSocialImageId: null,
         pageTitleDelimiter: '|',
         editorInterface: {}
       },
       contentTypes: [],
       contentTypeConfig: {},
     };
-    this.app = this.props.sdk.platformAlpha.app;
+    this.app = sdk.platformAlpha.app;
     this.app.onConfigure(() => this.onConfigure());
   };
 
 
   // eslint-disable-next-line react/sort-comp
   async fetchData() {
+    const { sdk } = this.props;
     // eslint-disable-next-line react/destructuring-assignment
     const parameters = await this.app.getParameters() || this.state.parameters;
-    const { items: contentTypes } = await this.props.sdk.space.getContentTypes();
+    const { items: contentTypes } = await sdk.space.getContentTypes();
     return {
       parameters,
       contentTypes,
@@ -113,16 +117,22 @@ class SeoConfig extends Component {
     );
   }
 
+  handleGlobalParameterChange = (field) => {
+    const { parameters } = this.state;
+
+    this.setState({
+      parameters: {
+        ...parameters,
+        [field.name]: field.value,
+      }
+    });
+  }
+
   handleDefaultFieldChange = (field, contentTypeId) => {
     const { contentTypeConfig } = this.state;
 
     const fieldConfigToChange = get(contentTypeConfig, `${contentTypeId}.controls`, []);
     const controls = head(fieldConfigToChange) || {};
-
-    // console.log('fieldConfigToChange', fieldConfigToChange);
-    // console.log('controls', controls);
-    // console.log('field', field);
-
 
     this.setState({
       contentTypeConfig: {
@@ -134,8 +144,29 @@ class SeoConfig extends Component {
     });
   }
 
+  handleDefaultImageChange = (contentfulAsset) => {
+    const { parameters } = this.state;
+    if(contentfulAsset && get(contentfulAsset, 'sys.id')) {
+      this.setState({
+        parameters: {
+          ...parameters,
+          defaultSocialImageId: get(contentfulAsset, 'sys.id'),
+        }
+      });
+    }
+  }
+
+  handleRemoveDefaultImage = () => {
+    const { parameters } = this.state;
+    this.setState({
+      parameters: {
+        ...parameters,
+        defaultSocialImageId: null,
+      }
+    });
+  }
+
   renderDefaultFieldConfig = (fieldPath, contentTypeFields, fieldType, contentTypeId) => {
-    // return get(contentTypeRowConfig, fieldPath, '');
     const { contentTypeConfig } = this.state;
     const currentValue = get(head(get(contentTypeConfig, `${contentTypeId}.controls`, [])),fieldPath);
     const validFields = filter(contentTypeFields, (field) => {
@@ -179,7 +210,7 @@ class SeoConfig extends Component {
 
   renderContentTypeConfigRow = (contentType) => {
     const { contentTypeConfig } = this.state; 
-    if(!isEmpty(contentTypeConfig) && get(contentTypeConfig, contentType.sys.id)) {
+    if(contentType && !isEmpty(contentTypeConfig) && get(contentTypeConfig, contentType.sys.id)) {
       // TODO: get teh full content type
       return (
         <TableRow key={Math.random()}
@@ -211,7 +242,8 @@ class SeoConfig extends Component {
     const { contentTypeConfig, contentTypes } = this.state;
     if(isEmpty(contentTypeConfig)) return null;
     return (
-      <Table className="fieldset" testId="SeoConfig-table-contentType">
+      <Table className="fieldset"
+        testId="SeoConfig-table-contentType">
         <TableHead>
           <TableRow testId="SeoConfig-tablehead-contentType">
             <TableCell testId="SeoConfig-tablehead-contentType-delete"/>
@@ -236,14 +268,11 @@ class SeoConfig extends Component {
 
       </Table>
     );
-    
   }
 
-  handleFieldChange = (field) => {
-
-  };
-
   render () {
+    const { sdk } = this.props;
+    const { parameters } = this.state;
     return (
       <div className="seo-config">
         <EmptyState
@@ -264,13 +293,31 @@ class SeoConfig extends Component {
             textInputProps={{
               testId: "SeoConfig-siteName",
               maxLength: 10,
-              onKeyPress: (e) => this.handleDefaultFieldChange(e.currentTarget),
-              onBlur: (e) => this.handleDefaultFieldChange(e.currentTarget),
+              onKeyPress: (e) => this.handleGlobalParameterChange(e.currentTarget),
+              onBlur: (e) => this.handleGlobalParameterChange(e.currentTarget),
             }}
-            value={this.state.parameters.siteName || ''}
-            countCharacters
-            onChange={(e) => this.handleDefaultFieldChange(e.currentTarget)}
-            onBlur={(e) => this.handleDefaultFieldChange(e.currentTarget)} />
+            value={parameters.siteName || ''}
+            countCharacters />
+          <Select className="fieldset"
+            onChange={(e) => this.handleGlobalParameterChange(e.currentTarget)}
+            name="pageTitleDelimiter"
+            value={parameters.pageTitleDelimiter || '|'}
+            testId="SeoConfig-select-pageTitleDelimiter">
+            <Option value="|"
+              key="|"
+              testId="SeoConfig-option-pageTitleDelimiter">|</Option>
+            <Option value="/"
+              key="/"
+              testId="SeoConfig-option-pageTitleDelimiter">/</Option>
+            <Option value=">"
+              key=">"
+              testId="SeoConfig-option-pageTitleDelimiter">&gt;</Option>
+          </Select>
+          <SingleAssetWithButton sdk={sdk}
+            assetId={parameters.defaultSocialImageId}
+            handleFieldChange={(asset) => this.handleDefaultImageChange(asset)} 
+            handleRemoveImage={() => this.handleRemoveDefaultImage()}
+            handleChangeImage={(asset) => this.handleDefaultImageChange(asset)}/>
         </div>
         {this.renderContentTypeDropdown()}
         {this.renderContentTypeConfigTable()}
@@ -288,6 +335,9 @@ SeoConfig.propTypes = {
         getParameters: PropTypes.func.isRequired,
         setReady: PropTypes.func.isRequired,
       })
+    }),
+    space: PropTypes.shape({
+      getContentTypes: PropTypes.func.isRequired,
     })
   }).isRequired
 };
