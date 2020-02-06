@@ -8,7 +8,7 @@ const mockAppConfig = {
         {
           fieldId: 'seo',
           settings: {
-            defaultNoIndex: false,
+            defaultNoIndex: 'noindex,nofollow',
             defaultPageTitleField: 'title',
             defaultDescriptionField: 'description',
             defaultSocialImageField: 'mainImage',

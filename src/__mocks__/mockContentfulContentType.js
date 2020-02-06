@@ -60,8 +60,29 @@ const array = [
         linkType: "Asset"
       },
       {
+        id: "anotherImage",
+        name: "Another Image",
+        type: "Link",
+        localized: false,
+        required: false,
+        validations: [],
+        disabled: false,
+        omitted: false,
+        linkType: "Asset"
+      },
+      {
         id: "seo",
         name: "SEO",
+        type: "Object",
+        localized: false,
+        required: false,
+        validations: [],
+        disabled: false,
+        omitted: false
+      },
+      {
+        id: "anotherObject",
+        name: "Anotehr Object",
         type: "Object",
         localized: false,
         required: false,
@@ -357,6 +378,16 @@ const single = {
     {
       id: "seo",
       name: "SEO",
+      type: "Object",
+      localized: false,
+      required: false,
+      validations: [],
+      disabled: false,
+      omitted: false
+    },
+    {
+      id: "anotherObject",
+      name: "Anotehr Object",
       type: "Object",
       localized: false,
       required: false,

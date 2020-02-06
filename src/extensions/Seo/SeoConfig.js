@@ -133,12 +133,16 @@ class SeoConfig extends Component {
 
     const fieldConfigToChange = get(contentTypeConfig, `${contentTypeId}.controls`, []);
     const controls = head(fieldConfigToChange) || {};
+    let newControlsValue = [set({...controls}, field.name, field.value)];
+    if(field.value === '0') {
+      newControlsValue = [omit({...controls}, field.name)];
+    }
 
     this.setState({
       contentTypeConfig: {
         ...contentTypeConfig,
         [contentTypeId]: {
-          controls: [set({...controls}, field.name, field.value)]
+          controls: newControlsValue
         }
       }
     });
@@ -208,10 +212,30 @@ class SeoConfig extends Component {
     });
   }
 
+  renderRobotsSelectList = (fieldPath, contentTypeId) => {
+    const { contentTypeConfig } = this.state;
+    // Find the current state if any
+    const currentValue = get(head(get(contentTypeConfig, `${contentTypeId}.controls`, [])),fieldPath);
+    return (
+      <Select className="fieldset"
+        onChange={(e) => this.handleDefaultFieldChange(e.currentTarget, contentTypeId)}
+        name={fieldPath}
+        value={currentValue}
+        testId="SeoConfig-select-defaultNoIndex">
+        <Option value="index,follow"
+          key="index,follow"
+          testId="SeoConfig-option-defaultNoIndex">Yes</Option>
+        <Option value="noindex,nofollow"
+          key="noindex,nofollow"
+          testId="SeoConfig-option-defaultNoIndex">No</Option>
+      </Select>
+    );
+  }
+
   renderContentTypeConfigRow = (contentType) => {
     const { contentTypeConfig } = this.state; 
     if(contentType && !isEmpty(contentTypeConfig) && get(contentTypeConfig, contentType.sys.id)) {
-      // TODO: get teh full content type
+      // TODO: get the full content type
       return (
         <TableRow key={Math.random()}
           testId="SeoConfig-tablerow-contentType">
@@ -227,7 +251,7 @@ class SeoConfig extends Component {
           </TableCell>
           <TableCell testId="SeoConfig-tablecell-contentType-name">{contentType.name}</TableCell>
           <TableCell testId="SeoConfig-tablecell-contentType-seo">{this.renderDefaultFieldConfig('fieldId', contentType.fields, 'Object', contentType.sys.id)}</TableCell>
-          <TableCell testId="SeoConfig-tablecell-contentType-noindex">yes/no</TableCell>
+          <TableCell testId="SeoConfig-tablecell-contentType-noindex">{this.renderRobotsSelectList('settings.defaultNoIndex', contentType.sys.id)}</TableCell>
           <TableCell testId="SeoConfig-tablecell-contentType-defaultPageTitleField">{this.renderDefaultFieldConfig('settings.defaultPageTitleField', contentType.fields, 'Symbol', contentType.sys.id)}</TableCell>
           <TableCell testId="SeoConfig-tablecell-contentType-defaultDescriptionField">{this.renderDefaultFieldConfig('settings.defaultDescriptionField', contentType.fields, 'Symbol', contentType.sys.id)}</TableCell>
           <TableCell testId="SeoConfig-tablecell-contentType-defaultSocialImageField">{this.renderDefaultFieldConfig('settings.defaultSocialImageField', contentType.fields, 'Asset', contentType.sys.id)}</TableCell>
@@ -273,6 +297,7 @@ class SeoConfig extends Component {
   render () {
     const { sdk } = this.props;
     const { parameters } = this.state;
+    console.log(parameters);
     return (
       <div className="seo-config">
         <EmptyState

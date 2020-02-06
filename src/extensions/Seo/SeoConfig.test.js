@@ -100,22 +100,67 @@ describe('<SeoConfig />', () => {
     });
   });
 
-  describe('content type table renderDefaultFieldConfig()', () => {
+  describe('content type table row fields', () => {
     test('each row should have correct defaultField options on render', async () => {
-      const { queryAllByTestId } = render(<SeoConfig sdk={sdk} />);
+      const { queryAllByTestId, getByTestId } = render(<SeoConfig sdk={sdk} />);
       await wait();
+      const [
+        fieldId,
+        defaultPageTitleField,
+        defaultDescriptionField,
+        defaultSocialImageField,
+      ] = queryAllByTestId('SeoConfig-select-fields');
+
+      const [mockEditorControls] = mockAppConfig.editorInterface.seoApp.controls;
       expect(queryAllByTestId('SeoConfig-select-fields').length).toEqual(4);
-      expect(queryAllByTestId('SeoConfig-select-fields')[0].value)
-        .toEqual(mockAppConfig.editorInterface.seoApp.controls[0].fieldId);
-      expect(queryAllByTestId('SeoConfig-select-fields')[1].value)
-        .toEqual(mockAppConfig.editorInterface.seoApp.controls[0].settings.defaultPageTitleField);
-      expect(queryAllByTestId('SeoConfig-select-fields')[2].value)
-        .toEqual(mockAppConfig.editorInterface.seoApp.controls[0].settings.defaultDescriptionField);
-      expect(queryAllByTestId('SeoConfig-select-fields')[3].value)
-        .toEqual(mockAppConfig.editorInterface.seoApp.controls[0].settings.defaultSocialImageField);
+
+      expect(fieldId.value)
+        .toEqual(mockEditorControls.fieldId);
+      expect(defaultPageTitleField.value)
+        .toEqual(mockEditorControls.settings.defaultPageTitleField);
+      expect(defaultDescriptionField.value)
+        .toEqual(mockEditorControls.settings.defaultDescriptionField);
+      expect(defaultSocialImageField.value)
+        .toEqual(mockEditorControls.settings.defaultSocialImageField);
+      expect(getByTestId('SeoConfig-select-defaultNoIndex').value)
+        .toEqual(mockEditorControls.settings.defaultNoIndex);
     });
 
-    test.todo('should change the value when selected');
+    test('should change the value when default field is selected', async () => {
+      const { queryAllByTestId } = render(<SeoConfig sdk={sdk} />);
+      await wait();
+      let [ fieldId ] = queryAllByTestId('SeoConfig-select-fields');
+
+      const [mockEditorControls] = mockAppConfig.editorInterface.seoApp.controls;
+      
+      fireEvent.change(fieldId, {
+        target: {
+          value: 'anotherObject',
+        }
+      });
+
+      await wait();
+
+      [ fieldId ] = queryAllByTestId('SeoConfig-select-fields');
+      expect(fieldId.value).not.toBe(mockEditorControls.fieldId);
+      expect(fieldId.value).toBe('anotherObject');
+    });
+
+    test('should remove the default field value when the user selects 0', async () => {
+      const { queryAllByTestId } = render(<SeoConfig sdk={sdk} />);
+      await wait();
+      let [, defaultPageTitleField] = queryAllByTestId('SeoConfig-select-fields');
+      
+      fireEvent.change(defaultPageTitleField, {
+        target: {
+          value: '0',
+        }
+      });
+
+      await wait();
+      [,defaultPageTitleField] = queryAllByTestId('SeoConfig-select-fields');
+      expect(defaultPageTitleField.value).toEqual('0');
+    });
   });
 
   describe('content type table renderContentTypeConfigRow()', () => {
