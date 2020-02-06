@@ -36,7 +36,6 @@ const Seo = ({ sdk }) => {
   };
 
   const handleAssetFieldChange = (metaTagName, asset) => {
-    // TODO: add status https://www.contentful.com/developers/docs/tutorials/general/determine-entry-asset-state/
     onFieldChange({
       name: metaTagName,
       value: {

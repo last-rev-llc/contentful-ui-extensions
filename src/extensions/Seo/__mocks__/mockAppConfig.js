@@ -1,6 +1,7 @@
 const mockAppConfig = {
   siteName: 'Last Rev',
   pageTitleDelimiter: '|',
+  defaultSocialImageId: '1234asdf',
   editorInterface: {
     seoApp: {
       controls: [

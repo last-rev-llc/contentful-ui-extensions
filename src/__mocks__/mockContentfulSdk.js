@@ -7,14 +7,13 @@ const sdk = {
       field: {
         getValue: jest.fn().mockImplementation(() => {
           return {
-            ...mockFieldValue,
+            ...mockFieldValue
           };
-        })
-        ,
-        setValue: jest.fn().mockResolvedValue({
-          'hello': 'world',
         }),
-        locale: 'en-US',
+        setValue: jest.fn().mockResolvedValue({
+          hello: "world"
+        }),
+        locale: "en-US"
       },
       dialogs: {
         selectSingleAsset: jest.fn().mockImplementation(() => {
@@ -22,17 +21,17 @@ const sdk = {
             resolve(mockContentfulAsset.success);
             reject(mockContentfulAsset.error);
           });
-        }),
+        })
       },
       platformAlpha: {
         app: {
-          getParameters: jest.fn().mockImplementation(async (appSettings) => {
+          getParameters: jest.fn().mockImplementation(async appSettings => {
             return {
               ...mockAppConfig,
-              appSettings,
+              appSettings
             };
           }),
-          onConfigure: jest.fn().mockImplementation((fn) => {
+          onConfigure: jest.fn().mockImplementation(fn => {
             fn();
           }),
           setReady: jest.fn().mockImplementation(() => {
@@ -43,12 +42,12 @@ const sdk = {
       space: {
         getContentTypes: jest.fn().mockImplementation(async () => {
           return {
-            items: mockContentfulContentType.array,
+            items: mockContentfulContentType.array
           };
         }),
-        getAsset: jest.fn().mockImplementation((type) => {
+        getAsset: jest.fn().mockImplementation(type => {
           return new Promise((resolve, reject) => {
-            if(type === 'reject') {
+            if (type === "reject") {
               return resolve(mockContentfulAsset.error);
             }
             return resolve(mockContentfulAsset.success);
@@ -59,8 +58,15 @@ const sdk = {
         is: () => {
           return true;
         }
+      },
+      locales: {
+        available: ["en-US"],
+        default: "en-US",
+        names: { "en-US": "English (United States)" },
+        fallbacks: {},
+        optional: { "en-US": false },
+        direction: { "en-US": "ltr" }
       }
-
     };
   }
 };

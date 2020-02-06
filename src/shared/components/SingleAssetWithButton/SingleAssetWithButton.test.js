@@ -23,7 +23,7 @@ afterEach(() => {
 // This is the fix from the author https://github.com/testing-library/react-testing-library/issues/535#issuecomment-576816390
 describe('<SingleAssetWithButton />', () => {
   test('should render the AssetCard if asset is found', async () => {
-    const { debug, queryByTestId } = render(<SingleAssetWithButton sdk={sdk}
+    const { queryByTestId } = render(<SingleAssetWithButton sdk={sdk}
       assetId="1234asdf" />);
     await wait();
     expect(queryByTestId('SingleAssetWithButton-AssetCard'))
@@ -42,13 +42,7 @@ describe('<SingleAssetWithButton />', () => {
     expect(queryByTestId('SingleAssetWithButton-ErrorNote')).toBeFalsy();
   });
 
-  test('should show error message if JSON is not valid', async () => {
-    const { queryByTestId } = render(<SingleAssetWithButton assetId="1234asdf"
-      sdk={sdk} />);
-    await wait();
-
-    expect(sdk.space.getAsset).toHaveBeenCalled();
-  });
+  test.todo('should show error message if JSON is not valid');
 
   test('should render the error note if Contentful returns an error', async () => {
     const { queryByTestId } = render(<SingleAssetWithButton assetId="1234asdf"
@@ -75,7 +69,7 @@ describe('<SingleAssetWithButton />', () => {
   });
 
   test('should render asset menu when clicked on', async () => {
-    const { debug, getByTestId, queryByTestId } = render(<SingleAssetWithButton assetId="1234asdf"
+    const { getByTestId, queryByTestId } = render(<SingleAssetWithButton assetId="1234asdf"
       sdk={sdk} />);
     await wait();
     fireEvent.click(getByTestId('cf-ui-card-actions').getElementsByTagName('button')[0]);
@@ -86,7 +80,7 @@ describe('<SingleAssetWithButton />', () => {
 
   test('should handleRemoveImage when remove action menu item clicked and passed in', async () => {
     const handleRemoveImage = jest.fn();
-    const { getByTestId } = render(<SingleAssetWithButton assetId="assethandleRemoveImage"
+    const { getByTestId } = render(<SingleAssetWithButton assetId="1234asdf"
       sdk={sdk} 
       handleRemoveImage={handleRemoveImage} />);
     await wait();
@@ -97,7 +91,7 @@ describe('<SingleAssetWithButton />', () => {
   });
   test('clicking on change image should call handleChangeImage if passed in', async () => {
     const handleChangeImage = jest.fn();
-    const { getByTestId } = render(<SingleAssetWithButton assetId="assethandleRemoveImage"
+    const { getByTestId } = render(<SingleAssetWithButton assetId="1234asdf"
       sdk={sdk} 
       handleChangeImage={handleChangeImage} />);
     await wait();
@@ -105,5 +99,13 @@ describe('<SingleAssetWithButton />', () => {
     await wait();
     fireEvent.click(getByTestId('SingleAssetWithButton-ChangeImage').getElementsByTagName('button')[0]);
     expect(handleChangeImage).toHaveBeenCalledTimes(1);
+  });
+
+  test('should default to the space locale if no field locale is present', async () => {
+    const { getByTestId } = render(<SingleAssetWithButton sdk={_.omit(sdk, 'field')} />);
+    await wait();
+    fireEvent.click(getByTestId('SingleAssetWithButton-Button'));
+    await wait();
+    expect(getByTestId('SingleAssetWithButton-AssetCard')).toBeTruthy();
   });
 });
