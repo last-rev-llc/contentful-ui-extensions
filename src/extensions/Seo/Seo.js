@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Tabs, Tab, TabPanel, TextField, FieldGroup, RadioButtonField, FormLabel, Note, HelpText } from '@contentful/forma-36-react-components';
 import { get, isEmpty, omit } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
@@ -7,15 +8,11 @@ import './Seo.scss';
 import PropTypes from 'prop-types';
 import SingleAssetWithButton from '../../shared/components/SingleAssetWithButton';
 
-const Seo = ({ sdk }) => {
-  const [seoObject, setSeoObject] = useState({});
+const Seo = (props) => {
+  const {sdk} = props;
+  const [seoObject, setSeoObject] = useState(sdk.field.getValue());
   const [selected, setSelected] = useState('preview');
-  const [pageTitleValue, setPageTitleValue] = useState('');
-
-  useEffect(() => {
-    setSeoObject(sdk.field.getValue());
-  }, [sdk.field]);  
-
+  
   const onFieldChange = (field) => {
     sdk.field.setValue({
       ...seoObject,
@@ -27,6 +24,26 @@ const Seo = ({ sdk }) => {
       setSeoObject(response);
     });
   };
+  useEffect(() => {
+    const handleTitleChange = (value) => {
+      if(value && value !== get(seoObject, 'title.value')) {
+        onFieldChange({
+          name: 'title',
+          value,
+        });
+      }
+    };
+    const handleDescriptionChange = (value) => {
+      if(value && value !== get(seoObject, 'description.value')) {
+        onFieldChange({
+          name: 'description',
+          value,
+        });
+      }
+    };
+    sdk.entry.fields.title.onValueChanged(handleTitleChange);
+    sdk.entry.fields.description.onValueChanged(handleDescriptionChange);
+  }, [seoObject]);
 
   const removeFieldProperty = (metaTagName) => {
     sdk.field.setValue(omit(seoObject, metaTagName))
@@ -97,16 +114,7 @@ const Seo = ({ sdk }) => {
     );
   };
 
-  // sdk.entry.fields.title.onValueChanged((value) => {
-  //   console.log('VALUE', value);
-  //   if(value && value !== pageTitleValue) {
-  //     console.log('will change');
-  //     onFieldChange({
-  //       name: 'title',
-  //       value: `${get(sdk, 'parameters.installation.siteName', '')} | ${value}`
-  //     });
-  //   }
-  // });
+  
 
 
   const renderGeneralTab = () => {
@@ -299,6 +307,7 @@ const Seo = ({ sdk }) => {
       {selected === 'twitter' && (
         renderTwitterTab()
       )}
+      <pre>{JSON.stringify(sdk.field.getValue(), null, 2)}</pre>
     </>
   );
 };
@@ -310,6 +319,9 @@ Seo.propTypes = {
       setValue: PropTypes.func.isRequired,
       locale: PropTypes.string.isRequired,
     }),
+    entry: PropTypes.shape({
+      fields: PropTypes.object.isRequired,
+    })
   }).isRequired
 };
 

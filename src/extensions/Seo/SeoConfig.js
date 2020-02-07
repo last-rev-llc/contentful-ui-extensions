@@ -297,7 +297,6 @@ class SeoConfig extends Component {
   render () {
     const { sdk } = this.props;
     const { parameters } = this.state;
-    console.log(parameters);
     return (
       <div className="seo-config">
         <EmptyState

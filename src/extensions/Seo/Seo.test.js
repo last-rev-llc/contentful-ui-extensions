@@ -21,6 +21,7 @@ afterEach(() => {
   cleanup();
 });
 
+
 describe('<Seo />', () => {
   describe('initialize with useEffect()', () => {
     test('preview tab is selected by default', () => {

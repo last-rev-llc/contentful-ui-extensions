@@ -66,6 +66,16 @@ const sdk = {
         fallbacks: {},
         optional: { "en-US": false },
         direction: { "en-US": "ltr" }
+      },
+      entry: {
+        fields: {
+          title: {
+            onValueChanged: jest.fn(),
+          },
+          description: {
+            onValueChanged: jest.fn(),
+          }
+        }
       }
     };
   }
