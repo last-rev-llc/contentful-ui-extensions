@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Tabs, Tab, TabPanel, TextField, FieldGroup, RadioButtonField, FormLabel, Note, HelpText } from '@contentful/forma-36-react-components';
-import { get, isEmpty, omit } from 'lodash';
+import { get, isEmpty, omit, debounce } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './Seo.scss';
 import PropTypes from 'prop-types';
@@ -294,6 +294,8 @@ const Seo = (props) => {
 
   return (
     <>
+      {console.log('NEW RENDER')}
+      {console.log('sdk', sdk)}
       {renderTabs()}
       {selected === 'preview' && (
         renderPreview()

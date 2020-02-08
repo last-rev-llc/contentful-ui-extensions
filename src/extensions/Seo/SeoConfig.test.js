@@ -161,6 +161,8 @@ describe('<SeoConfig />', () => {
       [,defaultPageTitleField] = queryAllByTestId('SeoConfig-select-fields');
       expect(defaultPageTitleField.value).toEqual('0');
     });
+
+    test.todo('should check if the content type has been deleted');
   });
 
   describe('content type table renderContentTypeConfigRow()', () => {
@@ -179,6 +181,8 @@ describe('<SeoConfig />', () => {
       await wait();
       expect(queryAllByTestId('SeoConfig-tablerow-contentType').length).toEqual(2);
     });
+
+    test.todo('should check if a field has been deleted');
   });
 
   describe('content type table renderContentTypeConfigTable()', () => {
