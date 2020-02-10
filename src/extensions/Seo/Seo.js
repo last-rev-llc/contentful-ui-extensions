@@ -1,20 +1,15 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useState, useEffect} from 'react';
+import React, {useState } from 'react';
 import {Tabs, Tab, TabPanel, TextField, FieldGroup, RadioButtonField, FormLabel, Note, HelpText } from '@contentful/forma-36-react-components';
-import { get, isEmpty, omit } from 'lodash';
+import { get, isEmpty, omit, debounce } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './Seo.scss';
 import PropTypes from 'prop-types';
 import SingleAssetWithButton from '../../shared/components/SingleAssetWithButton';
 
 const Seo = ({ sdk }) => {
-  const [seoObject, setSeoObject] = useState({});
-  const [selected, setSelected] = useState('preview');
-  const [pageTitleValue, setPageTitleValue] = useState('');
-
-  useEffect(() => {
-    setSeoObject(sdk.field.getValue());
-  }, [sdk.field]);  
+  const [seoObject, setSeoObject] = useState(sdk.field.getValue());
+  const [selected, setSelected] = useState('preview'); 
 
   const onFieldChange = (field) => {
     sdk.field.setValue({
@@ -28,6 +23,12 @@ const Seo = ({ sdk }) => {
     });
   };
 
+  const onFieldChangeDebounce = debounce((field) => {
+    return onFieldChange(field);
+  }, 500, {
+    leading: false,
+  });
+
   const removeFieldProperty = (metaTagName) => {
     sdk.field.setValue(omit(seoObject, metaTagName))
       .then((response) => {
@@ -36,7 +37,6 @@ const Seo = ({ sdk }) => {
   };
 
   const handleAssetFieldChange = (metaTagName, asset) => {
-    // TODO: add status https://www.contentful.com/developers/docs/tutorials/general/determine-entry-asset-state/
     onFieldChange({
       name: metaTagName,
       value: {
@@ -86,7 +86,7 @@ const Seo = ({ sdk }) => {
             <br />
             <div className="cite">
               <cite className=""
-                data-test-id="Seo-tabpanel-preview-cite">https://www.lastrev.com › company › about</cite>
+                data-test-id="Seo-tabpanel-preview-cite">https://www.example.com › path › slug</cite>
             </div>
             <div className="description"
               data-test-id="Seo-tabpanel-preview-description">
@@ -97,18 +97,6 @@ const Seo = ({ sdk }) => {
       </TabPanel>
     );
   };
-
-  // sdk.entry.fields.title.onValueChanged((value) => {
-  //   console.log('VALUE', value);
-  //   if(value && value !== pageTitleValue) {
-  //     console.log('will change');
-  //     onFieldChange({
-  //       name: 'title',
-  //       value: `${get(sdk, 'parameters.installation.siteName', '')} | ${value}`
-  //     });
-  //   }
-  // });
-
 
   const renderGeneralTab = () => {
     return (
@@ -121,7 +109,7 @@ const Seo = ({ sdk }) => {
           helpText="Browser tab and search engine result display."
           textInputProps={{
             maxLength: 60,
-            onKeyPress: (e) => onFieldChange(e.currentTarget),
+            onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
             testId: "Seo-tabpanel-general-title"
           }}
@@ -131,8 +119,6 @@ const Seo = ({ sdk }) => {
               get(seoObject, 'title.value')
           }
           countCharacters
-          onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)}
           className="fieldset" />
         <TextField id="description"
           textarea
@@ -143,10 +129,10 @@ const Seo = ({ sdk }) => {
           textInputProps={{
             maxLength: 158,
             testId: "Seo-tabpanel-general-description",
+            onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
+            onBlur: (e) => onFieldChange(e.currentTarget),
           }}
           countCharacters
-          onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)}
           className="fieldset" />
         <TextField id="keywords"
           name="keywords"
@@ -155,11 +141,11 @@ const Seo = ({ sdk }) => {
           helpText="Keywords used for search engine indexing."
           textInputProps={{
             maxLength: 255,
-            testId: "Seo-tabpanel-general-keywords"
+            testId: "Seo-tabpanel-general-keywords",
+            onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
+            onBlur: (e) => onFieldChange(e.currentTarget),
           }}
           countCharacters
-          onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)}
           className="fieldset" />
         <FieldGroup className="fieldset">
           <FormLabel className="fieldset"
@@ -205,14 +191,12 @@ const Seo = ({ sdk }) => {
           helpText="The title of your article without any branding such as your site name."
           textInputProps={{
             maxLength: 60,
-            onKeyPress: (e) => onFieldChange(e.currentTarget),
+            onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
             testId: "Seo-tabpanel-og:title"
           }}
           value={get(seoObject, 'og:title.value', get(seoObject, 'title.value'))}
-          countCharacters
-          onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)} />
+          countCharacters />
         <TextField id="og:description"
           textarea
           name="og:description"
@@ -221,11 +205,11 @@ const Seo = ({ sdk }) => {
           helpText="A brief description of the content, usually between 2 and 4 sentences. This will displayed below the title of the post on Facebook."
           textInputProps={{
             testId: "Seo-tabpanel-og:description",
-            maxLength: 255
+            maxLength: 255,
+            onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
+            onBlur: (e) => onFieldChange(e.currentTarget),
           }}
           countCharacters
-          onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)}
           className="fieldset" />
         <FormLabel className="fieldset"
           htmlFor="og:image">Post Image</FormLabel>
@@ -250,14 +234,12 @@ const Seo = ({ sdk }) => {
           helpText="The title of your article without any branding such as your site name."
           textInputProps={{
             maxLength: 60,
-            onKeyPress: (e) => onFieldChange(e.currentTarget),
+            onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
             testId: "Seo-tabpanel-twitter:title"
           }}
           value={get(seoObject, 'twitter:title.value', get(seoObject, 'title.value'))}
-          countCharacters
-          onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)} />
+          countCharacters />
         <TextField id="twitter:description"
           textarea
           
@@ -267,11 +249,11 @@ const Seo = ({ sdk }) => {
           helpText="A description that concisely summarizes the content as appropriate for presentation within a Tweet. You should not re-use the title as the description or use this field to describe the general services provided by the website."
           textInputProps={{
             maxLength: 255,
-            testId: "Seo-tabpanel-twitter:description"
+            testId: "Seo-tabpanel-twitter:description",
+            onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
+            onBlur: (e) => onFieldChange(e.currentTarget),
           }}
           countCharacters
-          onChange={(e) => onFieldChange(e.currentTarget)}
-          onBlur={(e) => onFieldChange(e.currentTarget)}
           className="fieldset" />
         <FormLabel className="fieldset"
           htmlFor="twitter:image">Post Image</FormLabel>
@@ -300,6 +282,9 @@ const Seo = ({ sdk }) => {
       {selected === 'twitter' && (
         renderTwitterTab()
       )}
+      <pre>
+        {JSON.stringify(seoObject, null, 2)}
+      </pre>
     </>
   );
 };

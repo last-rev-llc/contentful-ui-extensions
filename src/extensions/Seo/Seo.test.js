@@ -130,19 +130,14 @@ describe('<Seo />', () => {
       expect(getByTestId('Seo-tabpanel-general-robots-false').checked)
         .toBeTruthy();
     });
-    test('onFieldChange triggerd by input onChange, and onBlur', async () => {
+    test('onFieldChange triggerd by input onKeyPress, and onBlur', async () => {
       const { getByTestId } = render(<Seo sdk={sdk} />);
       fireEvent.click(getByTestId('Seo-tab-general'));
 
       fireEvent.blur(getByTestId('Seo-tabpanel-general-title'));
       fireEvent.focus(getByTestId('Seo-tabpanel-general-title'));
-      fireEvent.change(getByTestId('Seo-tabpanel-general-title'), {
-        target: {
-          value: 'ABC'
-        }
-      });
       await wait();
-      expect(await sdk.field.setValue).toHaveBeenCalledTimes(2);
+      expect(await sdk.field.setValue).toHaveBeenCalledTimes(1);
 
       fireEvent.blur(getByTestId('Seo-tabpanel-general-description'));
       fireEvent.focus(getByTestId('Seo-tabpanel-general-description'));
@@ -152,7 +147,7 @@ describe('<Seo />', () => {
         }
       });
       await wait();
-      expect(await sdk.field.setValue).toHaveBeenCalledTimes(4);
+      expect(await sdk.field.setValue).toHaveBeenCalledTimes(2);
       fireEvent.blur(getByTestId('Seo-tabpanel-general-keywords'));
       fireEvent.focus(getByTestId('Seo-tabpanel-general-keywords'));
       fireEvent.change(getByTestId('Seo-tabpanel-general-keywords'), {
@@ -161,7 +156,7 @@ describe('<Seo />', () => {
         }
       });
       await wait();
-      expect(await sdk.field.setValue).toHaveBeenCalledTimes(6);
+      expect(await sdk.field.setValue).toHaveBeenCalledTimes(3);
     });
   });
 
