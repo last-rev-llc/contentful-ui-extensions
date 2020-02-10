@@ -282,9 +282,6 @@ const Seo = ({ sdk }) => {
       {selected === 'twitter' && (
         renderTwitterTab()
       )}
-      <pre>
-        {JSON.stringify(seoObject, null, 2)}
-      </pre>
     </>
   );
 };
