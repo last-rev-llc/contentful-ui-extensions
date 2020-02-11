@@ -1,18 +1,21 @@
 # Last Rev: SEO
+
 The Last Rev SEO extension can be used to enable content creators to add meta data to websites for page titles, descriptions, and social sites like Facebook and Twitter
 
 ## Setup Instructions
-1. [Click here to deploy](https://app.netlify.com/start/deploy?repository=https://github.com/last-rev-llc/contentful-ui-extensions) to Netlify or deploy this repo to a hosting provider of your choice. 
+
+1. [Click here to deploy](https://app.netlify.com/start/deploy?repository=https://github.com/last-rev-llc/contentful-ui-extensions) to Netlify or deploy this repo to a hosting provider of your choice.
 2. Create a new UI Extension in your space and choose thos following Options:
     - Name: SEO
     - Field Types: Object
     - Hosting: Self-hosted(src)
-    - Self-Hosted URL: https://your-extension-domain.netlify.com/seo
+    - Self-Hosted URL: [https://your-extension-domain.netlify.com/seo](https://your-extension-domain.netlify.com/seo)
 3. Create an Object (JSON) field in your content model you want to use the SEO field
 4. On the Content Model page, select "Settings" on the new JSON field you added
-5. Go to Appearance and select your new UI Extension 
+5. Go to Appearance and select your new UI Extension
 
 ## Output Example
+
 ```json
 {
   "title": {
@@ -63,4 +66,5 @@ The Last Rev SEO extension can be used to enable content creators to add meta da
 ```
 
 ## Reporting Issues
+
 If you find any bugs or want to suggest a feature, please submit them on the Github repo Issues tab. Thanks!

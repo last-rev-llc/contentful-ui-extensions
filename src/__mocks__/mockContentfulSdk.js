@@ -47,7 +47,7 @@ const sdk = {
           };
         }),
         getAsset: jest.fn().mockImplementation((type) => {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             if(type === 'reject') {
               return resolve(mockContentfulAsset.error);
             }
