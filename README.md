@@ -29,23 +29,21 @@ In order to help streamline the process of development we have created a mock SD
 
 This will be a list of all available UI Extensions.
 
-##### Individual Extensions
-- [Color Picker](http://localhost:3000/color-picker)
-- [SEO](http://localhost:3000/seo)
 
 ### Using in Contentful
-To see the extension in your Contentful instance follow the directions below for each extension
+To see the extension in your Contentful instance follow the directions below for each extension.
+> When running locally you will need to allow "unsafe" scripts to be allowed. This is because you run localhost with http and since Contentful injects it using an iFrame browsers will block them by default.
+
+##### Individual Extension Documentation
+- [Color Picker](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/ColorPicker)
+- [SEO](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Seo)
+
 
 #### Prerequisites
 You need an account for Contentful to use these extensions. 
 - Go to [www.contentful.com](https://www.contentful.com/sign-up/?utm_campaign=lastrev-ui-extension)
 - Fill out the form and you will go to your first space
 - Please Follow the instructions for [Installing and using Extensions](https://www.contentful.com/developers/docs/extensibility/ui-extensions/managing-a-ui-extension-with-webapp/)
-
-[ ] TODO: SEO Needs to add docs for adding an app [Using Apps Alpha](https://www.contentful.com/developers/docs/extensibility/apps/building-apps/)
-
-### Installing
-[ ] TODO: Step by Step instructions to setup a UI extension and App
 
 ## Application Structure
 ```
@@ -54,6 +52,8 @@ You need an account for Contentful to use these extensions.
 ├── src
 │   ├── __mocks__
 │   ├── extensions
+│   ├── ├── ColorPicker
+│   ├── ├── Seo
 │   ├── shared
 ├── history.js
 ├── index.js
@@ -73,34 +73,34 @@ Normal watch mode
 npm test
 ```
 
-Runs in verbose and gives coverage report
-```
-npm run fulltest
-```
-
-### Testing Structure
+### Mocks
 ```
 .
 ├── __mocks__
 │   ├── mockContentfulAsset.js          # Mock Asset response from Contentful
 │   ├── mockContentfulContentType.js    # Mock Content Type Response from Contentful
 │   └── mockContentfulSdk.js            # Mock SDK used for mocking functions and data returned by Contentful
-└── ...
+│   └── mockLocations.js                # Mock locations for Contentful
+└── extensions
+│   ├── Seo                             # Each extension has a _mocks_ folder and a mockFieldValue and mockAppConfig (for apps alpha)
+│   ├── ├── __mocks__                   # mockFieldValue and mockAppConfig for SEO
 ```
 
 ## Deployment
 
-[ ] TODO
+You can deploy this to Netlify with one click 
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/last-rev-llc/contentful-ui-extensions/)
 
 ## Built With
 
-* [Create Ract App](https://github.com/facebook/create-react-app)
+* [Create React App](https://github.com/facebook/create-react-app)
 * [Contentful Management API](https://www.contentful.com/developers/docs/references/content-management-api/)
 * [Contentful UI Extensions](https://www.contentful.com/developers/docs/extensibility/ui-extensions/)
 
 ## Contributing
 
-[ ] TODO
+If you would like to contribute please submit a pull request. Make sure you write tests and it passes the linter before submitting.
 
 ## Versioning
 
