@@ -5,6 +5,7 @@ import React from 'react';
 import {Router, Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
+import FormStack from './FormStack';
 import Seo from './Seo';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
@@ -34,6 +35,10 @@ const App = ({ sdk, locations }) => {
             return <Seo sdk={sdk || usedSdk}
               locations={locations} />;
           }}/>
+        <Route path="/formstack"
+          exact
+          component={() => <FormStack sdk={sdk || colorPickerMockSdk}
+            locations={locations} />} />
       </Switch>
     </Router>
   );
