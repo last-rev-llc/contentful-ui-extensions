@@ -5,12 +5,12 @@ import React from 'react';
 import {Router, Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
-import HelloJustin from './HelloJustin';
+import UiExtensions from './UiExtensions';
 import Seo from './Seo';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
-import HelloJustinMockSdk from './HelloJustin/mockSdk';
+import NewFieldMockSdk from './UiExtensions/mockSdk';
 import colorPickerMockSdk from './ColorPicker/mockSdk';
 
 const App = ({ sdk, locations }) => {
@@ -24,9 +24,9 @@ const App = ({ sdk, locations }) => {
           exact
           component={() => <ColorPicker sdk={sdk || colorPickerMockSdk}
             locations={locations} />} />
-        <Route path="/hello-justin"
+        <Route path="/ui-extensions"
           exact
-          component={() => <HelloJustin sdk={sdk || HelloJustinMockSdk}
+          component={() => <UiExtensions sdk={sdk || NewFieldMockSdk}
             locations={locations} />} />
         <Route path="/seo"
           exact
