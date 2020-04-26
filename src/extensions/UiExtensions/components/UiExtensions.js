@@ -46,20 +46,21 @@ const UiExtensions = ({ sdk }) => {
   const [nameField, setNameField] = useState('');
   const [valueField, setValueField] = useState('');
 
+  // sdk.field.setValue({});
   // Sets the intial state value on component load to the Contentful value
-  // useEffect(() => {
-  //   if(sdk.field.getValue()) {
-  //     setJsonObject(sdk.field.getValue());
-  //   }
-  // }, [sdk.field]);
+  useEffect(() => {
+    if(sdk.field.getValue()) {
+      setJsonObject(sdk.field.getValue());
+    }
+  }, [sdk.field]);
 
   const addProperty = (name, value) => {
-    const {property} = value;
     const newValue = {
-      [name]: property
+      ...jsonObject,
+      [name]: value
     };
-    sdk.field.setValue(mockData);
-    setJsonObject(mockData);
+    sdk.field.setValue(newValue);
+    setJsonObject(newValue);
   };
 
   const onNameChange = event => {
@@ -78,12 +79,14 @@ const UiExtensions = ({ sdk }) => {
         onNameChange={onNameChange}
         onValueChange={onValueChange}
         addProperty={addProperty} />
-      <FieldList jsonObject={jsonObject} />
+      <FieldList 
+        sdk={sdk}
+        jsonObject={jsonObject}
+        setJsonObject={setJsonObject} />
     </>
   );
   
 };
-
 
 UiExtensions.propTypes = {
   sdk: PropTypes.shape({

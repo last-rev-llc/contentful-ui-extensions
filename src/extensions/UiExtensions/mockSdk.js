@@ -1,10 +1,10 @@
 const sdk = {
   field: {
     getValue: () => {
-      return 'Justin';
+      return this;
     },
-    setValue: () => {
-      return null;
+    setValue: value => {
+      return value;
     }
   },
 };

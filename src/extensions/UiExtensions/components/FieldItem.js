@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button } from '@contentful/forma-36-react-components';
 import FieldProperty from './FieldProperty';
 
-const FieldItem = ({ nameField, valueField }) => {
+const FieldItem = ({ sdk, jsonObject, setJsonObject, nameField, valueField }) => {
   const [name, setName] = useState(nameField);
   const [value, setValue] = useState(valueField);
 
@@ -12,6 +12,12 @@ const FieldItem = ({ nameField, valueField }) => {
   };
 
   const onValueChange = event => {
+    const newValue = {
+      ...jsonObject,
+      [nameField]: event.currentTarget.value
+    };
+    sdk.field.setValue(newValue);
+    setJsonObject(newValue);
     setValue(event.currentTarget.value);
   };
 
@@ -48,6 +54,14 @@ const FieldItem = ({ nameField, valueField }) => {
 };
 
 FieldItem.propTypes = {
+  sdk: PropTypes.shape({
+    field: PropTypes.shape({
+      getValue: PropTypes.func.isRequired,
+      setValue: PropTypes.func.isRequired
+    }),
+  }).isRequired,
+  jsonObject: PropTypes.object.isRequired,
+  setJsonObject: PropTypes.func.isRequired,
   nameField: PropTypes.string.isRequired, 
   valueField: PropTypes.string.isRequired
 };

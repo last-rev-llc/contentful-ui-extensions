@@ -3,7 +3,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import FieldItem from './FieldItem';
 
-const FieldList = ({ jsonObject }) => {
+const FieldList = ({ sdk, jsonObject, setJsonObject }) => {
+  console.log(sdk);
   console.log(jsonObject);
   const renderedList = _.keys(jsonObject).map((key, id) => {
     let fieldValue = '';
@@ -11,9 +12,15 @@ const FieldList = ({ jsonObject }) => {
     if (key) {
       fieldValue = jsonObject[key];
     }
+    const divKey = id;
     return (
-      <div id="row">
+      <div 
+        id="row" 
+        key={divKey}>
         <FieldItem 
+          sdk={sdk}
+          jsonObject={jsonObject}
+          setJsonObject={setJsonObject}
           nameField={key} 
           valueField={fieldValue || ''} />
       </div>
@@ -28,7 +35,14 @@ const FieldList = ({ jsonObject }) => {
 };
 
 FieldList.propTypes = {
-  jsonObject: PropTypes.object.isRequired
+  sdk: PropTypes.shape({
+    field: PropTypes.shape({
+      getValue: PropTypes.func.isRequired,
+      setValue: PropTypes.func.isRequired
+    }),
+  }).isRequired,
+  jsonObject: PropTypes.object.isRequired,
+  setJsonObject: PropTypes.func.isRequired
 };
 
 export default FieldList;
