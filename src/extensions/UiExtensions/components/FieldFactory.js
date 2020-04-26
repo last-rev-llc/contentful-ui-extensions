@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from '@contentful/forma-36-react-components';
 import FieldProperty from './FieldProperty';
 
-const FieldFactory = ({sdk}) => {
-  const [fieldValue, setFieldValue] = useState({});
+const FieldFactory = ({nameField, valueField, onNameChange, onValueChange, addProperty}) => {
 
   return (
     <div>
-      <FieldProperty sdk={sdk} />
+      <FieldProperty 
+        nameField={nameField}
+        valueField={valueField}
+        onNameChange={onNameChange} 
+        onValueChange={onValueChange}
+        readOnly={false} />
       <Button
         buttonType="positive"
         isFullWidth={false}
         loading={false}
-        onClick={() => {}}
+        onClick={() => addProperty(nameField, valueField)}
         testId="cf-ui-button"
         type="button">
         +
@@ -23,12 +27,11 @@ const FieldFactory = ({sdk}) => {
 };
 
 FieldFactory.propTypes = {
-  sdk: PropTypes.shape({
-    field: PropTypes.shape({
-      getValue: PropTypes.func.isRequired,
-      setValue: PropTypes.func.isRequired
-    })
-  }).isRequired
+  nameField: PropTypes.string.isRequired,
+  valueField: PropTypes.string.isRequired,
+  onNameChange: PropTypes.func.isRequired,
+  onValueChange: PropTypes.func.isRequired,
+  addProperty: PropTypes.func.isRequired
 };
 
 export default FieldFactory;

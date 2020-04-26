@@ -1,49 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { TextInput } from '@contentful/forma-36-react-components';
 
-const NameField = ({ sdk, isDisabled }) => {
-  
-  const [fieldValue, setFieldValue] = useState(null);
-  // Sets the intial state value on component load to the Contentful value
-  // useEffect(() => {
-  //   if(sdk.field.getValue()) {
-  //     setFieldValue(sdk.field.getValue());
-  //   }
-  // }, [sdk.field]);
-
-  const onInputChange = event => {
-    sdk.field.setValue(event.currentTarget.value);
-    setFieldValue(event.currentTarget.value);
-  };
+const NameField = ({ nameField, onNameChange, readOnly }) => {
 
   return (
     <div>
       <TextInput
         className=""
-        disabled={isDisabled}
+        disabled={readOnly}
         id="keyName"
         name="keyName"
-        onChange={event => onInputChange(event)}
-        required={false}
+        onChange={event => onNameChange(event)}
+        required
         testId="cf-ui-text-input-key-name"
-        value={fieldValue}
+        value={nameField}
         width="medium" />
     </div>
   );
 };
 
 NameField.propTypes = {
-  sdk: PropTypes.shape({
-    field: PropTypes.shape({
-      getValue: PropTypes.func.isRequired,
-      setValue: PropTypes.func.isRequired
-    })
-  }).isRequired,
-  isDisabled: PropTypes.shape({
-    getValue: PropTypes.func.isRequired,
-    setValue: PropTypes.func.isRequired
-  }).isRequired
+  nameField: PropTypes.string.isRequired,
+  onNameChange: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool.isRequired
 };
 
 export default NameField;

@@ -1,37 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import NameField from './NameField';
 import ValueField from './ValueField';
 
-const FieldProperty = ({ sdk }) => {
+const FieldProperty = ({ nameField, valueField, onNameChange, onValueChange, readOnly }) => {
   
-  const [fieldValue, setFieldValue] = useState(null);
-  // Sets the intial state value on component load to the Contentful value
-  // useEffect(() => {
-  //   if(sdk.field.getValue()) {
-  //     setFieldValue(sdk.field.getValue());
-  //   }
-  // }, [sdk.field]);
-
   return (
     <div>
       <NameField 
-        sdk={sdk} 
-        isDisabled={false} />
+        nameField={nameField}
+        onNameChange={onNameChange} 
+        readOnly={readOnly} />
       :
       <ValueField 
-        sdk={sdk} />
+        valueField={valueField}
+        onValueChange={onValueChange} />
     </div>
   );
 };
 
 FieldProperty.propTypes = {
-  sdk: PropTypes.shape({
-    field: PropTypes.shape({
-      getValue: PropTypes.func.isRequired,
-      setValue: PropTypes.func.isRequired
-    }),
-  }).isRequired
+  nameField: PropTypes.string.isRequired,
+  valueField: PropTypes.string.isRequired,
+  onNameChange: PropTypes.func.isRequired,
+  onValueChange: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool.isRequired
 };
 
 export default FieldProperty;
