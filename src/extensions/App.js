@@ -24,7 +24,7 @@ const App = ({ sdk, locations }) => {
           exact
           component={() => <ColorPicker sdk={sdk || colorPickerMockSdk}
             locations={locations} />} />
-        <Route path="/ui-extensions"
+        <Route path="/localization-lookup"
           exact
           component={() => <UiExtensions sdk={sdk || NewFieldMockSdk}
             locations={locations} />} />

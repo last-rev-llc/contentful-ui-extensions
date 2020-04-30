@@ -5,23 +5,32 @@ import FieldProperty from './FieldProperty';
 
 const FieldFactory = ({nameField, valueField, onNameChange, onValueChange, addProperty}) => {
 
+  const buttonStyle = {
+    marginTop: '-3px'
+  };
+
   return (
     <div>
-      <FieldProperty 
-        nameField={nameField}
-        valueField={valueField}
-        onNameChange={onNameChange} 
-        onValueChange={onValueChange}
-        readOnly={false} />
-      <Button
-        buttonType="positive"
-        isFullWidth={false}
-        loading={false}
-        onClick={() => addProperty(nameField, valueField)}
-        testId="cf-ui-button"
-        type="button">
-        +
-      </Button>
+      <div className="d-inline-block">
+        <FieldProperty 
+          nameField={nameField}
+          valueField={valueField}
+          onNameChange={onNameChange} 
+          onValueChange={onValueChange}
+          readOnly={false} />
+      </div>
+      <div className="d-inline-block ml-3">
+        <Button
+          style={buttonStyle}
+          buttonType="positive"
+          isFullWidth={false}
+          loading={false}
+          onClick={() => addProperty(nameField, valueField)}
+          testId="cf-ui-button"
+          type="button">
+          +
+        </Button>
+      </div>
     </div>
   );
 };

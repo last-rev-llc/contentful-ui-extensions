@@ -1,3 +1,3 @@
-import UiExtensions from './components/UiExtensions';
+import UiExtensions from './components/LocalizationLookup';
 
 export default UiExtensions;

@@ -6,15 +6,19 @@ import ValueField from './ValueField';
 const FieldProperty = ({ nameField, valueField, onNameChange, onValueChange, readOnly }) => {
   
   return (
-    <div>
-      <NameField 
-        nameField={nameField}
-        onNameChange={onNameChange} 
-        readOnly={readOnly} />
-      :
-      <ValueField 
-        valueField={valueField}
-        onValueChange={onValueChange} />
+    <div className="my-2">
+      <div className="d-inline-block">
+        <NameField 
+          nameField={nameField}
+          onNameChange={onNameChange} 
+          readOnly={readOnly} />
+      </div>
+      <span className="d-inline-block mx-3">:</span>
+      <div className="d-inline-block">
+        <ValueField 
+          valueField={valueField}
+          onValueChange={onValueChange} />
+      </div>
     </div>
   );
 };
