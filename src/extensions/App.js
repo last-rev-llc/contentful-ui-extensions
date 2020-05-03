@@ -5,12 +5,12 @@ import React from 'react';
 import {Router, Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
-import UiExtensions from './UiExtensions';
+import LocalizationLookup from './LocalizationLookup';
 import Seo from './Seo';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
-import NewFieldMockSdk from './UiExtensions/mockSdk';
+import localizationLookupMockSdk from './LocalizationLookup/mockSdk';
 import colorPickerMockSdk from './ColorPicker/mockSdk';
 
 const App = ({ sdk, locations }) => {
@@ -26,7 +26,7 @@ const App = ({ sdk, locations }) => {
             locations={locations} />} />
         <Route path="/localization-lookup"
           exact
-          component={() => <UiExtensions sdk={sdk || NewFieldMockSdk}
+          component={() => <LocalizationLookup sdk={sdk || localizationLookupMockSdk}
             locations={locations} />} />
         <Route path="/seo"
           exact

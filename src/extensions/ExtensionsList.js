@@ -9,8 +9,8 @@ export default function ExtensionsList() {
           className="">Color</Link></li>
         <li><Link to="/seo"
           className="">Seo</Link></li>
-        <li><Link to="/ui-extensions"
-          className="">UI Extensions</Link></li>
+        <li><Link to="/localization-lookup"
+          className="">Localization Lookup</Link></li>
       </ul>
     </div>
   );
