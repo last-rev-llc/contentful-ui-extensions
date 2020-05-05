@@ -179,6 +179,8 @@ const LocalizationLookup = ({ sdk }) => {
 
     const onCancel = () => {
       setEditKey('');
+      setUniqueError(false);
+      setNameRequiredError(false);
     };
 
     const onEditClick = () => {
@@ -186,26 +188,35 @@ const LocalizationLookup = ({ sdk }) => {
       setEditValue(value);
       setEditKey(name);
     };
+
+    const clearEdit = () => {
+      setEditKey('');
+      setEditName('');
+      setEditValue('');
+    };
   
     const onEditSave = () => {
       const keyValue = _.camelCase(editName);
-      const blankName = !editName;
-      const duplicateName = hasDuplicate(jsonObject, keyValue, oldName);
 
-      setNameRequiredError(!editName);
-      setUniqueError(hasDuplicate(jsonObject, keyValue, oldName));
-      
-      if (!blankName && !duplicateName) {
-        const newObject = _.omit(jsonObject, [oldName]);
-        const newValue = updateJson(newObject, keyValue, editValue);
+      if (keyValue !== oldName) {
+        const blankName = !editName;
+        const duplicateName = hasDuplicate(jsonObject, keyValue, oldName);
+
+        setNameRequiredError(!editName);
+        setUniqueError(hasDuplicate(jsonObject, keyValue, oldName));
         
-        sdk.field.setValue(newValue);
-        oldName = name;
-        setJsonObject(newValue);
-        setEditKey('');
-        setEditName('');
-        setEditValue('');
-      }     
+        if (!blankName && !duplicateName) {
+          const newObject = _.omit(jsonObject, [oldName]);
+          const newValue = updateJson(newObject, keyValue, editValue);
+          
+          sdk.field.setValue(newValue);
+          oldName = name;
+          setJsonObject(newValue);
+          clearEdit();
+        }
+      } else {
+        clearEdit();
+      }    
     };
   
     const onValueChange = event => {
