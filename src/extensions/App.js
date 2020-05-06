@@ -6,6 +6,8 @@ import {Router, Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
 import FormStack from './FormStack';
+import LivePreview from './LivePreview';
+import PreviewButton from './LivePreview/PreviewButton';
 import Seo from './Seo';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
@@ -38,6 +40,14 @@ const App = ({ sdk, locations }) => {
         <Route path="/formstack"
           exact
           component={() => <FormStack sdk={sdk || colorPickerMockSdk}
+            locations={locations} />} />
+        <Route path="/preview"
+          exact
+          component={() => <LivePreview sdk={sdk || {}}
+            locations={locations} />} />
+        <Route path="/preview-btn"
+          exact
+          component={() => <PreviewButton sdk={sdk || {}}
             locations={locations} />} />
       </Switch>
     </Router>
