@@ -7,38 +7,40 @@ const buttonStyle = {
   marginTop: '-3px'
 };
 
-const uniqueErrorMessage = 'This Name has already been added. Please change the Name to add field.';
-const nameRequiredErrorMessage = 'At least one character is required for the Name field';
+export const uniqueErrorMessage = 'This Name has already been added. Please change the Name to add field.';
+export const nameRequiredErrorMessage = 'At least one character is required for the Name field.';
 
-const updateJson = (json, name, value) => {
+export const updateJson = (json, name, value) => {
   return {
     ...json,
     [name]: value
   };
 };
 
-const renderError = (error, message) => {
+export const renderError = (error, message, position) => {
   return error ? (
-    <div className="alert alert-danger">
+    <div 
+      className="alert alert-danger"
+      data-test-id={`error-${position}`}>
       {message}
     </div>
   ) : null;
 };
 
-const renderButton = (label, buttonType, onClick) => {
+export const renderButton = (label, buttonType, onClick, position) => {
   return <Button
     style={buttonStyle}
     buttonType={buttonType}
     isFullWidth={false}
     loading={false}
     onClick={onClick}
-    testId="cf-ui-button"
+    testId={`cf-ui-button-${label}-${position}`}
     type="button">
     {label}
   </Button>;
 };
 
-const renderNameField = (nameField, onNameChange, readOnly) => {
+export const renderNameField = (nameField, onNameChange, readOnly, position) => {
   return (
     <div>
       <TextInput
@@ -49,14 +51,14 @@ const renderNameField = (nameField, onNameChange, readOnly) => {
         placeholder="Name"
         onChange={event => onNameChange(event)}
         required
-        testId="cf-ui-text-input-key-name"
+        testId={`cf-ui-text-input-key-name-${position}`}
         value={nameField}
         width="medium" />
     </div>
   );
 };
 
-const renderValueField = (valueField, onValueChange) => {
+export const renderValueField = (valueField, onValueChange, position) => {
   return (
     <div>
       <TextInput
@@ -66,28 +68,28 @@ const renderValueField = (valueField, onValueChange) => {
         placeholder="Value"
         onChange={event => onValueChange(event)}
         required={false}
-        testId="cf-ui-text-input-key-value"
+        testId={`cf-ui-text-input-key-value-${position}`}
         value={valueField}
         width="medium" />
     </div>
   );
 };
 
-const renderFieldProperty = (nameField, valueField, onNameChange, onValueChange, readOnly) => {
+export const renderFieldProperty = (nameField, valueField, onNameChange, onValueChange, readOnly, position) => {
   return (
     <div className="my-2">
       <div className="d-inline-block">
-        {renderNameField(nameField, onNameChange, readOnly)}
+        {renderNameField(nameField, onNameChange, readOnly, position)}
       </div>
       <span className="d-inline-block mx-3">:</span>
       <div className="d-inline-block">
-        {renderValueField(valueField, onValueChange)}
+        {renderValueField(valueField, onValueChange, position)}
       </div>
     </div>
   );
 };
 
-const hasDuplicate = (jsonObject, newName, oldName) => {
+export const hasDuplicate = (jsonObject, newName, oldName) => {
   return _.keys(jsonObject)
     .filter(key => key !== oldName)
     .some(key => newName.toUpperCase() === key.toUpperCase());
@@ -137,33 +139,33 @@ const LocalizationLookup = ({ sdk }) => {
     }
   };
 
-  const renderErrors = () => {
+  const renderErrors = position => {
     return !nameRequiredError 
-      ? renderError(uniqueError, uniqueErrorMessage) 
-      : renderError(nameRequiredError, nameRequiredErrorMessage);    
+      ? renderError(uniqueError, uniqueErrorMessage, position) 
+      : renderError(nameRequiredError, nameRequiredErrorMessage, position);
   };
 
   const renderFactoryErrors = () => {
     return !nameRequiredErrorInFactory 
-      ? renderError(uniqueErrorInFactory, uniqueErrorMessage) 
-      : renderError(nameRequiredErrorInFactory, nameRequiredErrorMessage);    
+      ? renderError(uniqueErrorInFactory, uniqueErrorMessage, 'factory') 
+      : renderError(nameRequiredErrorInFactory, nameRequiredErrorMessage, 'factory');
   };
 
   const renderFieldFactory = () => {
     return (
       <div>
         <div className="d-inline-block">
-          {renderFieldProperty(nameField, valueField, onNameFieldChange, onValueFieldChange, false)}
+          {renderFieldProperty(nameField, valueField, onNameFieldChange, onValueFieldChange, false, 'factory')}
         </div>
         <div className="d-inline-block ml-3">
-          {renderButton('+', 'positive', () => addProperty(nameField, valueField))}
+          {renderButton('+', 'positive', () => addProperty(nameField, valueField), 'factory')}
         </div>
         {renderFactoryErrors()}
       </div>
     );
   };
 
-  const renderFieldItem = (nameIn, valueIn) => {
+  const renderFieldItem = (nameIn, valueIn, position) => {
     const name = nameIn;
     let value = valueIn;
     let oldName = name;
@@ -178,6 +180,10 @@ const LocalizationLookup = ({ sdk }) => {
     };
 
     const onCancel = () => {
+      const newValue = updateJson(jsonObject, oldName, editValue);
+  
+      sdk.field.setValue(newValue);
+      setJsonObject(newValue);
       setEditKey('');
       setUniqueError(false);
       setNameRequiredError(false);
@@ -215,6 +221,10 @@ const LocalizationLookup = ({ sdk }) => {
           clearEdit();
         }
       } else {
+        const newValue = updateJson(jsonObject, oldName, editValue);
+  
+        sdk.field.setValue(newValue);
+        setJsonObject(newValue);
         clearEdit();
       }    
     };
@@ -226,6 +236,13 @@ const LocalizationLookup = ({ sdk }) => {
         sdk.field.setValue(newValue);
         setJsonObject(newValue);
       }
+      else {
+        const newValue = updateJson(jsonObject, oldName, event.currentTarget.value);
+  
+        sdk.field.setValue(newValue);
+        setJsonObject(newValue);
+      }
+      setEditValue(event.currentTarget.value);
       value = event.currentTarget.value;
     };
 
@@ -240,27 +257,27 @@ const LocalizationLookup = ({ sdk }) => {
     return disable ? (
       <div>
         <div className="d-inline-block">
-          {renderFieldProperty(name, value, () => {}, onValueChange, disable)}
+          {renderFieldProperty(name, value, () => {}, onValueChange, disable, position)}
         </div>
         <div className="d-inline-block ml-3">
-          {renderButton('Edit', 'primary', onEditClick)}
+          {renderButton('Edit', 'primary', onEditClick, position)}
         </div>
         <div className="d-inline-block ml-1">
-          {renderButton('-', 'negative', onDelete)}
+          {renderButton('-', 'negative', onDelete, position)}
         </div>
       </div>
     ) : (
       <div>
         <div className="d-inline-block">
-          {renderFieldProperty(editName, editValue, onEditNameChange, onEditValueChange, disable)}
+          {renderFieldProperty(editName, editValue, onEditNameChange, onEditValueChange, disable, position)}
         </div>
         <div className="d-inline-block ml-3">
-          {renderButton('Save', 'primary', onEditSave)}
+          {renderButton('Save', 'primary', onEditSave, position)}
         </div>
         <div className="d-inline-block ml-1">
-          {renderButton('Cancel', 'muted', onCancel)}
+          {renderButton('Cancel', 'muted', onCancel, position)}
         </div>
-        {renderErrors()}
+        {renderErrors(position)}
       </div>
     );
   };
@@ -274,8 +291,9 @@ const LocalizationLookup = ({ sdk }) => {
       return (
         <div 
           id="row" 
-          key={divKey}>
-          {renderFieldItem(key, fieldValue)}
+          key={divKey}
+          data-test-id="field-item">
+          {renderFieldItem(key, fieldValue, id)}
         </div>
       );
     });
