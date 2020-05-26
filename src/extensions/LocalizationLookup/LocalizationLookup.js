@@ -158,7 +158,7 @@ const LocalizationLookup = ({ sdk }) => {
           {renderFieldProperty(nameField, valueField, onNameFieldChange, onValueFieldChange, false, 'factory')}
         </div>
         <div className="d-inline-block ml-3">
-          {renderButton('+', 'positive', () => addProperty(nameField, valueField), 'factory')}
+          {renderButton('+', 'positive', () => addProperty(), 'factory')}
         </div>
         {renderFactoryErrors()}
       </div>
