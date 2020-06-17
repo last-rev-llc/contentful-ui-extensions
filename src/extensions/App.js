@@ -6,11 +6,13 @@ import {Router, Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
 import LocalizationLookup from './LocalizationLookup';
+import ContentDiff from './ContentDiff';
 import Seo from './Seo';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
 import localizationLookupMockSdk from './LocalizationLookup/mockSdk';
+import contentDiffMockSdk from './ContentDiff/mockSdk';
 import colorPickerMockSdk from './ColorPicker/mockSdk';
 
 const App = ({ sdk, locations }) => {
@@ -27,6 +29,10 @@ const App = ({ sdk, locations }) => {
         <Route path="/localization-lookup"
           exact
           component={() => <LocalizationLookup sdk={sdk || localizationLookupMockSdk}
+            locations={locations} />} />
+        <Route path="/content-diff"
+          exact
+          component={() => <ContentDiff sdk={sdk || contentDiffMockSdk}
             locations={locations} />} />
         <Route path="/seo"
           exact
