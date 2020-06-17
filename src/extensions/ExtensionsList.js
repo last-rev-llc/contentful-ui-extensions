@@ -11,6 +11,8 @@ export default function ExtensionsList() {
           className="">Seo</Link></li>
         <li><Link to="/localization-lookup"
           className="">Localization Lookup</Link></li>
+        <li><Link to="/locale-zooms"
+          className="">Locale Zooms</Link></li>
       </ul>
     </div>
   );
