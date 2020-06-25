@@ -1,22 +1,22 @@
 import React from 'react';
 // import _ from 'lodash';
 import PropTypes from 'prop-types';
-import diff from 'node-htmldiff';
+import { locations } from 'contentful-ui-extensions-sdk';
+import { SidebarExtension, DialogExtension } from '../../content-diff-dialog/src/index';
 
-const ContentDiff = () => {
-  const string1 = "Adam Was Here";
-  const string2 = "Adam and Justin were here";
-  const diffContent = diff(string1, string2);
+const ContentDiff = ({ sdk }) => {
 
-  return (
-    <>
-      <table>
-        <tr><td>{string1}</td>
-          <td><div dangerouslySetInnerHTML={{__html: diffContent}} /></td>
-          <td>{string2}</td></tr>
-      </table>
-    </>
-  );
+  return !sdk.location.is(locations.LOCATION_DIALOG) 
+    ? (
+      <>
+        <SidebarExtension sdk={sdk} />
+      </>
+    ) 
+    : (
+      <>
+        <DialogExtension sdk={sdk} />
+      </>
+    );
 
 };
 
@@ -26,6 +26,9 @@ ContentDiff.propTypes = {
       getValue: PropTypes.func.isRequired,
       setValue: PropTypes.func.isRequired
     }),
+    location: PropTypes.shape({
+      is: PropTypes.func.isRequired
+    })
   }).isRequired
 };
 

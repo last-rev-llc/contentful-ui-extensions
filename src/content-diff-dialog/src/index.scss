@@ -1,0 +1,61 @@
+html,
+body,
+div {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+del {
+  color: rgba(255, 0, 0, .5);
+}
+
+.field-list-wrap {
+  list-style: none;
+}
+
+.diff-field-line-changes {
+  border-bottom: solid 1rem black;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  p {
+    border-left: solid red 0.125rem;
+    padding-left: 0.5rem;
+    position: relative;
+
+    &:before {
+      content: 'p';
+      position: absolute;
+      left: -0.875rem;
+      font-weight: bold;
+      font-family: monospace;
+      font-size: 1rem;
+      line-height: 1rem;
+    }
+  }
+}
+
+.diff-field-line-wrap {
+  display: flex;
+}
+
+.diff-field-line-old {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+.diff-field-line-changes {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+.diff-field-line-new {
+  flex-grow: 1;
+  flex-basis: 0;
+}
