@@ -10,33 +10,69 @@ div {
 }
 
 del {
-  color: rgba(255, 0, 0, .5);
+  color: rgba(255, 0, 0, .25);
 }
 
 .field-list-wrap {
   list-style: none;
+  padding-left: 0;
+
+  .diff-field-wrap {
+    padding: 1rem;
+
+    &:nth-of-type(odd) {
+      background-color: rgba(46, 117, 212, 0.1);
+    }
+  }
 }
 
 .diff-field-line-changes {
-  border-bottom: solid 1rem black;
 
   &:last-of-type {
     border-bottom: none;
   }
 
   p {
+    line-height: 1.125em;
+    margin-bottom: .25em;
+  }
+
+  .embedded-entry-block,
+  .embedded-entry-inline,
+  .embedded-asset-block {
     border-left: solid red 0.125rem;
     padding-left: 0.5rem;
     position: relative;
+    margin-bottom: 1.25em;
 
     &:before {
+      left: -1.25rem;
       content: 'p';
       position: absolute;
-      left: -0.875rem;
       font-weight: bold;
       font-family: monospace;
       font-size: 1rem;
       line-height: 1rem;
+    }
+  }
+
+  .embedded-entry-block {
+    margin-left: 3rem;
+    &:before {
+      content: 'EB';
+    }
+  }
+
+  .embedded-entry-inline {
+    &:before {
+      content: 'EI';
+    }
+  }
+
+  .embedded-asset-block {
+    margin-left: 3rem;
+    &:before {
+      content: 'AB';
     }
   }
 }

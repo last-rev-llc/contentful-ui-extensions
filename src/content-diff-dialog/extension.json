@@ -1,6 +1,0 @@
-{
-  "id": "my-first-dialog-extension",
-  "name": "my-first-dialog-extension",
-  "srcdoc": "./build/index.html",
-  "sidebar": true
-}
