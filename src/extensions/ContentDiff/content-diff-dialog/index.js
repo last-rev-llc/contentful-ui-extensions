@@ -29,7 +29,7 @@ const fieldTypes = [
 const contentfulManagement = require('contentful-management');
 
 const clientManagement = contentfulManagement.createClient({
-  accessToken: 'CFPAT-TM4Y9bzzHC6dqyQwa3XlB7HBDR3ZH07N4Exq5hn3P70'
+  accessToken: '<place api key here>'
 });
 
 const renderTextInfo = ({ id, oldText, newText }) => {
@@ -83,8 +83,7 @@ const renderFields = (field) => {
   let result = null;
   switch (field.type) {
   case fieldTypes[RICH_TEXT]:
-    console.log('field', field);
-    result = renderRichTextLines(field.content);
+    result = renderTextInfo({ id: 0, oldText: field.content.oldValue, newText: field.content.currentValue });
     
     break;
   case fieldTypes[SYMBOL]:
@@ -95,7 +94,8 @@ const renderFields = (field) => {
     break;
   case fieldTypes[ARRAY]:
     if (field.arrayType === 'Symbol') {
-      result = renderTextLines(field.oldValue, field.currentValue);
+      // result = renderTextLines(field.oldValue, field.currentValue);
+      result = '';
     }
     break;
   default:
@@ -107,7 +107,7 @@ const renderFieldInfo = (id, field) => {
   return (
     <li className="diff-field-wrap"
       key={id}>
-      <FormLabel htmlFor="name">{field.label}</FormLabel>
+      <label htmlFor="fieldLabel">{field.label}</label>
       {renderFields(field)}
     </li>
   );
@@ -204,24 +204,110 @@ const createSimpleObjects = async (environment, contentTypeFields, entry, locale
     }));
 };
 
+const getValue = (field) => {
+  let value = null;
+
+  if (field) {
+    value = field.value;
+    if (field.type === 'Link') {
+      value = field.asset; // TODO get url
+    }
+  }
+  
+  return value;
+};
+
+const createHtmlForEntry = (entry) => {
+  return `
+    <li className="diff-field-wrap"
+      key="${entry.id}">
+      <label htmlFor="name">${entry.label}</label>
+      ${getValue(entry)}
+    </li>
+  `;
+};
+
+const getEmbeddedEntryValue = (field) => {
+  let value = null;
+  switch (field.type) {
+  case fieldTypes[RICH_TEXT]:
+    // result = renderRichTextLines(field.content);
+    
+    break;
+  case fieldTypes[SYMBOL]:
+    value = createHtmlForEntry(field);
+    break;
+  case fieldTypes[OBJECT]:
+    // result = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
+    break;
+  case fieldTypes[ARRAY]:
+    if (field.arrayType === 'Symbol') {
+      console.log('field', field);
+      // result = renderTextLines(field.oldValue, field.currentValue);
+    }
+    break;
+  default:
+  }
+  return value;
+};
+
+const createHtmlForEmbeddedEntry = (line) => {
+  return `${getEmbeddedEntryValue(line)}`;
+  // return `<li className="diff-field-wrap" key="${line.id}"><label htmlFor="name">${line.label}</label>${getEmbeddedEntryValue(line)}</li>`;
+};
+
+const createHtmlForEmbeddedEntryLines = (lines) => {
+  return lines.map(line => createHtmlForEmbeddedEntry(line));
+};
+
+const createHtmlForEmbeddedInlineEntry = (lines) => {
+  return lines.map(line => {
+    let html = null;
+    if (line.nodeType === 'text') {
+      html = `<p>${line.value}</p>`;
+    }
+    else {
+      html = createHtmlForEmbeddedEntry(line);
+    }
+    return html;
+  });
+};
+
+const createHtmlForParagraphLines = lines => {
+  return lines.map(line => {
+    let html = null;
+    if (line.nodeType === 'text') {
+      html = `<p>${line.value}</p>`;
+    }
+    else {
+      html = createHtmlForEmbeddedInlineEntry(line);
+    }
+    return html;
+  });
+};
+
 const createRichTextLines = async (lines, environment, snapshotDate) => {
   const rtfContentLines = await Promise.all(lines.map(async (line) => {
     let result = null;
     let entry = null;
+    let asset = null;
+    let content = null;
     
     switch (line.nodeType) {
     case 'embedded-asset-block':
-      result = await environment.getAsset(line.data.target.sys.id);
+      asset = await environment.getAsset(line.data.target.sys.id);
+      result = [`<div><img src="${asset.fields.file['en-US'].url}"</div>`];
       break;
 
     case 'embedded-entry-block':
       entry = await getEntryByDate(environment, line.data.target.sys.id, snapshotDate);
-      result = await createContentSimpleObjects(environment, snapshotDate ? entry.snapshot : entry);
+      content = await createContentSimpleObjects(environment, snapshotDate ? entry.snapshot : entry);
+      result = createHtmlForEmbeddedEntryLines(content);
       break;
 
     case 'paragraph':
       if (line.content.length > 1) {
-        result = await Promise.all(line.content.map(async inlineContent => {
+        content = await Promise.all(line.content.map(async inlineContent => {
           let inlineResult = inlineContent;
           if (inlineContent.nodeType === 'embedded-entry-inline') {
             entry = await getEntryByDate(environment, inlineContent.data.target.sys.id, snapshotDate);
@@ -229,22 +315,17 @@ const createRichTextLines = async (lines, environment, snapshotDate) => {
           }
           return Promise.resolve(inlineResult);
         }));
+        result = createHtmlForParagraphLines(content);
       } else {
-        return Promise.resolve({
-          type: line.nodeType,
-          content: line.content
-        });
+        result = createHtmlForParagraphLines(line.content);
       }
       break;
         
     default:
-      return Promise.resolve(line);
+      return null;
     }
     
-    return Promise.resolve({
-      type: line.nodeType,
-      content: result
-    });
+    return Promise.resolve(result);
   }));
   return Promise.resolve(rtfContentLines);
 };
@@ -261,19 +342,6 @@ const getLabel = (field) => {
   return field.label;
 };
 
-const getValue = (field) => {
-  let value = null;
-
-  if (field) {
-    value = field.value;
-    if (field.type === 'Link') {
-      value = field.asset;
-    }
-  }
-  
-  return value;
-};
-
 const getArrayType = (field) => {
   return field.arrayType;
 };
@@ -281,35 +349,13 @@ const getArrayType = (field) => {
 const getContent = async (field, environment, snapshotDate) => {
   const currentContent = await createRichTextLines(field.value.content, environment);
   const oldContent = await createRichTextLines(field.value.content, environment, snapshotDate);
-  const content = currentContent.map((current, contentIndex) => {
-    const isAsset = current.type === 'embedded-asset-block';
-    let result = {
-      type: getType(current),
-      lines: {
-        id: null,
-        type: null,
-        label: null,
-        currentValue: current.content,
-        oldValue: null,
-        arrayType: null,
-      }
-    };
-    if (!isAsset) {
-      result = {
-        type: getType(current),
-        lines: current.content.map((line, lineIndex) => ({
-          id: getId(line),
-          type: getType(line),
-          label: getLabel(line),
-          currentValue: getValue(line),
-          oldValue: getValue(oldContent[contentIndex].content[lineIndex]),
-          arrayType: getArrayType(line),
-        }))
-      };
-    }
-    return result;
-  });
-  return content;
+        
+  const result = {
+    currentValue: currentContent.map(content => content.join('')).join(''),
+    oldValue: oldContent.map(content => content.join('')).join(''),
+  };
+  console.log('content', result);
+  return result;
 };
 
 const createDiffFields = async (fields, snapshots, environment, snapshotDate) => {
@@ -321,8 +367,8 @@ const createDiffFields = async (fields, snapshots, environment, snapshotDate) =>
       type,
       label: getLabel(field),
       content: isRichText ? await getContent(field, environment, snapshotDate) : null,
-      currentValue: isRichText ? null : await getValue(field),
-      oldValue: isRichText ? null : await getValue(snapshots.filter(shot => shot.id === field.id)[0]),
+      currentValue: isRichText ? null : getValue(field),
+      oldValue: isRichText ? null : getValue(snapshots.filter(shot => shot.id === field.id)[0]),
       arrayType: getArrayType(field),
     };
   }));
