@@ -55,30 +55,6 @@ const renderTextLines = (oldLines, newLines) => {
 
 };
 
-const createEmbeddedEntries = (lines) => {
-  return lines.map((content, index) => {
-    return renderFieldInfo(index, content);
-  });
-  
-};
-
-const renderRichTextLines = (fieldContent) => {
-  return fieldContent.map(content => {
-    switch (content.type) {
-    case 'embedded-entry-block':
-      return createEmbeddedEntries(content.lines);
-    // case 'embedded-asset-block':
-    //   return `<div class='${line.type}'>${line.data.target.sys.id}</div>`;
-    // case 'embedded-entry-inline':
-    //   return `<div class='${line.type}'>${line.data.target.sys.id}</div>`;
-    // case 'paragraph':
-    //   return `<p class='${line.type}'>${line.content[0].value}</p>`;
-    default:
-      return null;
-    }
-  });
-};
-
 const renderFields = (field) => {
   let result = null;
   switch (field.type) {
@@ -94,8 +70,7 @@ const renderFields = (field) => {
     break;
   case fieldTypes[ARRAY]:
     if (field.arrayType === 'Symbol') {
-      // result = renderTextLines(field.oldValue, field.currentValue);
-      result = '';
+      result = renderTextLines(field.oldValue, field.currentValue);
     }
     break;
   default:
@@ -136,8 +111,6 @@ export class DialogExtension extends React.Component {
     sdk: PropTypes.object.isRequired
   };
 
-  
-
   render() {
     return (
       <div>
@@ -172,25 +145,9 @@ const createSimpleObjects = async (environment, contentTypeFields, entry, locale
         id = locale ? entry[content.id]['en-US'].sys.id : entry[content.id]._fieldLocales['en-US']._value.sys.id;
         asset = await environment.getAsset(id);
         break;
-      case 'RichText':
-        
-        break;
-      case 'Symbol':
-        
-        break;
-      case 'Object':
-        
-        break;
-      case 'Array':
-        
-        break;
 
       default:
 
-      }
-      if (content.type === 'Link') {
-        
-        // none
       }
       const value = entry[content.id] && (entry[content.id][locale] || entry[content.id].getValue());
       return { 
@@ -227,23 +184,35 @@ const createHtmlForEntry = (entry) => {
   `;
 };
 
+const getArrayValue = (arrayField) => {
+  return arrayField.value.map(value => `<p>${value}</p>`).join('');
+};
+
+const createHtmlForArray = (field) => {
+  return `
+    <li className="diff-field-wrap"
+      key="${field.id}">
+      <label htmlFor="name">${field.label}</label>
+      ${getArrayValue(field)}
+    </li>
+  `;
+};
+
 const getEmbeddedEntryValue = (field) => {
-  let value = null;
+  let value = '';
   switch (field.type) {
   case fieldTypes[RICH_TEXT]:
     // result = renderRichTextLines(field.content);
-    
     break;
   case fieldTypes[SYMBOL]:
     value = createHtmlForEntry(field);
     break;
   case fieldTypes[OBJECT]:
-    // result = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
+    // value = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
     break;
   case fieldTypes[ARRAY]:
     if (field.arrayType === 'Symbol') {
-      console.log('field', field);
-      // result = renderTextLines(field.oldValue, field.currentValue);
+      value = createHtmlForArray(field);
     }
     break;
   default:
@@ -253,7 +222,6 @@ const getEmbeddedEntryValue = (field) => {
 
 const createHtmlForEmbeddedEntry = (line) => {
   return `${getEmbeddedEntryValue(line)}`;
-  // return `<li className="diff-field-wrap" key="${line.id}"><label htmlFor="name">${line.label}</label>${getEmbeddedEntryValue(line)}</li>`;
 };
 
 const createHtmlForEmbeddedEntryLines = (lines) => {
@@ -354,7 +322,6 @@ const getContent = async (field, environment, snapshotDate) => {
     currentValue: currentContent.map(content => content.join('')).join(''),
     oldValue: oldContent.map(content => content.join('')).join(''),
   };
-  console.log('content', result);
   return result;
 };
 
