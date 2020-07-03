@@ -16,6 +16,7 @@ const RICH_TEXT = 0;
 const SYMBOL = 1;
 const OBJECT = 2;
 const ARRAY = 3;
+const LINK = 4;
 
 const firstIndex = 0;
 
@@ -23,22 +24,24 @@ const fieldTypes = [
   'RichText',
   'Symbol',
   'Object',
-  'Array'
+  'Array',
+  'Link',
 ];
 
 const contentfulManagement = require('contentful-management');
 
 const clientManagement = contentfulManagement.createClient({
-  accessToken: '<place api key here>'
+  accessToken: 'CFPAT-XH3t9M32kIHGuOPyXlccEgqur2dTP6g_em2-0eGyL88'
 });
 
-const renderTextInfo = ({ id, oldText, newText }) => {
+const renderTextInfo = ({id, oldText, newText, fieldType}) => {
+  const changedClass = newText === oldText ? 'no-change' : 'change';
+  
   return (
-    <div className="diff-field-line-wrap"
-      key={id}>
-      <div className="diff-field-line-changes"><span dangerouslySetInnerHTML={{__html: oldText}} /></div>
-      <div className="diff-field-line-changes"><span dangerouslySetInnerHTML={{__html: diff(oldText, newText)}} /></div>
-      <div className="diff-field-line-changes"><span dangerouslySetInnerHTML={{__html: newText}} /></div>
+    <div className="diff-field-line-wrap" key={id} data-field-type={fieldType}>
+      <div className={`diff-text diff-text_snapshot ${changedClass}`} dangerouslySetInnerHTML={{__html: oldText}} />
+      <div className={`diff-text diff-text_changed ${changedClass}`} dangerouslySetInnerHTML={{__html: diff(oldText, newText)}}/>
+      <div className={`diff-text diff-text_current ${changedClass}`} dangerouslySetInnerHTML={{__html: newText}}/>
     </div>
   );
 };
@@ -56,32 +59,41 @@ const renderTextLines = (oldLines, newLines) => {
 };
 
 const renderFields = (field) => {
-  let result = null;
+  if (_.isNil(field) || _.isNil(_.get(field, 'type'))) return '';
+  let result;
+
   switch (field.type) {
   case fieldTypes[RICH_TEXT]:
-    result = renderTextInfo({ id: 0, oldText: field.content.oldValue, newText: field.content.currentValue });
+    result = renderTextInfo({ id: 0, oldText: _.get(field, 'content.oldValue', ''), newText: _.get(field, 'content.currentValue', ''), fieldType: field.type });
+    break;
+  
+    case fieldTypes[SYMBOL]:
+      result = renderTextInfo({ id: 0, oldText: _.escape(_.get(field, 'oldValue', '')), newText: _.escape(_.get(field, 'currentValue', '')), fieldType: field.type });
+      break;
+  
+    case fieldTypes[OBJECT]:
+      // result = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
+      break;
+  
+    case fieldTypes[ARRAY]:
+      if (field.arrayType === 'Symbol') {
+        result = renderTextLines(_.get(field, 'oldValue', []), _.get(field, 'currentValue', []), field.type);
+      }
+      break;
+
+    case fieldTypes[LINK]:
+      result = renderTextInfo({ id: 0, oldText: createAssetHtml(_.get(field, 'oldValue')), newText: createAssetHtml(_.get(field, 'currentValue')), fieldType: field.type });
+      break;
     
-    break;
-  case fieldTypes[SYMBOL]:
-    result = renderTextInfo({ id: 0, oldText: field.oldValue, newText: field.currentValue });
-    break;
-  case fieldTypes[OBJECT]:
-    // result = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
-    break;
-  case fieldTypes[ARRAY]:
-    if (field.arrayType === 'Symbol') {
-      result = renderTextLines(field.oldValue, field.currentValue);
-    }
-    break;
-  default:
+    default:
+      break;
   }
   return result;
 };
 
 const renderFieldInfo = (id, field) => {
   return (
-    <li className="diff-field-wrap"
-      key={id}>
+    <li className="diff-field-wrap" key={id}>
       <label htmlFor="fieldLabel">{field.label}</label>
       {renderFields(field)}
     </li>
@@ -113,43 +125,41 @@ export class DialogExtension extends React.Component {
 
   render() {
     return (
-      <div>
-        <ul className='field-list-wrap'>{renderFieldTables(this.props.sdk.parameters.invocation.fields)}</ul>
-      </div>
+      <ul className='field-list-wrap'>{renderFieldTables(this.props.sdk.parameters.invocation.fields)}</ul>
     );
   }
 }
 
 const createContentSimpleObjects = async (environment, entry) => {
-  let result = null;
-  if (entry) {
-    const ct = await environment.getContentType(entry.sys.contentType.sys.id);
-    result = ct.fields.map(field => ({
-      id: field.id,
-      type: field.type, 
-      value: entry.fields[field.id]['en-US'],
-      arrayType: field.items && field.items.type,
-      label: field.name
-    }));
-  }
-  return result;
+  if (!entry) return;
+  
+  const ct = await environment.getContentType(entry.sys.contentType.sys.id);
+  return ct.fields.map(field => ({
+    id: field.id,
+    type: field.type, 
+    value: entry.fields[field.id]['en-US'],
+    arrayType: field.items && field.items.type,
+    label: field.name
+  }));
 };
 
 const createSimpleObjects = async (environment, contentTypeFields, entry, locale) => {
   return Promise.all(contentTypeFields
     .map(async content => {
-      let asset = null;
+      let asset;
       let id = '';
       switch (content.type) {
-      case 'Link':
-        id = locale ? entry[content.id]['en-US'].sys.id : entry[content.id]._fieldLocales['en-US']._value.sys.id;
-        asset = await environment.getAsset(id);
-        break;
+        case 'Link':
+          id = locale ? _.get(entry, `[${content.id}]['en-US'].sys.id`) : _.get(entry, `[${content.id}]._fieldLocales['en-US']._value.sys.id`);
+          if (!id) break;
+          asset = await environment.getAsset(id);
+          break;
 
-      default:
-
+        default:
       }
+
       const value = entry[content.id] && (entry[content.id][locale] || entry[content.id].getValue());
+      
       return { 
         id: content.id,
         type: content.type, 
@@ -162,22 +172,14 @@ const createSimpleObjects = async (environment, contentTypeFields, entry, locale
 };
 
 const getValue = (field) => {
-  let value = null;
-
-  if (field) {
-    value = field.value;
-    if (field.type === 'Link') {
-      value = field.asset; // TODO get url
-    }
-  }
+  if (!field) return;
   
-  return value;
+  return _.get(field, 'asset', _.get(field, 'value'));
 };
 
 const createHtmlForEntry = (entry) => {
   return `
-    <li className="diff-field-wrap"
-      key="${entry.id}">
+    <li class="embedded-${entry.type} diff-field-wrap" key="${entry.id}">
       <label htmlFor="name">${entry.label}</label>
       ${getValue(entry)}
     </li>
@@ -185,13 +187,12 @@ const createHtmlForEntry = (entry) => {
 };
 
 const getArrayValue = (arrayField) => {
-  return arrayField.value.map(value => `<p>${value}</p>`).join('');
+  const arrayValues = arrayField.value.map(value => `<li class='array-value'>${value}</li>`).join('');
+  return `<ul class='array-field-wrap'>${arrayValues}</ul>`;
 };
 
 const createHtmlForArray = (field) => {
-  return `
-    <li className="diff-field-wrap"
-      key="${field.id}">
+  return `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}">
       <label htmlFor="name">${field.label}</label>
       ${getArrayValue(field)}
     </li>
@@ -229,72 +230,90 @@ const createHtmlForEmbeddedEntryLines = (lines) => {
 };
 
 const createHtmlForEmbeddedInlineEntry = (lines) => {
-  return lines.map(line => {
-    let html = null;
+  return _.compact(lines).map(line => {
     if (line.nodeType === 'text') {
-      html = `<p>${line.value}</p>`;
+      if (line.value.trim() !== "") return `<p>${line.value}</p>`;
+      return '';
     }
-    else {
-      html = createHtmlForEmbeddedEntry(line);
-    }
-    return html;
+    return createHtmlForEmbeddedEntry(line);
   });
 };
 
 const createHtmlForParagraphLines = lines => {
-  return lines.map(line => {
-    let html = null;
+  return _.compact(lines).map(line => {
     if (line.nodeType === 'text') {
-      html = `<p>${line.value}</p>`;
+      if (line.value.trim() === '') return '';
+      
+      return `<p>test ${line.value}</p>`;
     }
-    else {
-      html = createHtmlForEmbeddedInlineEntry(line);
-    }
-    return html;
+    
+    return `<div class='embedded-inline-entry'><ul class='field-list-wrap'>${createHtmlForEmbeddedInlineEntry(line)}</ul></div>`;
   });
+};
+
+const createAssetHtml = (asset) => {
+  if (!asset || _.isUndefined(_.get(asset, 'fields'))) return '';
+
+  return `
+    <div class='entry-name'>${asset.fields.title['en-US']}</div>
+      <ul class='field-list-wrap'>
+        <li className="diff-field-wrap"><img src="${asset.fields.file['en-US'].url}"/></li>
+      </ul>
+    </div>
+  `;
 };
 
 const createRichTextLines = async (lines, environment, snapshotDate) => {
   const rtfContentLines = await Promise.all(lines.map(async (line) => {
-    let result = null;
-    let entry = null;
-    let asset = null;
-    let content = null;
+    let result;
+    let entry;
+    let asset;
+    let content;
     
     switch (line.nodeType) {
-    case 'embedded-asset-block':
-      asset = await environment.getAsset(line.data.target.sys.id);
-      result = [`<div><img src="${asset.fields.file['en-US'].url}"</div>`];
-      break;
+      case 'embedded-asset-block':
+        asset = await environment.getAsset(line.data.target.sys.id);
+        result = [`<div class="${line.nodeType}">${createAssetHtml(asset, line.nodeType)}</div>`];
+        break;
 
-    case 'embedded-entry-block':
-      entry = await getEntryByDate(environment, line.data.target.sys.id, snapshotDate);
-      content = await createContentSimpleObjects(environment, snapshotDate ? entry.snapshot : entry);
-      result = createHtmlForEmbeddedEntryLines(content);
-      break;
-
-    case 'paragraph':
-      if (line.content.length > 1) {
-        content = await Promise.all(line.content.map(async inlineContent => {
-          let inlineResult = inlineContent;
-          if (inlineContent.nodeType === 'embedded-entry-inline') {
-            entry = await getEntryByDate(environment, inlineContent.data.target.sys.id, snapshotDate);
-            inlineResult = await createContentSimpleObjects(environment, snapshotDate ? entry.snapshot : entry);
-          }
-          return Promise.resolve(inlineResult);
-        }));
-        result = createHtmlForParagraphLines(content);
-      } else {
-        result = createHtmlForParagraphLines(line.content);
-      }
-      break;
+      case 'embedded-entry-block':
+        entry = await getEntryByDate(environment, line.data.target.sys.id, snapshotDate);
+        if (!entry) break;
         
-    default:
-      return null;
+        content = await createContentSimpleObjects(environment, snapshotDate ? entry.snapshot : entry);
+        result = createHtmlForEmbeddedEntryLines(content);
+        
+        const contentType = _.startCase(_.get(entry, 'sys.contentType.sys.id', ''));
+        
+        result.unshift(`<div class="${line.nodeType}"><div class='entry-name'>${contentType}</div><ul class="field-list-wrap">`);
+        result.push('</ul></div>');
+        break;
+
+      case 'paragraph':
+        console.log('line', line);
+        if (line.content.length > 1) {
+          content = await Promise.all(line.content.map(async inlineContent => {
+            let inlineResult = inlineContent;
+            if (inlineContent.nodeType === 'embedded-entry-inline') {
+              entry = await getEntryByDate(environment, inlineContent.data.target.sys.id, snapshotDate);
+              if (!entry) return Promise.resolve();
+              inlineResult = await createContentSimpleObjects(environment, snapshotDate ? entry.snapshot : entry);
+            }
+            return Promise.resolve(inlineResult);
+          }));
+          result = createHtmlForParagraphLines(content);
+        } else {
+          result = createHtmlForParagraphLines(line.content);
+        }
+        break;
+          
+      default:
+        return;
     }
     
     return Promise.resolve(result);
   }));
+
   return Promise.resolve(rtfContentLines);
 };
 
@@ -317,10 +336,11 @@ const getArrayType = (field) => {
 const getContent = async (field, environment, snapshotDate) => {
   const currentContent = await createRichTextLines(field.value.content, environment);
   const oldContent = await createRichTextLines(field.value.content, environment, snapshotDate);
+  console.log('oldContent', snapshotDate, oldContent);
         
   const result = {
-    currentValue: currentContent.map(content => content.join('')).join(''),
-    oldValue: oldContent.map(content => content.join('')).join(''),
+    currentValue: _.compact(currentContent).map(content => content.join('')).join(''),
+    oldValue: _.compact(oldContent).map(content => content.join('')).join(''),
   };
   return result;
 };
@@ -329,13 +349,14 @@ const createDiffFields = async (fields, snapshots, environment, snapshotDate) =>
   const diffFields = await Promise.all(fields.map(async field => {
     const type = getType(field);
     const isRichText = getType(field) === 'RichText';
+    
     return {
       id: getId(field),
       type,
       label: getLabel(field),
-      content: isRichText ? await getContent(field, environment, snapshotDate) : null,
-      currentValue: isRichText ? null : getValue(field),
-      oldValue: isRichText ? null : getValue(snapshots.filter(shot => shot.id === field.id)[0]),
+      content: isRichText ? await getContent(field, environment, snapshotDate) : false,
+      currentValue: isRichText ? '' : getValue(field),
+      oldValue: isRichText ? '' : getValue(snapshots.filter(shot => shot.id === field.id)[0]),
       arrayType: getArrayType(field),
     };
   }));
@@ -349,7 +370,7 @@ const addRemovedOldFields = async (fields, snapshots, environment, snapshotDate)
         id: getId(shot),
         type: getType(shot),
         label: getLabel(shot),
-        currentValue: null,
+        currentValue: false,
         oldValue: await getValue(shot, environment, snapshotDate),
         arrayType: getArrayType(shot)
       });
@@ -360,9 +381,8 @@ const addRemovedOldFields = async (fields, snapshots, environment, snapshotDate)
 };
 
 export class SidebarExtension extends React.Component {
-  environment = null;
-
-  version = null;
+  environment;
+  version;
   
   static propTypes = {
     sdk: PropTypes.object.isRequired
@@ -395,8 +415,11 @@ export class SidebarExtension extends React.Component {
     const version = this.version || this.state.versions[0];
     const currentFields = await createSimpleObjects(this.environment, this.props.sdk.contentType.fields.filter(type => !type.disabled), this.props.sdk.entry.fields);
     const oldFields = await createSimpleObjects(this.environment, this.props.sdk.contentType.fields.filter(type => !type.disabled), version.snapshot.fields, 'en-US');
+    console.log('oldFields', oldFields)
     let fields = await createDiffFields(currentFields, oldFields, this.environment, new Date(version.sys.updatedAt));
+    
     fields = await addRemovedOldFields(fields, oldFields, this.environment, new Date(version.sys.updatedAt));
+    
     const result = await this.props.sdk.dialogs.openExtension({
       width: 'fullWidth',
       title: 'Last Rev Content Diff UIE',
