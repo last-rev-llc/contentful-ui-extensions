@@ -13,6 +13,7 @@ import history from "../history";
 import localizationLookupMockSdk from "./LocalizationLookup/mockSdk";
 import colorPickerMockSdk from "./ColorPicker/mockSdk";
 import BynderImage from "./BynderImage";
+import {createMockSDK} from "./BynderImage/mockSdk"
 
 const App = ({ sdk, locations }) => {
   return (
@@ -44,7 +45,7 @@ const App = ({ sdk, locations }) => {
           exact
           component={() => (
             <BynderImage
-              sdk={sdk || localizationLookupMockSdk}
+              sdk={sdk || createMockSDK()}
               locations={locations}
             />
           )}
