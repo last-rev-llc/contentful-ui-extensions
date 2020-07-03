@@ -47,6 +47,7 @@ To see the extension in your Contentful instance follow the directions below for
 
 - [Color Picker](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/ColorPicker)
 - [SEO](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Seo)
+- [BynderImage]((https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/BynderImage))
 
 ### Prerequisites
 
@@ -64,6 +65,7 @@ You need an account for Contentful to use these extensions.
 ├── src
 │   ├── __mocks__
 │   ├── extensions
+│   ├── ├── BynderImages
 │   ├── ├── ColorPicker
 │   ├── ├── Seo
 │   ├── shared

@@ -5,7 +5,7 @@ The Last Rev Color Picker extension can be used anytime you want to give your us
 ## Setup Instructions
 
 1. [Click here to deploy](https://app.netlify.com/start/deploy?repository=https://github.com/last-rev-llc/contentful-ui-extensions) to Netlify or deploy this repo to a hosting provider of your choice.
-2. Create a new UI Extension in your space and choose thos following Options:
+2. Create a new UI Extension in your space and choose these following Options:
     - Name: Color Picker
     - Field Types: Symbol
     - Hosting: Self-hosted(src)
