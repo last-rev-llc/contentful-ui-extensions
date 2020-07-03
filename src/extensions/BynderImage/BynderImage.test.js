@@ -2,7 +2,7 @@ import React from "react";
 import { mockBynderData, createMockSDK } from "./mockSdk";
 import BynderImage, { setIfEmpty } from "./BynderImage";
 import { fireEvent } from "@testing-library/dom";
-import { cleanup, render, rerender } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
 
 afterEach(() => {
   cleanup();
