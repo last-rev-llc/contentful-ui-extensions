@@ -62,6 +62,7 @@ const BynderImage = ({ sdk }) => {
   useEffect(() => {
     sdk.window.startAutoResizer();
     listenForBynderChanges();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
