@@ -6,7 +6,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import ReactDOM from 'react-dom';
-import { Button, Select, Option, FormLabel } from '@contentful/forma-36-react-components';
+import { Button, Select, Option } from '@contentful/forma-36-react-components';
 import { init, locations } from 'contentful-ui-extensions-sdk';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './index.scss';
@@ -29,48 +29,53 @@ const fieldTypes = [
 const contentfulManagement = require('contentful-management');
 
 const clientManagement = contentfulManagement.createClient({
-  accessToken: '<place api key here>'
+  accessToken: 'CFPAT-Ioj7yK9qBTJPXaxLsaKG3AhrYimwZZWjIiLlSpJs0PY'
 });
 
-const renderTextInfo = ({ id, oldText, newText }) => {
+const getTextDiff = ({ id, keyId, oldText, newText }) => {
   return (
     <div className="diff-field-line-wrap"
-      key={id}>
-      <div className="diff-field-line-changes"><span dangerouslySetInnerHTML={{__html: oldText}} /></div>
-      <div className="diff-field-line-changes"><span dangerouslySetInnerHTML={{__html: diff(oldText, newText)}} /></div>
-      <div className="diff-field-line-changes"><span dangerouslySetInnerHTML={{__html: newText}} /></div>
+      data-test-id={`cdd-diff-fields-${id}-${keyId}`}
+      key={keyId}>
+      <div className="diff-field-line-changes"><span data-test-id={`cdd-old-text-${id}-${keyId}`}
+        dangerouslySetInnerHTML={{__html: oldText}} /></div>
+      <div className="diff-field-line-changes"><span data-test-id={`cdd-diff-text-${id}-${keyId}`}
+        dangerouslySetInnerHTML={{__html: diff(oldText, newText)}} /></div>
+      <div className="diff-field-line-changes"><span data-test-id={`cdd-new-text-${id}-${keyId}`}
+        dangerouslySetInnerHTML={{__html: newText}} /></div>
     </div>
   );
 };
 
-const renderTextLines = (oldLines, newLines) => {
+const getTextDiffLines = (oldLines, newLines) => {
   const oldIsLonger = oldLines.length >= newLines.length;
   const lines = oldIsLonger ? oldLines : newLines;
 
-  return lines.map((line, index) => renderTextInfo({ 
-    id: index, 
+  return lines.map((line, index) => getTextDiff({ 
+    id: line.id, 
+    keyId: index,
     oldText: oldIsLonger ? line : oldLines[index] || '<blank>', 
     newText: oldIsLonger ? newLines[index] || '<blank>' : line
   }));
 
 };
 
-const renderFields = (field) => {
+const getFields = (field) => {
   let result = null;
   switch (field.type) {
   case fieldTypes[RICH_TEXT]:
-    result = renderTextInfo({ id: 0, oldText: field.content.oldValue, newText: field.content.currentValue });
+    result = getTextDiff({ id: field.id, keyId: 0, oldText: field.content.oldValue, newText: field.content.currentValue });
     
     break;
   case fieldTypes[SYMBOL]:
-    result = renderTextInfo({ id: 0, oldText: field.oldValue, newText: field.currentValue });
+    result = getTextDiff({ id: field.id, keyId: 0, oldText: field.oldValue, newText: field.currentValue });
     break;
   case fieldTypes[OBJECT]:
     // result = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
     break;
   case fieldTypes[ARRAY]:
     if (field.arrayType === 'Symbol') {
-      result = renderTextLines(field.oldValue, field.currentValue);
+      result = getTextDiffLines(field.oldValue, field.currentValue);
     }
     break;
   default:
@@ -78,18 +83,18 @@ const renderFields = (field) => {
   return result;
 };
 
-const renderFieldInfo = (id, field) => {
+const getFieldInfo = (id, field) => {
   return (
     <li className="diff-field-wrap"
       key={id}>
       <label htmlFor="fieldLabel">{field.label}</label>
-      {renderFields(field)}
+      {getFields(field)}
     </li>
   );
 };
 
-const renderFieldTables = (fields) => {
-  const fieldTable = fields.map((field, index) => renderFieldInfo(index, field));
+const getFieldTables = (fields) => {
+  const fieldTable = fields.map((field, index) => getFieldInfo(index, field));
   return fieldTable;
 };
 
@@ -114,7 +119,7 @@ export class DialogExtension extends React.Component {
   render() {
     return (
       <div>
-        <ul className='field-list-wrap'>{renderFieldTables(this.props.sdk.parameters.invocation.fields)}</ul>
+        <ul className='field-list-wrap'>{getFieldTables(this.props.sdk.parameters.invocation.fields)}</ul>
       </div>
     );
   }
@@ -269,6 +274,7 @@ const createRichTextLines = async (lines, environment, snapshotDate) => {
 
     case 'embedded-entry-block':
       entry = await getEntryByDate(environment, line.data.target.sys.id, snapshotDate);
+      console.log('embedded-entry-block', entry);
       content = await createContentSimpleObjects(environment, snapshotDate ? entry.snapshot : entry);
       result = createHtmlForEmbeddedEntryLines(content);
       break;
@@ -279,6 +285,7 @@ const createRichTextLines = async (lines, environment, snapshotDate) => {
           let inlineResult = inlineContent;
           if (inlineContent.nodeType === 'embedded-entry-inline') {
             entry = await getEntryByDate(environment, inlineContent.data.target.sys.id, snapshotDate);
+            console.log('paragraph', entry);
             inlineResult = await createContentSimpleObjects(environment, snapshotDate ? entry.snapshot : entry);
           }
           return Promise.resolve(inlineResult);
@@ -463,6 +470,36 @@ export const initialize = sdk => {
 };
 
 init(initialize);
+
+export {
+  getTextDiff,
+  getTextDiffLines,
+  getFields,
+  getFieldInfo,
+  getFieldTables,
+  getEntryByDate,
+  createContentSimpleObjects,
+  createSimpleObjects,
+  getValue,
+  createHtmlForEntry,
+  getArrayValue,
+  createHtmlForArray,
+  getEmbeddedEntryValue,
+  createHtmlForEmbeddedEntry,
+  createHtmlForEmbeddedEntryLines,
+  createHtmlForEmbeddedInlineEntry,
+  createHtmlForParagraphLines,
+  createRichTextLines,
+  getId,
+  getType,
+  getLabel,
+  getArrayType,
+  getContent,
+  createDiffFields,
+  addRemovedOldFields,
+};
+
+export default SidebarExtension;
 
 /**
  * By default, iframe of the extension is fully reloaded on every save of a source file.
