@@ -13,6 +13,7 @@ import ExtensionsList from './ExtensionsList';
 import history from '../history';
 import localizationLookupMockSdk from './LocalizationLookup/mockSdk';
 import colorPickerMockSdk from './ColorPicker/mockSdk';
+import PhoneNumberMockSdk from './PhoneNumber/mockSdk';
 
 const App = ({ sdk, locations }) => {
   return (
@@ -27,7 +28,7 @@ const App = ({ sdk, locations }) => {
             locations={locations} />} />
         <Route path="/phone-number"
           exact
-          component={() => <PhoneNumber sdk={sdk}
+          component={() => <PhoneNumber sdk={sdk || PhoneNumberMockSdk}
             locations={locations} />} />
         <Route path="/localization-lookup"
           exact
