@@ -4,51 +4,107 @@ div {
   margin: 0;
   padding: 0;
   border: 0;
-  font-size: 100%;
-  font: inherit;
+  font-size: 16px;
+  font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
   vertical-align: baseline;
 }
 
+img {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  max-width: 300px;
+}
+
 del {
-  color: rgba(255, 0, 0, .25);
-  border-bottom: solid 2px red;
+  position: relative;
+  color: rgba(255, 0, 0, .5);
+  text-decoration-color: rgba(255, 0, 0, 1);
+  display: inline-block;
+
+  &::before {
+    background-color: rgba(255, 0, 0, .25);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: '';
+  }
 }
 
 ins {
   text-decoration: none;
   border-bottom: solid 2px green;
+
+  .entry-name & {
+    border-bottom: none;
+  }
+
+  [data-field-type=Link] & {
+    display: inline-block;
+  }
+}
+
+label {
+  font-size: 0.875rem !important;
+  display: block;
+  color: #606c7c;
 }
 
 .field-list-wrap {
   list-style: none;
   padding-left: 0;
-
-  .diff-field-wrap {
-    padding: 0.5rem;
-  }
+  width: 100%;
 
   > .diff-field-wrap {
-    padding: 1rem;
-    border-bottom: solid 1px rgba(46, 117, 212, 0.5);
+    padding: 0.875rem;
+    border-bottom: solid 1px rgb(238, 238, 238);
 
-    &:nth-of-type(odd) {
-      background-color: rgba(46, 117, 212, 0.05);
+    &:last-of-type {
+      border-bottom: none;
     }
+  }
 
-    label {
-      font-size: 1.125rem !important;
+  .embedded-inline-entry {
+    .diff-field-wrap {
+      padding: 0;
     }
   }
 }
 
-.diff-field-line-changes {
-  &-old,
-  &-new {
-    display: none;
-  }
+.array-field-wrap {
+  list-style: none;
+  display: flex;
+  padding-left: 0;
 
-  &-no-change {
-    opacity: 0.25;
+  li {
+    border: solid .125rem rgba(46, 117, 212, 0.25);
+    border-radius: .25rem;
+    background-color: white;
+    padding: .25rem;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+
+    &:last-of-type {
+      margin-right: 0;
+    }
+  }
+}
+
+.diff-field-line-wrap {
+  display: flex;
+}
+
+.diff-text {
+  width: 100%;
+  flex-basis: 0;
+  flex-grow: 1;
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  &_snapshot,
+  &_current {
+    //display: none;
   }
 
   &:last-of-type {
@@ -56,66 +112,69 @@ ins {
   }
 
   p {
-    line-height: 1.125em;
-    margin-bottom: .25em;
+    line-height: 1.25em;
+    margin-bottom: .25rem;
   }
 
   .embedded-entry-block,
-  .embedded-entry-inline,
+  .embedded-inline-entry,
   .embedded-asset-block {
-    border-left: solid red 0.125rem;
-    padding-left: 0.5rem;
-    position: relative;
-    margin-bottom: 1.25em;
+    display: block;
+    border: solid 1px rgb(238, 238, 238);
+    margin: 1.75rem 0;
 
-    &:before {
-      left: -1.25rem;
-      content: 'p';
-      position: absolute;
-      font-weight: bold;
-      font-family: monospace;
-      font-size: 1rem;
-      line-height: 1rem;
+    &:first-of-type {
+      margin-top: 0;
+    }
+
+    > * {
+      background-color: white;
+      padding: 0.875rem;
     }
   }
 
   .embedded-entry-block {
-    margin-left: 3rem;
-    &:before {
-      content: 'EB';
+    .field-list-wrap {
+      padding: 0;
     }
   }
 
-  .embedded-entry-inline {
-    &:before {
-      content: 'EI';
-    }
-  }
-
-  .embedded-asset-block {
-    margin-left: 3rem;
-    &:before {
-      content: 'AB';
-    }
+  .entry-name {
+    color: #606c7c;
+    font-size: 1rem;
+    line-height: 1rem;
+    padding-bottom: 0;
   }
 }
 
 .diff-field-line-wrap {
-  display: flex;
-  margin-left: 1rem;
-}
+  &[data-field-type=RichText] {
+    background: rgb(247, 249, 250);
+    padding: 1.75rem;
+  }
 
-.diff-field-line-old {
-  flex-grow: 1;
-  flex-basis: 0;
-}
+  &[data-field-type=Link] {
+    del {
+      margin: 0.5rem 3rem 0.5rem 0;
 
-.diff-field-line-changes {
-  flex-grow: 1;
-  flex-basis: 0;
-}
+      &::before {
+        background-color: rgba(255, 0, 0, 0.75);
+      }
+      
+      img {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+    }
+  }
 
-.diff-field-line-new {
-  flex-grow: 1;
-  flex-basis: 0;
+  .entry-name {
+    del {
+      margin: 0;
+
+      &::before {
+        background-color: rgba(255, 0, 0, 0.25);
+      }
+    }
+  }
 }
