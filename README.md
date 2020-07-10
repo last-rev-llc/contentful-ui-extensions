@@ -47,6 +47,7 @@ To see the extension in your Contentful instance follow the directions below for
 
 - [Color Picker](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/ColorPicker)
 - [SEO](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Seo)
+- [PhoneNumber](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/PhoneNumber)
 
 ### Prerequisites
 
@@ -65,6 +66,7 @@ You need an account for Contentful to use these extensions.
 │   ├── __mocks__
 │   ├── extensions
 │   ├── ├── ColorPicker
+│   ├── ├── PhoneNumber
 │   ├── ├── Seo
 │   ├── shared
 ├── history.js

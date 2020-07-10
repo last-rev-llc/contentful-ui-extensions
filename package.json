@@ -5,6 +5,7 @@
   "dependencies": {
     "@contentful/forma-36-fcss": "0.0.34",
     "@contentful/forma-36-react-components": "^3.28.7",
+    "@testing-library/dom": "^7.20.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",

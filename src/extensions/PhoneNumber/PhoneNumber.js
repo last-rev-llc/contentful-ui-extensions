@@ -34,11 +34,11 @@ export default function PhoneNumber({ sdk }) {
         id="label"
         name="label"
         labelText="label"
+        data-testid="phoneNumberLabel"
         textInputProps={{
           maxLength: 60,
           onKeyPress: (e) => handleLabelChange(e.currentTarget),
           onBlur: (e) => handleLabelChange(e.currentTarget),
-          testId: "Seo-tabpanel-general-title",
         }} />
       <TextField
         value={fieldValue.phoneNumber || ""}
@@ -46,22 +46,22 @@ export default function PhoneNumber({ sdk }) {
         name="phoneNumber"
         labelText="phoneNumber"
         required
+        data-testid="phoneNumber"
         textInputProps={{
           maxLength: 15,
           onKeyPress: (e) => handlePhoneNumberChange(e.currentTarget),
           onBlur: (e) => handlePhoneNumberChange(e.currentTarget),
-          testId: "Seo-tabpanel-general-title",
         }} />
       <TextField
         value={fieldValue.extension || ""}
         id="extension"
         name="extension"
         labelText="extension"
+        data-testid="phoneNumberExtension"
         textInputProps={{
           maxLength: 10,
           onKeyPress: (e) => handleExtensionChange(e.currentTarget),
           onBlur: (e) => handleExtensionChange(e.currentTarget),
-          testId: "Seo-tabpanel-general-title",
         }} />
     </div>
   );
