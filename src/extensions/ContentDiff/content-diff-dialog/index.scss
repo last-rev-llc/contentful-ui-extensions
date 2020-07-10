@@ -9,6 +9,47 @@ div {
   vertical-align: baseline;
 }
 
+pre {
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  
+  code {
+    position: relative;
+    width: 100%;
+    display: block;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-size: 0.75rem;
+
+    &::after {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      border: solid 1px rgb(238, 238, 238);
+      top: 0;
+      left: 0;
+      content: '';
+    }
+
+    &::before {
+      position: absolute;
+      height: 1.75rem;
+      width: 100%;
+      top: 0;
+      left: 0;
+      padding: 0.25rem;
+      content: ' Code';
+      font-size: 1rem;
+      font-family: monospace;
+      text-transform: uppercase;
+      background-color: rgb(238, 238, 238);
+    }
+  }
+ }
+
 img {
   margin-top: 0.5rem;
   margin-bottom: 0.25rem;

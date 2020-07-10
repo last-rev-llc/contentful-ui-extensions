@@ -13,17 +13,80 @@ const entrySymbolFieldTwo = {
 const contentTypeSymbolFieldOne = {
   id: 'contentTypeSymbolFieldOne',
   type: 'Symbol',
-  name: 'Content Type Symbol Field One'
+  name: 'Content Type Symbol Field One',
+  'en-US': 'symbol field 1'
 };
 
 const contentTypeSymbolFieldTwo = {
   id: 'contentTypeSymbolFieldTwo',
   type: 'Symbol',
-  name: 'Content Type Symbol Field Two'
+  name: 'Content Type Symbol Field Two',
+  'en-US': 'symbol field 2'
 };
 
 const arrayField = {
 
+};
+
+const assetFieldOne = {
+  fields: {
+    title: {
+      'en-US': 'Asset Field One'
+    },
+    file: {
+      'en-US': {
+        url: 'http://localhost/images/exampleone.jpeg'
+      }
+    }
+  },
+};
+
+const snapshotOne = {
+  sys: {
+    updatedAt: '2020-06-29T23:04:28.809Z',
+    id: '123456',
+    contentType: {
+      sys: {
+        id: 'entryOne'
+      }
+    }
+  },
+  snapshot: {
+    fields: {contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo},
+    sys: {
+      updatedAt: '2020-06-29T23:04:28.809Z',
+      id: '123456',
+      contentType: {
+        sys: {
+          id: 'entryOne'
+        }
+      }
+    }
+  }
+};
+
+const snapshotTwo = {
+  sys: {
+    updatedAt: '2020-06-28T23:04:28.809Z',
+    id: '123456',
+    contentType: {
+      sys: {
+        id: 'entryOne'
+      }
+    }
+  },
+  snapshot: {
+    fields: {entrySymbolFieldOne, entrySymbolFieldTwo},
+    sys: {
+      updatedAt: '2020-06-29T23:04:28.809Z',
+      id: '123456',
+      contentType: {
+        sys: {
+          id: 'entryOne'
+        }
+      }
+    }
+  }
 };
 
 const entryOne = {
@@ -31,57 +94,61 @@ const entryOne = {
     id: '123456',
     contentType: {
       sys: {
-        id: '765432'
+        id: 'entryOne'
       }
     }
   },
-  fields: [entrySymbolFieldOne, entrySymbolFieldTwo],
-  getSnapshots: () => new Promise((resolve, reject) => {
-    resolve({
-      items: [{
+  snapshot: {
+    sys: {
+      id: '123456',
+      contentType: {
         sys: {
-          updatedAt: '2020-06-29T23:04:28.809Z'
-        },
-        snapshot: {
-          fields: [entrySymbolFieldOne, entrySymbolFieldTwo]
+          id: 'entryOne'
         }
-      },
-      {
-        sys: {
-          updatedAt: '2020-06-28T23:04:28.809Z'
-        },
-        snapshot: {
-          fields: [entrySymbolFieldOne, entrySymbolFieldTwo]
-        }
-      }]
-    });
-  })
+      }
+    }
+  },
+  fields: { contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo },
+  getSnapshots: async () => ({ items: [snapshotOne, snapshotTwo] })
 };
 
 const sdk = {
   environment: {
-    getEntry: (entryId) => new Promise((resolve, reject) => {
-      resolve(entryOne);
-    }),
-    getContentType: (contentTypeId) => new Promise((resolve, reject) => {
-      resolve({
-        sys: {
-          id: contentTypeId
-        },
-        fields: [contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo]
-      });
+    getEntry: async (entryId) => entryOne,
+    getAsset: async (assetId) => assetFieldOne,
+    getContentType: async (contentTypeId) => ({
+      sys: {
+        id: contentTypeId
+      },
+      fields: [contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo]
     })
+  },
+  ids: {
+    space: 'space',
+    environment: 'master'
+  },
+  location: {
+    is: () => false
+  },
+  window: {
+    startAutoResizer: () => true
+  },
+  entry: {
+    fields: {}
   }
 };
 
 export {
+  assetFieldOne,
   richTextField,
   entrySymbolFieldOne,
   entrySymbolFieldTwo,
   contentTypeSymbolFieldOne,
   contentTypeSymbolFieldTwo,
   arrayField,
-  entryOne
+  entryOne,
+  snapshotOne,
+  snapshotTwo
 };
 
 export default sdk;

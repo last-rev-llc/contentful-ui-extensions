@@ -6,6 +6,7 @@
     "@contentful/forma-36-fcss": "0.0.34",
     "@contentful/forma-36-react-components": "^3.28.7",
     "@contentful/forma-36-tokens": "^0.5.2",
+    "@sentry/react": "^5.19.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
