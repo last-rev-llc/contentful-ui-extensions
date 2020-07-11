@@ -27,7 +27,8 @@ import SidebarExtension, {
   getArrayType,
   getContent,
   createDiffFields,
-  addRemovedOldFields
+  addRemovedOldFields,
+  getTextValue
 } from './index';
 import sdk, {
   assetFieldOne,
@@ -49,9 +50,17 @@ const testContentType = {
   fields: [contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo]
 };
 
+const testEditorInterface = {
+  controls: [{
+    fieldId: 'textMultiLineSimpleObject',
+    widgetId: 'multipleLine'
+  }]
+};
+
 sdk.environment.getEntry = jest.fn(async () => entryOne);
 entryOne.getSnapshots = jest.fn(async () => ({ items: [snapshotOne, snapshotTwo] }));
 sdk.environment.getContentType = jest.fn(async () => testContentType);
+sdk.space.getEditorInterface = jest.fn(async () => testEditorInterface);
 sdk.environment.getAsset = jest.fn(async () => assetFieldOne);
 
 afterEach(() => {
@@ -63,8 +72,6 @@ const diffFieldsTestId = "cdd-diff-fields";
 const oldTextTestId = "cdd-old-text";
 const newTextTestId = "cdd-new-text";
 const diffTextTestId = "cdd-diff-text";
-const assetTitleTestId = "cdd-asset-title";
-const assetImageTestId = "cdd-asset-image";
 const fieldLabelTestId = "cdd-field-label";
 const entryWrapTestId = "cdd-entry-wrap";
 const entryLabelTestId = "cdd-entry-label";
@@ -75,16 +82,6 @@ const arrayWrapTestId = "cdd-array-wrap";
 const arrayLabelTestId = "cdd-array-label";
 const entryTextTestId = "cdd-entry-text";
 const embeddedWrapTestId = "cdd-embedded-wrap";
-const embeddedAssetBlockTestId = "cdd-embedded-asset-block";
-const embeddedEntryNameTestId = "cdd-embedded-entry-name";
-const embeddedEntryWrapTestId = "cdd-embedded-entry-wrap";
-
-const textInfo = {
-  id: 'textInfo',
-  keyId: 0,
-  oldText: 'old',
-  newText: 'new'
-};
 
 const richTextFieldInfo = {
   id: 'richTextFieldInfo',
@@ -199,6 +196,18 @@ const symbolSimpleObject = {
   getValue: jest.fn(() => symbolSimpleObject.value)
 };
 
+const textMultiLineSimpleObject = {
+  id: 'textMultiLineSimpleObject',
+  type: 'Text',
+  textType: 'multipleLine',
+  value: `
+    this is multiLine text text
+    here is another line
+  `, 
+  label: 'Text Multi Line Simple Object',
+  getValue: jest.fn(() => textMultiLineSimpleObject.value)
+};
+
 const arraySimpleObject = {
   id: 'arraySimpleObject',
   type: 'Array', 
@@ -245,6 +254,21 @@ const symbolSnapshotObject = {
   'en-US': 'this is test text'
 };
 
+const textMultiLineSnapshotObject = {
+  id: 'textMultiLineSnapshotObject',
+  type: 'Text', 
+  textType: 'multipleLine', 
+  value: `
+    this is multiLine text text
+    here is another line
+  `, 
+  label: 'Text Multi Line Snapshot Object',
+  'en-US': `
+    this is multiLine text text
+    here is another line
+  `
+};
+
 const arraySnapshotObject = {
   id: 'arraySnapshotObject',
   type: 'Array', 
@@ -274,69 +298,104 @@ const linkSnapshotObject = {
   }
 };
 
-const richTextContentType = {
-  type: richTextSimpleObject.type,
-  id: richTextSimpleObject.id,
-  name: richTextSimpleObject.label
+const richTextSnapshotControl = {
+  field: {
+    type: richTextSnapshotObject.type,
+    name: richTextSnapshotObject.label
+  },
+  fieldId: richTextSnapshotObject.id
 };
 
-const symbolContentType = {
-  type: symbolSimpleObject.type,
-  id: symbolSimpleObject.id,
-  name: symbolSimpleObject.label
+const symbolSnapshotControl = {
+  field: {
+    type: symbolSnapshotObject.type,
+    name: symbolSnapshotObject.label
+  },
+  fieldId: symbolSnapshotObject.id
 };
 
-const arrayContentType = {
-  type: arraySimpleObject.type,
-  id: arraySimpleObject.id,
-  name: arraySimpleObject.label
+const arraySnapshotControl = {
+  field: {
+    type: arraySnapshotObject.type,
+    name: arraySnapshotObject.label
+  },
+  fieldId: arraySnapshotObject.id
 };
 
-const linkContentType = {
-  type: linkSimpleObject.type,
-  id: linkSimpleObject.id,
-  name: linkSimpleObject.label
+const linkSnapshotControl = {
+  field: {
+    type: linkSnapshotObject.type,
+    name: linkSnapshotObject.label
+  },
+  fieldId: linkSnapshotObject.id
 };
 
-const richTextSnapshotContentType = {
-  type: richTextSnapshotObject.type,
-  id: richTextSnapshotObject.id,
-  name: richTextSnapshotObject.label
+const textMultiLineSnapshotControl = {
+  field: {
+    type: textMultiLineSnapshotObject.type,
+    name: textMultiLineSnapshotObject.label
+  },
+  fieldId: textMultiLineSnapshotObject.id,
+  widgetId: textMultiLineSnapshotObject.textType
 };
 
-const symbolSnapshotContentType = {
-  type: symbolSnapshotObject.type,
-  id: symbolSnapshotObject.id,
-  name: symbolSnapshotObject.label
+const richTextControl = {
+  field: {
+    type: richTextSimpleObject.type,
+    name: richTextSimpleObject.label
+  },
+  fieldId: richTextSimpleObject.id
 };
 
-const arraySnapshotContentType = {
-  type: arraySnapshotObject.type,
-  id: arraySnapshotObject.id,
-  name: arraySnapshotObject.label
+const symbolControl = {
+  field: {
+    type: symbolSimpleObject.type,
+    name: symbolSimpleObject.label
+  },
+  fieldId: symbolSimpleObject.id
 };
 
-const linkSnapshotContentType = {
-  type: linkSnapshotObject.type,
-  id: linkSnapshotObject.id,
-  name: linkSnapshotObject.label
+const arrayControl = {
+  field: {
+    type: arraySimpleObject.type,
+    name: arraySimpleObject.label
+  },
+  fieldId: arraySimpleObject.id
 };
 
-const testContentTypes = [richTextContentType, symbolContentType, arrayContentType, linkContentType];
-const testSnapshotContentTypes = [richTextSnapshotContentType, symbolSnapshotContentType, arraySnapshotContentType, linkSnapshotContentType];
+const linkControl = {
+  field: {
+    type: linkSimpleObject.type,
+    name: linkSimpleObject.label
+  },
+  fieldId: linkSimpleObject.id
+};
+
+const textMultiLineControl = {
+  field: {
+    type: textMultiLineSimpleObject.type,
+    name: textMultiLineSimpleObject.label
+  },
+  fieldId: textMultiLineSimpleObject.id,
+  widgetId: textMultiLineSimpleObject.textType
+};
+const testControls = [richTextControl, symbolControl, arrayControl, linkControl, textMultiLineControl];
+const testSnapshotControls = [richTextSnapshotControl, symbolSnapshotControl, arraySnapshotControl, linkSnapshotControl, textMultiLineSnapshotControl];
 
 const testEntry = {
   richTextSimpleObject,
   symbolSimpleObject,
   arraySimpleObject,
-  linkSimpleObject
+  linkSimpleObject,
+  textMultiLineSimpleObject
 };
 
 const testSnapshot = {
   richTextSnapshotObject,
   symbolSnapshotObject,
   arraySnapshotObject,
-  linkSnapshotObject
+  linkSnapshotObject,
+  textMultiLineSnapshotObject
 };
 
 const paragraphLineOne = { nodeType: 'text', value: 'line 1' };
@@ -414,6 +473,12 @@ const testSimpleObjects = [symbolSimpleObject, arraySimpleObject];
 
 describe('content-diff-dialog helper methods', () => {
   describe('getTextDiff(textInfo = {id, oldText, newText})', () => {
+    const textInfo = {
+      id: 'textInfo',
+      keyId: 0,
+      oldText: 'old',
+      newText: 'new'
+    };
     test('shows a div with the value of oldText', () => {
       const { getByTestId } = render(getTextDiff(textInfo));
       const oldText = getByTestId(oldTextTestId);
@@ -455,6 +520,8 @@ describe('content-diff-dialog helper methods', () => {
   });
 
   describe('createAssetHtml(asset = { fields: { title: { en-US }, file: { en-US: { url } } } })', () => {
+    const assetTitleTestId = "cdd-asset-title";
+    const assetImageTestId = "cdd-asset-image";
     test('shows asset image and title', () => {
       const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: createAssetHtml(assetFieldOne)}} />);
       expect(getByTestId(assetTitleTestId).textContent).toBe(assetFieldOne.fields.title['en-US']);
@@ -583,11 +650,12 @@ describe('content-diff-dialog helper methods', () => {
     
   });
 
-  describe('createContentSimpleObjects(environment, entry)', () => {
+  describe('createContentSimpleObjects(space, environment, entry)', () => {
     test('returns array of objects with content info', async () => {
       const returnedObjects = [{
         id: contentTypeSymbolFieldOne.id,
         type: contentTypeSymbolFieldOne.type, 
+        textType: false,
         value: contentTypeSymbolFieldOne['en-US'],
         arrayType: contentTypeSymbolFieldOne.items && contentTypeSymbolFieldOne.items.type,
         label: contentTypeSymbolFieldOne.name
@@ -595,27 +663,29 @@ describe('content-diff-dialog helper methods', () => {
       {
         id: contentTypeSymbolFieldTwo.id,
         type: contentTypeSymbolFieldTwo.type, 
+        textType: false,
         value: contentTypeSymbolFieldTwo['en-US'],
         arrayType: contentTypeSymbolFieldTwo.items && contentTypeSymbolFieldTwo.items.type,
         label: contentTypeSymbolFieldTwo.name
       }];
-      const contentObjects = await createContentSimpleObjects(sdk.environment, entryOne);
+      const contentObjects = await createContentSimpleObjects(sdk.space, sdk.environment, entryOne);
       expect(sdk.environment.getContentType).toHaveBeenCalledTimes(1);
       expect(sdk.environment.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
       expect(JSON.stringify(contentObjects)).toBe(JSON.stringify(returnedObjects));
     });
   });
 
-  describe('createSimpleObjects(environment, contentTypeFields, entry, locale)', () => {
+  describe('createSimpleObjects(environment, controls, entry, locale)', () => {
     describe('returns array of objects in this structure { id, type, value, arrayType, label, asset }', () => {
       test('without a locale passed in', async () => {
         const testRichText = _.omit(richTextSimpleObject, [getValue]);
         const testSymbol = _.omit(symbolSimpleObject, [getValue]);
         const testArray = _.omit(arraySimpleObject, [getValue, 'items']);
         const testLink = _.omit(linkSimpleObject, [getValue, '_fieldLocales']);
-        const testEntrySimpleObjects = [testRichText, testSymbol, testArray, testLink];
+        const testText = _.omit(textMultiLineSimpleObject, [getValue]);
+        const testEntrySimpleObjects = [testRichText, testSymbol, testArray, testLink, testText];
 
-        const testObjects = await createSimpleObjects(sdk.environment, testContentTypes, testEntry);
+        const testObjects = await createSimpleObjects(sdk.environment, testControls, testEntry);
         expect(sdk.environment.getAsset).toHaveBeenCalledTimes(1);
         expect(sdk.environment.getAsset).toHaveBeenCalledWith(linkSimpleObject._fieldLocales['en-US']._value.sys.id);
         expect(JSON.stringify(testObjects)).toBe(JSON.stringify(testEntrySimpleObjects));
@@ -626,9 +696,10 @@ describe('content-diff-dialog helper methods', () => {
         const testSymbol = _.omit(symbolSnapshotObject, ['en-US']);
         const testArray = _.omit(arraySnapshotObject, ['en-US', 'items']);
         const testLink = _.omit(linkSnapshotObject, ['en-US']);
-        const testEntrySimpleObjects = [testRichText, testSymbol, testArray, testLink];
+        const testText = _.omit(textMultiLineSnapshotObject, ['en-US']);
+        const testEntrySimpleObjects = [testRichText, testSymbol, testArray, testLink, testText];
 
-        const testObjects = await createSimpleObjects(sdk.environment, testSnapshotContentTypes, testSnapshot, 'en-US');
+        const testObjects = await createSimpleObjects(sdk.environment, testSnapshotControls, testSnapshot, 'en-US');
         expect(sdk.environment.getAsset).toHaveBeenCalledTimes(1);
         expect(sdk.environment.getAsset).toHaveBeenCalledWith(linkSnapshotObject['en-US'].sys.id);
         expect(JSON.stringify(testObjects)).toBe(JSON.stringify(testEntrySimpleObjects));
@@ -746,10 +817,13 @@ describe('content-diff-dialog helper methods', () => {
     });
   });
 
-  describe('createRichTextLines(lines = [{ nodeType, content, data: { target: { sys: { id } } } }], environment, snapshotDate)', () => {
+  describe('createRichTextLines(lines = [{ nodeType, content, data: { target: { sys: { id } } } }], space, environment, snapshotDate)', () => {
     describe('returns html for all rich text field lines of all types', () => {
+      const embeddedAssetBlockTestId = "cdd-embedded-asset-block";
+      const embeddedEntryNameTestId = "cdd-embedded-entry-name";
+      const embeddedEntryWrapTestId = "cdd-embedded-entry-wrap";
       test('if line is of type embedded-asset-block without snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.environment)}} />);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.space, sdk.environment)}} />);
         await waitForElement(() => getByTestId(embeddedAssetBlockTestId));
         expect(sdk.environment.getAsset).toHaveBeenCalledTimes(1);
         expect(sdk.environment.getAsset).toHaveBeenCalledWith(embeddedAssetLine.data.target.sys.id);
@@ -757,7 +831,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('if line is of type embedded-asset-block with snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.environment, new Date())}} />);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.space, sdk.environment, new Date())}} />);
         await waitForElement(() => getByTestId(embeddedAssetBlockTestId));
         expect(sdk.environment.getAsset).toHaveBeenCalledTimes(1);
         expect(sdk.environment.getAsset).toHaveBeenCalledWith(embeddedAssetLine.data.target.sys.id);
@@ -765,7 +839,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('if line is of type embedded-entry-block without snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.environment)}} />);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.space, sdk.environment)}} />);
         await waitForElement(() => getByTestId(embeddedEntryWrapTestId));
         await waitForElement(() => getByTestId(embeddedEntryNameTestId));
 
@@ -778,7 +852,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('if line is of type embedded-entry-block with snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
         await waitForElement(() => getByTestId(embeddedEntryWrapTestId));
         await waitForElement(() => getByTestId(embeddedEntryNameTestId));
 
@@ -792,7 +866,7 @@ describe('content-diff-dialog helper methods', () => {
 
       describe('if line is of type paragraph', () => {
         test('has no embedded entry inline and no snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.environment)}} />);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space, sdk.environment)}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
   
           expect(sdk.environment.getEntry).not.toHaveBeenCalled();
@@ -801,7 +875,7 @@ describe('content-diff-dialog helper methods', () => {
         });
   
         test('has no embedded entry inline but has snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
   
           expect(sdk.environment.getEntry).not.toHaveBeenCalled();
@@ -810,7 +884,7 @@ describe('content-diff-dialog helper methods', () => {
         });
 
         test('has embedded entry inline but no snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.environment)}} />);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space, sdk.environment)}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
           await waitForElement(() => getByTestId(embeddedWrapTestId));
 
@@ -822,7 +896,7 @@ describe('content-diff-dialog helper methods', () => {
         });
   
         test('has embedded entry inline and has snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
           await waitForElement(() => getByTestId(embeddedWrapTestId));
 
@@ -926,7 +1000,7 @@ describe('content-diff-dialog helper methods', () => {
 
   describe('getContent(field = { id, type, value, arrayType, label }, environment, snapshotDate, snapshot)', () => {
     test('returns an object with current and old html values of rich text field', async () => {
-      const content = await getContent(richTextEntryField, sdk.environment, new Date(snapshotOne.sys.updatedAt), richTextEntryField);
+      const content = await getContent(richTextEntryField, sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt), richTextEntryField);
       expect(content.currentValue).toBeTruthy();
       expect(content.oldValue).toBeTruthy();
       expect(content.currentValue === content.oldValue).toBeTruthy();
@@ -936,7 +1010,7 @@ describe('content-diff-dialog helper methods', () => {
   describe('createDiffFields(fields, snapshots, environment, snapshotDate)', () => {
     describe('creates object with this structure { id, type, label, content: { currentValue, oldValue }, currentValue, oldValue, arrayType }', () => {
       test('when there is a rich text field', async () => {
-        const fields = await createDiffFields([richTextSimpleObject], [richTextSimpleObject], sdk.environment, new Date(snapshotOne.sys.updatedAt));
+        const fields = await createDiffFields([richTextSimpleObject], [richTextSimpleObject], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt));
         expect(fields[0]).toBeTruthy();
         expect(fields[0].id).toBe(richTextSimpleObject.id);
         expect(fields[0].type).toBe(richTextSimpleObject.type);
@@ -951,7 +1025,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('when there is a symbol field', async () => {
-        const fields = await createDiffFields([symbolSimpleObject], [symbolSimpleObject], sdk.environment, new Date(snapshotOne.sys.updatedAt));
+        const fields = await createDiffFields([symbolSimpleObject], [symbolSimpleObject], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt));
         expect(fields[0]).toBeTruthy();
         expect(fields[0].id).toBe(symbolSimpleObject.id);
         expect(fields[0].type).toBe(symbolSimpleObject.type);
@@ -964,7 +1038,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('when there is a array field', async () => {
-        const fields = await createDiffFields([arraySimpleObject], [arraySimpleObject], sdk.environment, new Date(snapshotOne.sys.updatedAt));
+        const fields = await createDiffFields([arraySimpleObject], [arraySimpleObject], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt));
         expect(fields[0]).toBeTruthy();
         expect(fields[0].id).toBe(arraySimpleObject.id);
         expect(fields[0].type).toBe(arraySimpleObject.type);
@@ -977,7 +1051,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('when there is a link field', async () => {
-        const fields = await createDiffFields([linkSimpleObject], [linkSimpleObject], sdk.environment, new Date(snapshotOne.sys.updatedAt));
+        const fields = await createDiffFields([linkSimpleObject], [linkSimpleObject], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt));
         expect(fields[0]).toBeTruthy();
         expect(fields[0].id).toBe(linkSimpleObject.id);
         expect(fields[0].type).toBe(linkSimpleObject.type);
@@ -1002,6 +1076,40 @@ describe('content-diff-dialog helper methods', () => {
       expect(fields[1].currentValue).toBeFalsy();
       expect(fields[1].oldValue).toBeTruthy();
       expect(fields[1].arrayType).toBeFalsy();
+    });
+  });
+
+  describe('getTextValue(field)', () => {
+    test('wraps text value in pre tags if code tags are present', () => {
+      const testText = {
+        value: '<code>this is wraped in code tags</code>'
+      };
+      const value = getTextValue(testText);
+      expect(value.replace(testText.value, '')).toBe('<pre></pre>');
+    });
+
+    test('wraps text value in pre tags if text type is markdown', () => {
+      const testText = {
+        value: `
+          markdown line 1
+          markdown line 2
+        `,
+        textType: 'markdown'
+      };
+      const value = getTextValue(testText);
+      expect(value.replace(testText.value, '')).toBe('<pre></pre>');
+    });
+
+    test('wraps text value in pre tags if text type is multipleLine', () => {
+      const testText = {
+        value: `
+          multipleLine line 1
+          multipleLine line 2
+        `,
+        textType: 'multipleLine'
+      };
+      const value = getTextValue(testText);
+      expect(value.replace(testText.value, '')).toBe('<pre></pre>');
     });
   });
 

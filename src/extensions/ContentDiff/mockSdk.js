@@ -123,6 +123,14 @@ const sdk = {
       fields: [contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo]
     })
   },
+  space: {
+    getEditorInterface: async (contentTypeId) => ({
+      controls: [{
+        fieldId: 'textFieldOne',
+        widgetId: 'multipleLine'
+      }]
+    })
+  },
   ids: {
     space: 'space',
     environment: 'master'

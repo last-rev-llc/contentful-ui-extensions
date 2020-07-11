@@ -33,7 +33,7 @@ const fieldTypes = [
 const contentfulManagement = require('contentful-management');
 
 const clientManagement = contentfulManagement.createClient({
-  accessToken: '<place api key here>'
+  accessToken: 'CFPAT-bPHNK075d3bHHJWE1Oc2wgZJXhauhuDNXW9wMXUm7qA'
 });
 
 const getTextDiff = ({id, oldText, newText, fieldType}) => {
@@ -103,7 +103,7 @@ const getFields = (field) => {
     break;
   
   case fieldTypes[ARRAY]:
-    if (field.arrayType === 'Symbol') {
+    if (field.arrayType === fieldTypes[SYMBOL]) {
       result = getTextDiffLines(_.get(field, 'oldValue', []), _.get(field, 'currentValue', []), field.type);
     }
     break;
@@ -203,8 +203,6 @@ const createSimpleObjects = async (environment, controls, entry, locale) => {
 
       default:
       }
-      console.log('entry', entry);
-      console.log('control', control);
       const value = entry[control.fieldId] && (entry[control.fieldId][locale] || entry[control.fieldId].getValue());
       return { 
         id: control.fieldId,
@@ -219,18 +217,18 @@ const createSimpleObjects = async (environment, controls, entry, locale) => {
 };
 
 const getTextValue = (field) => {
-
+  let value = _.escape(field.value).replace("&lt;code&gt;", "<code>").replace("&lt;/code&gt;", "</code>");
+  if (field.textType === 'markdown' || field.textType === 'multipleLine' || value.indexOf('<code>') > -1) {
+    value = `<pre>${value}</pre>`;
+  }
+  return value;
 };
 
 const getValue = (field) => {
   let value;
   if (field) {
     if (field.type === 'Symbol' || field.type === 'Text') {
-      const fieldValue = _.escape(field.value).replace("&lt;code&gt;", "<code>").replace("&lt;/code&gt;", "</code>");
-      value = field.textType === 'markdown' ? `<code>${fieldValue}</code>` : fieldValue;
-      if (field.type === 'Text' || value.indexOf('<code>') > -1){
-        value = `<pre>${value}</pre>`;
-      }
+      value = getTextValue(field);
     }
     else {
       value = _.get(field, 'asset', _.get(field, 'value'));
@@ -553,6 +551,7 @@ export {
   getContent,
   createDiffFields,
   addRemovedOldFields,
+  getTextValue
 };
 
 export default SidebarExtension;
