@@ -33,7 +33,7 @@ const fieldTypes = [
 const contentfulManagement = require('contentful-management');
 
 const clientManagement = contentfulManagement.createClient({
-  accessToken: 'CFPAT-bPHNK075d3bHHJWE1Oc2wgZJXhauhuDNXW9wMXUm7qA'
+  accessToken: '<place api key here>'
 });
 
 const getTextDiff = ({id, oldText, newText, fieldType}) => {
