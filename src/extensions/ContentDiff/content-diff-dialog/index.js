@@ -12,29 +12,27 @@ import '@contentful/forma-36-react-components/dist/styles.css';
 import './index.scss';
 import diff from 'node-htmldiff';
 
-const RICH_TEXT = 0;
-const SYMBOL = 1;
-const OBJECT = 2;
-const ARRAY = 3;
-const LINK = 4;
-const TEXT = 5;
-
 const firstIndex = 0;
 
-const fieldTypes = [
-  'RichText',
-  'Symbol',
-  'Object',
-  'Array',
-  'Link',
-  'Text'
-];
+const fieldTypes = {
+  richText: 'RichText',
+  symbol: 'Symbol',
+  object: 'Object',
+  array: 'Array',
+  link: 'Link',
+  text: 'Text'
+};
 
-const contentfulManagement = require('contentful-management');
+const richTextFieldTypes = {
+  asset: 'embedded-asset-block',
+  entry: 'embedded-entry-block',
+  paragraph: 'paragraph'
+};
 
-const clientManagement = contentfulManagement.createClient({
-  accessToken: '<place api key here>'
-});
+const paragraphFieldTypes = {
+  text: 'text',
+  inlineEntry: 'embedded-entry-inline'
+};
 
 const getTextDiff = ({id, oldText, newText, fieldType}) => {
   const changedClass = newText === oldText ? 'no-change' : 'change';
@@ -86,29 +84,29 @@ const getFields = (field) => {
   let result;
 
   switch (field.type) {
-  case fieldTypes[RICH_TEXT]:
+  case fieldTypes.richText:
     result = getTextDiff({ id: 0, oldText: _.get(field, 'content.oldValue', ''), newText: _.get(field, 'content.currentValue', ''), fieldType: field.type });
     break;
   
-  case fieldTypes[SYMBOL]:
+  case fieldTypes.symbol:
     result = getTextDiff({ id: 0, oldText: _.escape(_.get(field, 'oldValue', '')), newText: _.escape(_.get(field, 'currentValue', '')), fieldType: field.type });
     break;
 
-  case fieldTypes[TEXT]:
+  case fieldTypes.text:
     result = getTextDiff({ id: 0, oldText: _.get(field, 'oldValue', ''), newText: _.get(field, 'currentValue', ''), fieldType: field.type });
     break;
   
-  case fieldTypes[OBJECT]:
+  case fieldTypes.object:
     // result = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
     break;
   
-  case fieldTypes[ARRAY]:
-    if (field.arrayType === fieldTypes[SYMBOL]) {
+  case fieldTypes.array:
+    if (field.arrayType === fieldTypes.symbol) {
       result = getTextDiffLines(_.get(field, 'oldValue', []), _.get(field, 'currentValue', []), field.type);
     }
     break;
 
-  case fieldTypes[LINK]:
+  case fieldTypes.link:
     result = getTextDiff({ id: 0, oldText: createAssetHtml(_.get(field, 'oldValue')), newText: createAssetHtml(_.get(field, 'currentValue')), fieldType: field.type });
     break;
     
@@ -136,15 +134,10 @@ const getFieldTables = (fields) => {
   return fieldTable;
 };
 
-const getEntryByDate = async (environment, entryId, snapshotDate) => {
-  const entry = await environment.getEntry(entryId);
-  let result = entry;
-  if (snapshotDate) {
-    const snapshots = await entry.getSnapshots();
-    result = snapshots.items.filter(item => new Date(item.sys.updatedAt) <= snapshotDate)[firstIndex];
-  }
-
-  return result;
+const getEntryByDate = async (space, entryId, snapshotDate) => {
+  return snapshotDate 
+    ? ((await space.getEntrySnapshots(entryId)).items || []).filter(item => new Date(item.sys.updatedAt) <= snapshotDate)[firstIndex] 
+    : space.getEntry(entryId);
 };
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -163,16 +156,16 @@ export class DialogExtension extends React.Component {
   }
 }
 
-const createContentSimpleObjects = async (space, environment, entry) => {
+const createContentSimpleObjects = async (space, entry) => {
   let objects;
   let control;
   if (!entry) return objects;
-  const contentType = await environment.getContentType(entry.sys.contentType.sys.id);
+  const contentType = await space.getContentType(entry.sys.contentType.sys.id);
   const editorInterface = await space.getEditorInterface(entry.sys.contentType.sys.id);
   if (!contentType) return objects;
   const controls = (editorInterface && editorInterface.controls) || [];
   objects = contentType.fields.map(field => {
-    control = field.type === 'Text' && controls.filter(c => c.fieldId === field.id)[firstIndex];
+    control = field.type === fieldTypes.text && controls.filter(c => c.fieldId === field.id)[firstIndex];
     return {
       id: field.id,
       type: field.type, 
@@ -185,19 +178,19 @@ const createContentSimpleObjects = async (space, environment, entry) => {
   return objects;
 };
 
-const createSimpleObjects = async (environment, controls, entry, locale) => {
+const createSimpleObjects = async (space, controls, entry, locale) => {
   return Promise.all(controls
     .map(async control => {
       let asset;
       let textType;
       let id = '';
       switch (control.field.type) {
-      case 'Link':
+      case fieldTypes.link:
         id = locale ? _.get(entry, `[${control.fieldId}]['en-US'].sys.id`) : _.get(entry, `[${control.fieldId}]._fieldLocales['en-US']._value.sys.id`);
         if (!id) break;
-        asset = await environment.getAsset(id);
+        asset = await space.getAsset(id);
         break;
-      case 'Text':
+      case fieldTypes.text:
         textType = control.widgetId;
         break;
 
@@ -227,7 +220,7 @@ const getTextValue = (field) => {
 const getValue = (field) => {
   let value;
   if (field) {
-    if (field.type === 'Symbol' || field.type === 'Text') {
+    if (field.type === fieldTypes.symbol || field.type === fieldTypes.text) {
       value = getTextValue(field);
     }
     else {
@@ -262,20 +255,20 @@ const createHtmlForArray = (field) => {
 const getEmbeddedEntryValue = (field) => {
   let value = '';
   switch (field.type) {
-  case fieldTypes[RICH_TEXT]:
+  case fieldTypes.richText:
     // result = renderRichTextLines(field.content);
     break;
-  case fieldTypes[SYMBOL]:
+  case fieldTypes.symbol:
     value = createHtmlForEntry(field);
     break;
-  case fieldTypes[TEXT]:
+  case fieldTypes.text:
     value = createHtmlForEntry(field);
     break;
-  case fieldTypes[OBJECT]:
+  case fieldTypes.object:
     // value = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
     break;
-  case fieldTypes[ARRAY]:
-    if (field.arrayType === 'Symbol') {
+  case fieldTypes.array:
+    if (field.arrayType === fieldTypes.symbol) {
       value = createHtmlForArray(field);
     }
     break;
@@ -290,7 +283,7 @@ const createHtmlForEmbeddedEntryLines = (lines) => {
 
 const createHtmlForParagraphLines = lines => {
   return _.compact(lines).map(line => {
-    if (line.nodeType === 'text') {
+    if (line.nodeType === paragraphFieldTypes.text) {
       if (line.value.trim() === '') return '';
       return `<p data-test-id="cdd-entry-text">${line.value}</p>`;
     }
@@ -299,7 +292,7 @@ const createHtmlForParagraphLines = lines => {
   });
 };
 
-const createRichTextLines = async (lines, space, environment, snapshotDate) => {
+const createRichTextLines = async (lines, space, snapshotDate) => {
   const rtfContentLines = await Promise.all(lines.map(async (line) => {
     let result;
     let entry;
@@ -308,16 +301,16 @@ const createRichTextLines = async (lines, space, environment, snapshotDate) => {
     let contentType;
     
     switch (line.nodeType) {
-    case 'embedded-asset-block':
-      asset = await environment.getAsset(line.data.target.sys.id);
+    case richTextFieldTypes.asset:
+      asset = await space.getAsset(line.data.target.sys.id);
       result = [`<div class="${line.nodeType}" data-test-id="cdd-embedded-asset-block">${createAssetHtml(asset, line.nodeType)}</div>`];
       break;
 
-    case 'embedded-entry-block':
-      entry = await getEntryByDate(environment, line.data.target.sys.id, snapshotDate);
+    case richTextFieldTypes.entry:
+      entry = await getEntryByDate(space, line.data.target.sys.id, snapshotDate);
       if (!entry) break;
       
-      content = await createContentSimpleObjects(space, environment, snapshotDate ? entry.snapshot : entry);
+      content = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
       result = createHtmlForEmbeddedEntryLines(content);
       
       contentType = _.startCase(_.get(entry, 'sys.contentType.sys.id', ''));
@@ -326,14 +319,14 @@ const createRichTextLines = async (lines, space, environment, snapshotDate) => {
       result.push('</ul></div>');
       break;
 
-    case 'paragraph':
+    case richTextFieldTypes.paragraph:
       if (line.content.length > 1) {
         content = await Promise.all(line.content.map(async inlineContent => {
           let inlineResult = inlineContent;
-          if (inlineContent.nodeType === 'embedded-entry-inline') {
-            entry = await getEntryByDate(environment, inlineContent.data.target.sys.id, snapshotDate);
+          if (inlineContent.nodeType === paragraphFieldTypes.inlineEntry) {
+            entry = await getEntryByDate(space, inlineContent.data.target.sys.id, snapshotDate);
             if (!entry) return Promise.resolve();
-            inlineResult = await createContentSimpleObjects(space, environment, snapshotDate ? entry.snapshot : entry);
+            inlineResult = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
           }
           return Promise.resolve(inlineResult);
         }));
@@ -368,9 +361,9 @@ const getArrayType = (field) => {
   return field.arrayType;
 };
 
-const getContent = async (field, space, environment, snapshotDate, snapshot) => {
-  const currentContent = await createRichTextLines(field.value.content, space, environment);
-  const oldContent = await createRichTextLines(snapshot.value.content, space, environment, snapshotDate);
+const getContent = async (field, space, snapshotDate, snapshot) => {
+  const currentContent = await createRichTextLines(field.value.content, space);
+  const oldContent = await createRichTextLines(snapshot.value.content, space, snapshotDate);
         
   const result = {
     currentValue: _.compact(currentContent).map(content => content.join('')).join(''),
@@ -379,16 +372,16 @@ const getContent = async (field, space, environment, snapshotDate, snapshot) => 
   return result;
 };
 
-const createDiffFields = async (fields, snapshots, space, environment, snapshotDate) => {
+const createDiffFields = async (fields, snapshots, space, snapshotDate) => {
   const diffFields = await Promise.all(fields.map(async field => {
     const type = getType(field);
-    const isRichText = getType(field) === 'RichText';
+    const isRichText = type === fieldTypes.richText;
     const snapshot = snapshots.filter(shot => shot.id === field.id)[0];
     return {
       id: getId(field),
       type,
       label: getLabel(field),
-      content: isRichText ? await getContent(field, space, environment, snapshotDate, snapshot) : false,
+      content: isRichText ? await getContent(field, space, snapshotDate, snapshot) : false,
       currentValue: isRichText ? '' : getValue(field),
       oldValue: isRichText ? '' : getValue(snapshot),
       arrayType: getArrayType(field),
@@ -397,8 +390,8 @@ const createDiffFields = async (fields, snapshots, space, environment, snapshotD
   return diffFields;
 };
 
-const addRemovedOldFields = async (fields, snapshots) => {
-  await Promise.all(snapshots.map(async shot => {
+const addRemovedOldFields = (fields, snapshots) => {
+  snapshots.forEach(shot => {
     if (fields.every(field => field.id !== shot.id)) {
       fields.push({
         id: getId(shot),
@@ -409,8 +402,7 @@ const addRemovedOldFields = async (fields, snapshots) => {
         arrayType: getArrayType(shot)
       });
     }
-    return shot;
-  }));
+  });
   return fields;
 };
 
@@ -434,16 +426,7 @@ export class SidebarExtension extends React.Component {
   componentDidMount() {
     this._isMounted = true;
     this.props.sdk.window.startAutoResizer();
-    clientManagement.getSpace(this.props.sdk.ids.space)
-      .then(space => {
-        this.space = space;
-        return space.getEnvironment(this.props.sdk.ids.environment);
-      })
-      .then(env => {
-        this.environment = env;
-        return env.getEntry(this.props.sdk.ids.entry);
-      })
-      .then(entry => entry.getSnapshots())
+    this.props.sdk.space.getEntrySnapshots(this.props.sdk.ids.entry)
       .then(snapshots => this._isMounted && this.setState({ versions: snapshots.items }));
   }
 
@@ -454,11 +437,10 @@ export class SidebarExtension extends React.Component {
   onButtonClick = async () => {
     const version = this.version || this.state.versions[0];
     const controls = this.props.sdk.editor.editorInterface.controls.filter(({ field }) => !field.disabled);
-    const currentFields = await createSimpleObjects(this.environment, controls, this.props.sdk.entry.fields);
-    const oldFields = await createSimpleObjects(this.environment, controls, version.snapshot.fields, 'en-US');
-    let fields = await createDiffFields(currentFields, oldFields, this.props.sdk.space, this.environment, new Date(version.sys.updatedAt));
-    fields = await addRemovedOldFields(fields, oldFields, this.environment, new Date(version.sys.updatedAt));
-    
+    const currentFields = await createSimpleObjects(this.props.sdk.space, controls, this.props.sdk.entry.fields);
+    const oldFields = await createSimpleObjects(this.props.sdk.space, controls, version.snapshot.fields, 'en-US');
+    let fields = await createDiffFields(currentFields, oldFields, this.props.sdk.space, new Date(version.sys.updatedAt));
+    fields = addRemovedOldFields(fields, oldFields);
     await this.props.sdk.dialogs.openExtension({
       width: 'fullWidth',
       title: 'Last Rev Content Diff UIE',

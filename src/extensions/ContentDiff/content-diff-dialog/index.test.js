@@ -57,11 +57,11 @@ const testEditorInterface = {
   }]
 };
 
-sdk.environment.getEntry = jest.fn(async () => entryOne);
-entryOne.getSnapshots = jest.fn(async () => ({ items: [snapshotOne, snapshotTwo] }));
-sdk.environment.getContentType = jest.fn(async () => testContentType);
+sdk.space.getEntry = jest.fn(async () => entryOne);
+sdk.space.getEntrySnapshots = jest.fn(async () => ({ items: [snapshotOne, snapshotTwo] }));
+sdk.space.getContentType = jest.fn(async () => testContentType);
 sdk.space.getEditorInterface = jest.fn(async () => testEditorInterface);
-sdk.environment.getAsset = jest.fn(async () => assetFieldOne);
+sdk.space.getAsset = jest.fn(async () => assetFieldOne);
 
 afterEach(() => {
   cleanup();
@@ -630,27 +630,27 @@ describe('content-diff-dialog helper methods', () => {
     });
   });
 
-  describe('getEntryByDate(environment, entryId, snapshotDate)', () => {
+  describe('getEntryByDate(space, entryId, snapshotDate)', () => {
 
     test('returns entry object if a date is not passed in', async () => {
-      const withoutDate = await getEntryByDate(sdk.environment, entryOne.sys.id);
-      expect(sdk.environment.getEntry).toHaveBeenCalledTimes(1);
-      expect(sdk.environment.getEntry).toHaveBeenCalledWith(entryOne.sys.id);
-      expect(entryOne.getSnapshots).not.toHaveBeenCalled();
+      const withoutDate = await getEntryByDate(sdk.space, entryOne.sys.id);
+      expect(sdk.space.getEntry).toHaveBeenCalledTimes(1);
+      expect(sdk.space.getEntry).toHaveBeenCalledWith(entryOne.sys.id);
+      expect(sdk.space.getEntrySnapshots).not.toHaveBeenCalled();
       expect(JSON.stringify(withoutDate)).toBe(JSON.stringify(entryOne));
     });
 
     test('returns snapshot object if a date is passed in', async () => {
-      const withDate = await getEntryByDate(sdk.environment, entryOne.sys.id, new Date(snapshotOne.sys.updatedAt));
-      expect(sdk.environment.getEntry).toHaveBeenCalledTimes(1);
-      expect(sdk.environment.getEntry).toHaveBeenCalledWith(entryOne.sys.id);
-      expect(entryOne.getSnapshots).toHaveBeenCalledTimes(1);
+      const withDate = await getEntryByDate(sdk.space, entryOne.sys.id, new Date(snapshotOne.sys.updatedAt));
+      expect(sdk.space.getEntry).not.toHaveBeenCalled();
+      expect(sdk.space.getEntrySnapshots).toHaveBeenCalledTimes(1);
+      expect(sdk.space.getEntrySnapshots).toHaveBeenCalledWith(entryOne.sys.id);
       expect(JSON.stringify(withDate)).toBe(JSON.stringify(snapshotOne));
     });
     
   });
 
-  describe('createContentSimpleObjects(space, environment, entry)', () => {
+  describe('createContentSimpleObjects(space, entry)', () => {
     test('returns array of objects with content info', async () => {
       const returnedObjects = [{
         id: contentTypeSymbolFieldOne.id,
@@ -668,14 +668,14 @@ describe('content-diff-dialog helper methods', () => {
         arrayType: contentTypeSymbolFieldTwo.items && contentTypeSymbolFieldTwo.items.type,
         label: contentTypeSymbolFieldTwo.name
       }];
-      const contentObjects = await createContentSimpleObjects(sdk.space, sdk.environment, entryOne);
-      expect(sdk.environment.getContentType).toHaveBeenCalledTimes(1);
-      expect(sdk.environment.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
+      const contentObjects = await createContentSimpleObjects(sdk.space, entryOne);
+      expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
+      expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
       expect(JSON.stringify(contentObjects)).toBe(JSON.stringify(returnedObjects));
     });
   });
 
-  describe('createSimpleObjects(environment, controls, entry, locale)', () => {
+  describe('createSimpleObjects(space, controls, entry, locale)', () => {
     describe('returns array of objects in this structure { id, type, value, arrayType, label, asset }', () => {
       test('without a locale passed in', async () => {
         const testRichText = _.omit(richTextSimpleObject, [getValue]);
@@ -685,9 +685,9 @@ describe('content-diff-dialog helper methods', () => {
         const testText = _.omit(textMultiLineSimpleObject, [getValue]);
         const testEntrySimpleObjects = [testRichText, testSymbol, testArray, testLink, testText];
 
-        const testObjects = await createSimpleObjects(sdk.environment, testControls, testEntry);
-        expect(sdk.environment.getAsset).toHaveBeenCalledTimes(1);
-        expect(sdk.environment.getAsset).toHaveBeenCalledWith(linkSimpleObject._fieldLocales['en-US']._value.sys.id);
+        const testObjects = await createSimpleObjects(sdk.space, testControls, testEntry);
+        expect(sdk.space.getAsset).toHaveBeenCalledTimes(1);
+        expect(sdk.space.getAsset).toHaveBeenCalledWith(linkSimpleObject._fieldLocales['en-US']._value.sys.id);
         expect(JSON.stringify(testObjects)).toBe(JSON.stringify(testEntrySimpleObjects));
       });
 
@@ -699,9 +699,9 @@ describe('content-diff-dialog helper methods', () => {
         const testText = _.omit(textMultiLineSnapshotObject, ['en-US']);
         const testEntrySimpleObjects = [testRichText, testSymbol, testArray, testLink, testText];
 
-        const testObjects = await createSimpleObjects(sdk.environment, testSnapshotControls, testSnapshot, 'en-US');
-        expect(sdk.environment.getAsset).toHaveBeenCalledTimes(1);
-        expect(sdk.environment.getAsset).toHaveBeenCalledWith(linkSnapshotObject['en-US'].sys.id);
+        const testObjects = await createSimpleObjects(sdk.space, testSnapshotControls, testSnapshot, 'en-US');
+        expect(sdk.space.getAsset).toHaveBeenCalledTimes(1);
+        expect(sdk.space.getAsset).toHaveBeenCalledWith(linkSnapshotObject['en-US'].sys.id);
         expect(JSON.stringify(testObjects)).toBe(JSON.stringify(testEntrySimpleObjects));
       });
     });
@@ -823,88 +823,88 @@ describe('content-diff-dialog helper methods', () => {
       const embeddedEntryNameTestId = "cdd-embedded-entry-name";
       const embeddedEntryWrapTestId = "cdd-embedded-entry-wrap";
       test('if line is of type embedded-asset-block without snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.space, sdk.environment)}} />);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.space)}} />);
         await waitForElement(() => getByTestId(embeddedAssetBlockTestId));
-        expect(sdk.environment.getAsset).toHaveBeenCalledTimes(1);
-        expect(sdk.environment.getAsset).toHaveBeenCalledWith(embeddedAssetLine.data.target.sys.id);
+        expect(sdk.space.getAsset).toHaveBeenCalledTimes(1);
+        expect(sdk.space.getAsset).toHaveBeenCalledWith(embeddedAssetLine.data.target.sys.id);
         expect(getByTestId(embeddedAssetBlockTestId).getAttribute('class')).toBe(embeddedAssetLine.nodeType);
       });
 
       test('if line is of type embedded-asset-block with snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.space, sdk.environment, new Date())}} />);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.space, new Date())}} />);
         await waitForElement(() => getByTestId(embeddedAssetBlockTestId));
-        expect(sdk.environment.getAsset).toHaveBeenCalledTimes(1);
-        expect(sdk.environment.getAsset).toHaveBeenCalledWith(embeddedAssetLine.data.target.sys.id);
+        expect(sdk.space.getAsset).toHaveBeenCalledTimes(1);
+        expect(sdk.space.getAsset).toHaveBeenCalledWith(embeddedAssetLine.data.target.sys.id);
         expect(getByTestId(embeddedAssetBlockTestId).getAttribute('class')).toBe(embeddedAssetLine.nodeType);
       });
 
       test('if line is of type embedded-entry-block without snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.space, sdk.environment)}} />);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.space)}} />);
         await waitForElement(() => getByTestId(embeddedEntryWrapTestId));
         await waitForElement(() => getByTestId(embeddedEntryNameTestId));
 
-        expect(sdk.environment.getEntry).toHaveBeenCalledTimes(1);
-        expect(sdk.environment.getEntry).toHaveBeenCalledWith(embeddedEntryLine.data.target.sys.id);
-        expect(sdk.environment.getContentType).toHaveBeenCalledTimes(1);
-        expect(sdk.environment.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
+        expect(sdk.space.getEntry).toHaveBeenCalledTimes(1);
+        expect(sdk.space.getEntry).toHaveBeenCalledWith(embeddedEntryLine.data.target.sys.id);
+        expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
+        expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
         expect(getByTestId(embeddedEntryWrapTestId).getAttribute('class')).toBe(embeddedEntryLine.nodeType);
         expect(getByTestId(embeddedEntryNameTestId).textContent).toBe('Entry One');
       });
 
       test('if line is of type embedded-entry-block with snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.space, new Date(snapshotOne.sys.updatedAt))}} />);
         await waitForElement(() => getByTestId(embeddedEntryWrapTestId));
         await waitForElement(() => getByTestId(embeddedEntryNameTestId));
 
-        expect(sdk.environment.getEntry).toHaveBeenCalledTimes(1);
-        expect(sdk.environment.getEntry).toHaveBeenCalledWith(embeddedEntryLine.data.target.sys.id);
-        expect(sdk.environment.getContentType).toHaveBeenCalledTimes(1);
-        expect(sdk.environment.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
+        expect(sdk.space.getEntrySnapshots).toHaveBeenCalledTimes(1);
+        expect(sdk.space.getEntrySnapshots).toHaveBeenCalledWith(embeddedEntryLine.data.target.sys.id);
+        expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
+        expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
         expect(getByTestId(embeddedEntryWrapTestId).getAttribute('class')).toBe(embeddedEntryLine.nodeType);
         expect(getByTestId(embeddedEntryNameTestId).textContent).toBe('Entry One');
       });
 
       describe('if line is of type paragraph', () => {
         test('has no embedded entry inline and no snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space, sdk.environment)}} />);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space)}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
   
-          expect(sdk.environment.getEntry).not.toHaveBeenCalled();
-          expect(sdk.environment.getContentType).not.toHaveBeenCalled();
+          expect(sdk.space.getEntry).not.toHaveBeenCalled();
+          expect(sdk.space.getContentType).not.toHaveBeenCalled();
           expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
         });
   
         test('has no embedded entry inline but has snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space, new Date(snapshotOne.sys.updatedAt))}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
   
-          expect(sdk.environment.getEntry).not.toHaveBeenCalled();
-          expect(sdk.environment.getContentType).not.toHaveBeenCalled();
+          expect(sdk.space.getEntry).not.toHaveBeenCalled();
+          expect(sdk.space.getContentType).not.toHaveBeenCalled();
           expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
         });
 
         test('has embedded entry inline but no snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space, sdk.environment)}} />);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space)}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
           await waitForElement(() => getByTestId(embeddedWrapTestId));
 
           expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
-          expect(sdk.environment.getEntry).toHaveBeenCalledTimes(1);
-          expect(sdk.environment.getEntry).toHaveBeenCalledWith(embeddedEntryInline.data.target.sys.id);
-          expect(sdk.environment.getContentType).toHaveBeenCalledTimes(1);
-          expect(sdk.environment.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
+          expect(sdk.space.getEntry).toHaveBeenCalledTimes(1);
+          expect(sdk.space.getEntry).toHaveBeenCalledWith(embeddedEntryInline.data.target.sys.id);
+          expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
+          expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
         });
   
         test('has embedded entry inline and has snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt))}} />);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space, new Date(snapshotOne.sys.updatedAt))}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
           await waitForElement(() => getByTestId(embeddedWrapTestId));
 
           expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
-          expect(sdk.environment.getEntry).toHaveBeenCalledTimes(1);
-          expect(sdk.environment.getEntry).toHaveBeenCalledWith(embeddedEntryInline.data.target.sys.id);
-          expect(sdk.environment.getContentType).toHaveBeenCalledTimes(1);
-          expect(sdk.environment.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
+          expect(sdk.space.getEntrySnapshots).toHaveBeenCalledTimes(1);
+          expect(sdk.space.getEntrySnapshots).toHaveBeenCalledWith(embeddedEntryInline.data.target.sys.id);
+          expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
+          expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
         });
       });
     });
@@ -1000,7 +1000,7 @@ describe('content-diff-dialog helper methods', () => {
 
   describe('getContent(field = { id, type, value, arrayType, label }, environment, snapshotDate, snapshot)', () => {
     test('returns an object with current and old html values of rich text field', async () => {
-      const content = await getContent(richTextEntryField, sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt), richTextEntryField);
+      const content = await getContent(richTextEntryField, sdk.space, new Date(snapshotOne.sys.updatedAt), richTextEntryField);
       expect(content.currentValue).toBeTruthy();
       expect(content.oldValue).toBeTruthy();
       expect(content.currentValue === content.oldValue).toBeTruthy();
@@ -1010,7 +1010,7 @@ describe('content-diff-dialog helper methods', () => {
   describe('createDiffFields(fields, snapshots, environment, snapshotDate)', () => {
     describe('creates object with this structure { id, type, label, content: { currentValue, oldValue }, currentValue, oldValue, arrayType }', () => {
       test('when there is a rich text field', async () => {
-        const fields = await createDiffFields([richTextSimpleObject], [richTextSimpleObject], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt));
+        const fields = await createDiffFields([richTextSimpleObject], [richTextSimpleObject], sdk.space, new Date(snapshotOne.sys.updatedAt));
         expect(fields[0]).toBeTruthy();
         expect(fields[0].id).toBe(richTextSimpleObject.id);
         expect(fields[0].type).toBe(richTextSimpleObject.type);
@@ -1025,7 +1025,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('when there is a symbol field', async () => {
-        const fields = await createDiffFields([symbolSimpleObject], [symbolSimpleObject], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt));
+        const fields = await createDiffFields([symbolSimpleObject], [symbolSimpleObject], sdk.space, new Date(snapshotOne.sys.updatedAt));
         expect(fields[0]).toBeTruthy();
         expect(fields[0].id).toBe(symbolSimpleObject.id);
         expect(fields[0].type).toBe(symbolSimpleObject.type);
@@ -1038,7 +1038,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('when there is a array field', async () => {
-        const fields = await createDiffFields([arraySimpleObject], [arraySimpleObject], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt));
+        const fields = await createDiffFields([arraySimpleObject], [arraySimpleObject], sdk.space, new Date(snapshotOne.sys.updatedAt));
         expect(fields[0]).toBeTruthy();
         expect(fields[0].id).toBe(arraySimpleObject.id);
         expect(fields[0].type).toBe(arraySimpleObject.type);
@@ -1051,7 +1051,7 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('when there is a link field', async () => {
-        const fields = await createDiffFields([linkSimpleObject], [linkSimpleObject], sdk.space, sdk.environment, new Date(snapshotOne.sys.updatedAt));
+        const fields = await createDiffFields([linkSimpleObject], [linkSimpleObject], sdk.space, new Date(snapshotOne.sys.updatedAt));
         expect(fields[0]).toBeTruthy();
         expect(fields[0].id).toBe(linkSimpleObject.id);
         expect(fields[0].type).toBe(linkSimpleObject.type);
@@ -1066,8 +1066,8 @@ describe('content-diff-dialog helper methods', () => {
   });
 
   describe('addRemovedOldFields(fields, snapshots)', () => {
-    test('adds old fields that have been removed', async () => {
-      const fields = await addRemovedOldFields([richTextSimpleObject], [symbolSimpleObject]);
+    test('adds old fields that have been removed', () => {
+      const fields = addRemovedOldFields([richTextSimpleObject], [symbolSimpleObject]);
       expect(fields[1]).toBeTruthy();
       expect(fields[1].id).toBe(symbolSimpleObject.id);
       expect(fields[1].type).toBe(symbolSimpleObject.type);

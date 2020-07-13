@@ -108,28 +108,26 @@ const entryOne = {
       }
     }
   },
-  fields: { contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo },
-  getSnapshots: async () => ({ items: [snapshotOne, snapshotTwo] })
+  fields: { contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo }
 };
 
 const sdk = {
-  environment: {
+  space: {
+    getEntrySnapshots: async () => ({ items: [snapshotOne, snapshotTwo] }),
     getEntry: async (entryId) => entryOne,
-    getAsset: async (assetId) => assetFieldOne,
     getContentType: async (contentTypeId) => ({
       sys: {
         id: contentTypeId
       },
       fields: [contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo]
-    })
-  },
-  space: {
+    }),
     getEditorInterface: async (contentTypeId) => ({
       controls: [{
         fieldId: 'textFieldOne',
         widgetId: 'multipleLine'
       }]
-    })
+    }),
+    getAsset: async (assetId) => assetFieldOne
   },
   ids: {
     space: 'space',
