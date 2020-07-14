@@ -140,6 +140,22 @@ const getEntryByDate = async (space, entryId, snapshotDate) => {
     : space.getEntry(entryId);
 };
 
+const getLoading = () => {
+  return (
+    <div>
+      <p>Loading...</p>
+    </div>
+  );
+};
+
+const getError = message => {
+  return (
+    <div>
+      <h4>{message}</h4>
+    </div>
+  );
+};
+
 // eslint-disable-next-line react/prefer-stateless-function
 export class DialogExtension extends React.Component {
   
@@ -148,11 +164,14 @@ export class DialogExtension extends React.Component {
   };
 
   render() {
-    return (
-      <div>
-        <ul className='field-list-wrap'>{getFieldTables(this.props.sdk.parameters.invocation.fields)}</ul>
-      </div>
-    );
+    // this.props.sdk.parameters.invocation.fields = [];  // uncomment to check no fields
+    return this.props.sdk.parameters.invocation.fields.length > 0 
+      ? (
+        <div>
+          <ul className='field-list-wrap'>{getFieldTables(this.props.sdk.parameters.invocation.fields)}</ul>
+        </div>
+      )
+      : getError('No fields returned');
   }
 }
 
@@ -252,11 +271,108 @@ const createHtmlForArray = (field) => {
   `;
 };
 
-const getEmbeddedEntryValue = (field) => {
+const createHtmlForEmbeddedEntryLines = async (lines, space, snapshotDate, isEmbedded) => {
+  return Promise.all(_.compact(lines).map(async line => getEmbeddedEntryValue(line, space, snapshotDate, isEmbedded)));
+};
+
+const createHtmlForParagraphLines = async (lines, space, snapshotDate, isEmbedded) => {
+  return Promise.all(_.compact(lines).map(async line => {
+    if (line.nodeType === paragraphFieldTypes.text) {
+      if (line.value.trim() === '') return '';
+      return `<p data-test-id="cdd-entry-text">${line.value}</p>`;
+    }
+    let paragraphLines = await createHtmlForEmbeddedEntryLines(line, space, snapshotDate, isEmbedded);
+    paragraphLines = isEmbedded ? paragraphLines.join('') : paragraphLines;
+    return `<div class='embedded-inline-entry'><ul class='field-list-wrap' data-test-id="cdd-embedded-wrap">${paragraphLines}</ul></div>`;
+  }));
+};
+
+const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
+  const rtfContentLines = await Promise.all(lines.map(async (line) => {
+    let result;
+    let entry;
+    let asset;
+    let content;
+    let contentType;
+    let wrapper;
+
+    switch (line.nodeType) {
+    case richTextFieldTypes.asset:
+      asset = await space.getAsset(line.data.target.sys.id);
+      result = `<div class="${line.nodeType}" data-test-id="cdd-embedded-asset-block">${createAssetHtml(asset, line.nodeType)}</div>`;
+      result = isEmbedded ? result : [result];
+      break;
+
+    case richTextFieldTypes.entry:
+      entry = await getEntryByDate(space, line.data.target.sys.id, snapshotDate);
+      if (!entry) break;
+      content = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
+      result = await createHtmlForEmbeddedEntryLines(content, space, snapshotDate, isEmbedded);
+      
+      contentType = _.startCase(_.get(entry, 'sys.contentType.sys.id', ''));
+      result.unshift(`<div class="${line.nodeType}" data-test-id="cdd-embedded-entry-wrap"><div class='entry-name' data-test-id="cdd-embedded-entry-name">${contentType}</div><ul class="field-list-wrap">`);
+      result.push('</ul></div>');
+      break;
+
+    case richTextFieldTypes.paragraph:
+      if (line.content.length > 1) {
+        content = await Promise.all(line.content.map(async inlineContent => {
+          let inlineResult = inlineContent;
+          if (inlineContent.nodeType === paragraphFieldTypes.inlineEntry) {
+            entry = await getEntryByDate(space, inlineContent.data.target.sys.id, snapshotDate);
+            if (!entry) return Promise.resolve();
+            inlineResult = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
+          }
+          return Promise.resolve(inlineResult);
+        }));
+        result = await createHtmlForParagraphLines(content, space, snapshotDate, isEmbedded);
+      } else {
+        result = await createHtmlForParagraphLines(line.content, space, snapshotDate, isEmbedded);
+      }
+      result = isEmbedded ? result.join('') : result;
+      break;
+        
+    default:
+    }
+    
+    return Promise.resolve(result);
+  }));
+
+  return Promise.resolve(rtfContentLines);
+};
+
+const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
+  // return <div>{createRichTextLines(field.value.content, space, snapshotDate, true)}</div>;
+  const lines = await createRichTextLines(field.value.content, space, snapshotDate, true);
+  lines.join('');
+  return `
+    <li className="diff-field-wrap">
+      <label htmlFor="fieldLabel" 
+        data-test-id="cdd-embedded-field-label">
+        ${field.label}
+      </label>
+      ${lines}
+    </li>
+  `;
+};
+
+const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => {
   let value = '';
   switch (field.type) {
   case fieldTypes.richText:
-    // result = renderRichTextLines(field.content);
+    if (isEmbedded) {
+      value = `
+        <li>
+          <label htmlFor="fieldLabel" 
+            data-test-id="cdd-field-label">
+            ${field.label}
+          </label>
+        </li>
+      `;
+    }
+    else {
+      value = await createEmbeddedRichTextLines(field, space, snapshotDate);
+    }
     break;
   case fieldTypes.symbol:
     value = createHtmlForEntry(field);
@@ -275,74 +391,6 @@ const getEmbeddedEntryValue = (field) => {
   default:
   }
   return value;
-};
-
-const createHtmlForEmbeddedEntryLines = (lines) => {
-  return _.compact(lines).map(line => getEmbeddedEntryValue(line));
-};
-
-const createHtmlForParagraphLines = lines => {
-  return _.compact(lines).map(line => {
-    if (line.nodeType === paragraphFieldTypes.text) {
-      if (line.value.trim() === '') return '';
-      return `<p data-test-id="cdd-entry-text">${line.value}</p>`;
-    }
-    
-    return `<div class='embedded-inline-entry'><ul class='field-list-wrap' data-test-id="cdd-embedded-wrap">${createHtmlForEmbeddedEntryLines(line)}</ul></div>`;
-  });
-};
-
-const createRichTextLines = async (lines, space, snapshotDate) => {
-  const rtfContentLines = await Promise.all(lines.map(async (line) => {
-    let result;
-    let entry;
-    let asset;
-    let content;
-    let contentType;
-    
-    switch (line.nodeType) {
-    case richTextFieldTypes.asset:
-      asset = await space.getAsset(line.data.target.sys.id);
-      result = [`<div class="${line.nodeType}" data-test-id="cdd-embedded-asset-block">${createAssetHtml(asset, line.nodeType)}</div>`];
-      break;
-
-    case richTextFieldTypes.entry:
-      entry = await getEntryByDate(space, line.data.target.sys.id, snapshotDate);
-      if (!entry) break;
-      
-      content = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
-      result = createHtmlForEmbeddedEntryLines(content);
-      
-      contentType = _.startCase(_.get(entry, 'sys.contentType.sys.id', ''));
-      
-      result.unshift(`<div class="${line.nodeType}" data-test-id="cdd-embedded-entry-wrap"><div class='entry-name' data-test-id="cdd-embedded-entry-name">${contentType}</div><ul class="field-list-wrap">`);
-      result.push('</ul></div>');
-      break;
-
-    case richTextFieldTypes.paragraph:
-      if (line.content.length > 1) {
-        content = await Promise.all(line.content.map(async inlineContent => {
-          let inlineResult = inlineContent;
-          if (inlineContent.nodeType === paragraphFieldTypes.inlineEntry) {
-            entry = await getEntryByDate(space, inlineContent.data.target.sys.id, snapshotDate);
-            if (!entry) return Promise.resolve();
-            inlineResult = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
-          }
-          return Promise.resolve(inlineResult);
-        }));
-        result = createHtmlForParagraphLines(content);
-      } else {
-        result = createHtmlForParagraphLines(line.content);
-      }
-      break;
-        
-    default:
-    }
-    
-    return Promise.resolve(result);
-  }));
-
-  return Promise.resolve(rtfContentLines);
 };
 
 const getId = (field) => {
@@ -407,10 +455,6 @@ const addRemovedOldFields = (fields, snapshots) => {
 };
 
 export class SidebarExtension extends React.Component {
-  space;
-
-  environment;
-
   version;
   
   static propTypes = {
@@ -419,7 +463,7 @@ export class SidebarExtension extends React.Component {
 
   constructor(props){
     super(props);
-    this.state = { versions: [] };
+    this.state = { versions: [], loaded: false };
     this._isMounted = false;
   }
 
@@ -427,7 +471,8 @@ export class SidebarExtension extends React.Component {
     this._isMounted = true;
     this.props.sdk.window.startAutoResizer();
     this.props.sdk.space.getEntrySnapshots(this.props.sdk.ids.entry)
-      .then(snapshots => this._isMounted && this.setState({ versions: snapshots.items }));
+    //  .then(() => this._isMounted && this.setState({ versions: [], loaded: true }));  // uncomment to check no versions
+      .then(snapshots => this._isMounted && this.setState({ versions: snapshots.items, loaded: true })); // comment to check no versions
   }
 
   componentWillUnmount() {
@@ -441,6 +486,7 @@ export class SidebarExtension extends React.Component {
     const oldFields = await createSimpleObjects(this.props.sdk.space, controls, version.snapshot.fields, 'en-US');
     let fields = await createDiffFields(currentFields, oldFields, this.props.sdk.space, new Date(version.sys.updatedAt));
     fields = addRemovedOldFields(fields, oldFields);
+    console.log('sdk', this.props.sdk);
     await this.props.sdk.dialogs.openExtension({
       width: 'fullWidth',
       title: 'Last Rev Content Diff UIE',
@@ -451,26 +497,7 @@ export class SidebarExtension extends React.Component {
     });
   }
 
-  getVersion(event) {
-    this.version = this.state.versions.filter(v => v.sys.id === event.currentTarget.value)[firstIndex];
-  }
-
-  renderOptions = options => {
-    return options.map(option => {
-      const updatedAt = new Date(option.sys.updatedAt);
-      return (
-        <Option
-          key={option.sys.id}
-          testId="cf-ui-select-option"
-          value={option.sys.id}>
-          {updatedAt.toLocaleDateString('en-us', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}&nbsp;
-          {updatedAt.toLocaleTimeString('en-us', {hour: '2-digit', minute:'2-digit'})}
-        </Option>
-      );
-    });
-  };
-
-  render() {
+  getDropdownAndButton() {
     return (
       <div>
         <Select
@@ -484,7 +511,7 @@ export class SidebarExtension extends React.Component {
           testId="cf-ui-select"
           width="full"
           willBlurOnEsc>
-          {this.renderOptions(this.state.versions)}
+          {this.getOptions(this.state.versions)}
         </Select>
         <Button
           buttonType="positive"
@@ -495,6 +522,35 @@ export class SidebarExtension extends React.Component {
         </Button>
       </div>
     );
+  }
+
+  getLoadedInfo() {
+    return this.state.versions.length > 0 ? this.getDropdownAndButton() : getError('No versions returned');
+  }
+
+  getVersion(event) {
+    this.version = this.state.versions.filter(v => v.sys.id === event.currentTarget.value)[firstIndex];
+  }
+
+  getOptions = options => {
+    return options.length > 0 
+      ? options.map(option => {
+        const updatedAt = new Date(option.sys.updatedAt);
+        return (
+          <Option
+            key={option.sys.id}
+            testId="cf-ui-select-option"
+            value={option.sys.id}>
+            {updatedAt.toLocaleDateString('en-us', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}&nbsp;
+            {updatedAt.toLocaleTimeString('en-us', {hour: '2-digit', minute:'2-digit'})}
+          </Option>
+        );
+      })
+      : [<Option />];
+  };
+
+  render() {
+    return this.state.loaded ? this.getLoadedInfo() : getLoading();
   }
 }
 
