@@ -1,9 +1,16 @@
 # Last Rev: Content Diff
 
 The Last Rev Content Diff extension can be used to show changes between content model versions one level deep in certain field types.
+
 Working Field Types:
+RichText,
+Symbol,
+Array,
+Text,
+Link
 
 Non-Working Field Types:
+Object
 
 ## Setup Instructions
 
@@ -13,9 +20,8 @@ Non-Working Field Types:
     - Field Types: Object
     - Hosting: Self-hosted(src)
     - Self-Hosted URL: [https://your-extension-domain.netlify.com/seo](https://your-extension-domain.netlify.com/content-diff)
-3. Create an Object (JSON) field in your content model you want to use the SEO field
-4. On the Content Model page, select "Settings" on the new JSON field you added
-5. Go to Appearance and select your new UI Extension
+3. Go to an existing content model and select the Sidebar tab
+4. On the Sidebar configuration page, select "Use custom sidebar" and add the Content Diff UI Extension
 
 ## Reporting Issues
 
