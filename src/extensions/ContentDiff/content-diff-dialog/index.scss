@@ -26,7 +26,7 @@ pre {
       position: absolute;
       height: 100%;
       width: 100%;
-      border: solid 1px rgb(238, 238, 238);
+      border: solid 1px rgb(128, 128, 128);
       top: 0;
       left: 0;
       content: '';
@@ -99,7 +99,7 @@ label {
   > .diff-field-wrap {
     padding: 0.5rem 0.5rem;
     margin: 1rem 1rem;
-    border-left: solid 3px rgb(211, 220, 224);
+    border-left: solid 2px rgb(211, 220, 224);
   }
 
   .embedded-inline-entry {
@@ -115,18 +115,19 @@ label {
   padding-left: 0;
 
   li {
-    border: solid .125rem rgba(46, 117, 212, 0.25);
+    border: solid 1px rgba(128, 128, 128, 0.75);
     border-radius: .25rem;
     background-color: white;
-    padding: .25rem;
+    padding: 0.25rem 0.5rem;
     margin-right: 0.5rem;
-    font-size: 1rem;
+    font-size: 0.75rem;
 
     &:last-of-type {
       margin-right: 0;
     }
   }
 }
+
 
 .diff-text {
   width: 100%;
@@ -135,6 +136,11 @@ label {
   padding-left: 1rem;
   padding-right: 1rem;
   font-size: 0.875rem;
+
+  .diff-field-line-wrap & {
+    padding-left: 0;
+    padding-right: 0;
+  }
 
   &_snapshot,
   &_current {
@@ -153,6 +159,7 @@ label {
   p {
     line-height: 1.25em;
     display: inline;
+    font-size: 0.875rem;
     
     + p {
       display: block;
@@ -161,11 +168,23 @@ label {
     }
   }
 
+  .diff-level-max {
+    padding-top: 0;
+    padding-bottom: 0;
+
+    p, ins, del {
+      color: rgba(255, 0, 0, .5);
+      font-size: 0.75rem;
+      font-style: italic;
+      margin-bottom: 0;
+    }
+  }
+
   .embedded-entry-block,
   .embedded-inline-entry,
   .embedded-asset-block {
     display: block;
-    border: solid 1px rgb(238, 238, 238);
+    border: solid 1px rgb(211, 220, 224);
     margin: 1.75rem 0;
     background-color: white;
 
@@ -202,7 +221,7 @@ label {
   display: flex;
 
   &[data-field-type=RichText] {
-    background: rgb(247, 249, 250);
+    background: #edf4fc;
     padding: 1.25rem;
   }
 

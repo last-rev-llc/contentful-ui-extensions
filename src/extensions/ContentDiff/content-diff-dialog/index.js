@@ -186,13 +186,13 @@ const createContentSimpleObjects = async (space, entry) => {
   const controls = (editorInterface && editorInterface.controls) || [];
   objects = contentType.fields.map(field => {
     control = field.type === fieldTypes.text && controls.filter(c => c.fieldId === field.id)[firstIndex];
-    // console.log('control', control, field);
-    // if(!control) return false;
+    
     return {
       id: field.id,
+      contentId: entry.sys.id,
       type: field.type, 
       textType: control && control.widgetId,
-      value: _.get(entry, `fields[${field.id}]['en-US']`, "<i>This field did not exist at the selected date</i>"),
+      value: _.get(entry, `fields[${field.id}]['en-US']`, { content: [{ nodeType: "paragraph", content: [{ nodeType: "text", value: "<i class='blank-value'>No value entered</i>" }] }]}),
       arrayType: field.items && field.items.type,
       label: field.name
     };
@@ -312,7 +312,6 @@ const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
     let asset;
     let content;
     let contentType;
-    let wrapper;
 
     switch (line.nodeType) {
     case richTextFieldTypes.asset:
@@ -322,15 +321,21 @@ const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
       break;
 
     case richTextFieldTypes.entry:
-      entry = await getEntryByDate(space, line.data.target.sys.id, snapshotDate);
-      if (!entry) break;
-      content = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
-      result = await createHtmlForEmbeddedEntryLines(content, space, snapshotDate, isEmbedded);
-      contentType = _.startCase(_.get(entry, 'snapshot.sys.contentType.sys.id', _.get(entry, 'sys.contentType.sys.id', '')));
+      if (isEmbedded) {
+        result = ['<div class="diff-level-max diff-field-wrap"><p>Diff level too deep. Content not available.</p></div>'];
+        contentType = `Embedded Entry ID: ${line.data.target.sys.id}`;
+      } else {
+        entry = await getEntryByDate(space, line.data.target.sys.id, snapshotDate);
+        if (!entry) break;
+        content = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
+        
+        result = await createHtmlForEmbeddedEntryLines(content, space, snapshotDate, isEmbedded);
+        contentType = _.startCase(_.get(entry, 'snapshot.sys.contentType.sys.id', _.get(entry, 'sys.contentType.sys.id', '')));
+      }
+      
       result.unshift(`<div class="${line.nodeType}" data-test-id="cdd-embedded-entry-wrap"><div class='entry-name' data-test-id="cdd-embedded-entry-name" data-entry-id="${_.get(line, 'data.target.sys.id', '')}">${contentType}</div><ul class="field-list-wrap">`);
       result.push('</ul></div>');
       result = _.isArray(result) ? result.join('') : result;
-      console.log(isEmbedded, result);
       break;
 
     case richTextFieldTypes.paragraph:
@@ -357,23 +362,19 @@ const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
     
     return Promise.resolve(result);
   }));
-  // console.log('isEmbedded', isEmbedded, rtfContentLines);
-  if (isEmbedded) {
-    // rtfContentLines = rtfContentLines.map(content => content.join(''));
-  }
+  
   return Promise.resolve(rtfContentLines);
 };
 
 const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
-  // return <div>{createRichTextLines(field.value.content, space, snapshotDate, true)}</div>;
   const lines = await createRichTextLines(field.value.content, space, snapshotDate, true);
-  lines.join('');
-  return `<li class="emebbed-rich-text diff-field-wrap">
+  
+  return `<li class="embedded-rich-text diff-field-wrap">
       <label htmlFor="fieldLabel" 
         data-test-id="cdd-embedded-field-label">
         ${field.label}
       </label>
-      ${lines}
+      ${lines.join('')}
     </li>`;
 };
 
@@ -384,10 +385,11 @@ const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => 
   switch (field.type) {
   case fieldTypes.richText:
     if (isEmbedded) {
-      value = `<li>
+      value = `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}" data-test-id="cdd-entry-wrap">
           <label htmlFor="fieldLabel" data-test-id="cdd-field-label">
-            ${field.label}
+            ${field.label} - ID: ${field.contentId}
           </label>
+          <div class='diff-level-max diff-field-wrap'><p>Diff level too deep. Content not available.</p></div>
         </li>`;
     }
     else {
@@ -418,6 +420,7 @@ const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => 
     }
     break;
   default:
+    value = field.value;
   }
 
   return value;
@@ -444,8 +447,8 @@ const getContent = async (field, space, snapshotDate, snapshot) => {
   const oldContent = await createRichTextLines(snapshot.value.content, space, snapshotDate);
         
   const result = {
-    currentValue: _.compact(currentContent).map(content => content.join('')).join(''),
-    oldValue: _.compact(oldContent).map(content => content.join('')).join(''),
+    currentValue: _.compact(currentContent).map(content => _.isArray(content) ? content.join('') : content).join(''),
+    oldValue: _.compact(oldContent).map(content =>  _.isArray(content) ? content.join('') : content).join(''),
   };
 
   return result;

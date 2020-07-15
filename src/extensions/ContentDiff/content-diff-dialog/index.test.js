@@ -561,12 +561,10 @@ describe('content-diff-dialog helper methods', () => {
     });
 
     test('shows array field info', () => {
-      const { getAllByTestId } = render(getFields(arrayFieldInfo));
-      expect(getAllByTestId(diffFieldsTestId).every(field => field.getAttribute('data-field-type') === arrayFieldInfo.type)).toBeTruthy();
-      expect(getAllByTestId(diffFieldsTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(oldTextTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(diffTextTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(newTextTestId).length).toBe(arrayFieldLength);
+      const { getByTestId, getAllByTestId } = render(getFields(arrayFieldInfo));
+      expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(arrayFieldInfo.type);
+      expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
+      expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
     });
 
     test('shows link field info', () => {
@@ -601,10 +599,8 @@ describe('content-diff-dialog helper methods', () => {
     test('shows array fields with label', () => {
       const { getByTestId, getAllByTestId } = render(getFieldInfo(0, arrayFieldInfo));
       expect(getByTestId(fieldLabelTestId).textContent).toBe(arrayFieldInfo.label);
-      expect(getAllByTestId(diffFieldsTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(oldTextTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(diffTextTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(newTextTestId).length).toBe(arrayFieldLength);
+      expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
+      expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
     });
 
     test('shows link fields with label', () => {
@@ -621,12 +617,9 @@ describe('content-diff-dialog helper methods', () => {
   describe('getFieldTables(fields = [{ id, type, label, content: { currentValue, oldValue }, currentValue, oldValue, arrayType }])', () => {
     test('shows all enabled fields and contents', () => {
       const { getAllByTestId } = render(getFieldTables(testFields));
-      const diffFieldsLength = (testFields.length + arrayFieldLength) - 1;
       expect(getAllByTestId(fieldLabelTestId).length).toBe(testFields.length);
-      expect(getAllByTestId(diffFieldsTestId).length).toBe(diffFieldsLength);
-      expect(getAllByTestId(oldTextTestId).length).toBe(diffFieldsLength);
-      expect(getAllByTestId(diffTextTestId).length).toBe(diffFieldsLength);
-      expect(getAllByTestId(newTextTestId).length).toBe(diffFieldsLength);
+      expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
+      expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
     });
   });
 
@@ -654,6 +647,7 @@ describe('content-diff-dialog helper methods', () => {
     test('returns array of objects with content info', async () => {
       const returnedObjects = [{
         id: contentTypeSymbolFieldOne.id,
+        contentId: entryOne.sys.id,
         type: contentTypeSymbolFieldOne.type, 
         textType: false,
         value: contentTypeSymbolFieldOne['en-US'],
@@ -662,6 +656,7 @@ describe('content-diff-dialog helper methods', () => {
       },
       {
         id: contentTypeSymbolFieldTwo.id,
+        contentId: entryOne.sys.id,
         type: contentTypeSymbolFieldTwo.type, 
         textType: false,
         value: contentTypeSymbolFieldTwo['en-US'],
@@ -669,6 +664,8 @@ describe('content-diff-dialog helper methods', () => {
         label: contentTypeSymbolFieldTwo.name
       }];
       const contentObjects = await createContentSimpleObjects(sdk.space, entryOne);
+      expect(sdk.space.getEditorInterface).toHaveBeenCalledTimes(1);
+      expect(sdk.space.getEditorInterface).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
       expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
       expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
       expect(JSON.stringify(contentObjects)).toBe(JSON.stringify(returnedObjects));
@@ -756,15 +753,22 @@ describe('content-diff-dialog helper methods', () => {
   });
 
   describe('getEmbeddedEntryValue(field = { id, type, value, arrayType, label, asset })', () => {
-    test('returns html for entry label and values if the field\'s type is symbol', () => {
-      const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: getEmbeddedEntryValue(symbolSimpleObject)}} />);
+    test('returns html for entry label and values if the field\'s type is symbol', async () => {
+      const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await getEmbeddedEntryValue(symbolSimpleObject, sdk.space)}} />);
+      await waitForElement(() => getByTestId(entryWrapTestId));
+      await waitForElement(() => getByTestId(entryLabelTestId));
+      await waitForElement(() => getByTestId(entryValueTestId));
       expect(getByTestId(entryWrapTestId).getAttribute('class')).toMatch(new RegExp(symbolSimpleObject.type));
       expect(getByTestId(entryLabelTestId).textContent).toBe(symbolSimpleObject.label);
       expect(getByTestId(entryValueTestId).textContent).toBe(symbolSimpleObject.value);
     });
 
-    test('returns html for array label and all of its values in a list if the field\'s type is array', () => {
-      const { getByTestId, getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: getEmbeddedEntryValue(arraySimpleObject)}} />);
+    test('returns html for array label and all of its values in a list if the field\'s type is array', async () => {
+      const { getByTestId, getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: await getEmbeddedEntryValue(arraySimpleObject)}} />);
+      await waitForElement(() => getByTestId(arrayWrapTestId));
+      await waitForElement(() => getByTestId(arrayLabelTestId));
+      await waitForElement(() => getByTestId(arrayListTestId));
+      await waitForElement(() => getAllByTestId(arrayListItemTestId));
       expect(getByTestId(arrayWrapTestId).getAttribute('class')).toMatch(new RegExp(arraySimpleObject.type));
       expect(getByTestId(arrayLabelTestId).textContent).toBe(arraySimpleObject.label);
       expect(queryByTestId(arrayListTestId)).toBeTruthy();
@@ -774,8 +778,15 @@ describe('content-diff-dialog helper methods', () => {
   });
 
   describe('createHtmlForEmbeddedEntryLines(fields = [{ id, type, value, arrayType, label, asset }])', () => {
-    test('returns html for all field labels and values in fields array', () => {
-      const { getByTestId, getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: createHtmlForEmbeddedEntryLines(testSimpleObjects)}} />);
+    test('returns html for all field labels and values in fields array', async () => {
+      const { getByTestId, getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createHtmlForEmbeddedEntryLines(testSimpleObjects, sdk.space)}} />);
+      await waitForElement(() => getByTestId(entryWrapTestId));
+      await waitForElement(() => getByTestId(entryLabelTestId));
+      await waitForElement(() => getByTestId(entryValueTestId));
+      await waitForElement(() => getByTestId(arrayWrapTestId));
+      await waitForElement(() => getByTestId(arrayLabelTestId));
+      await waitForElement(() => getByTestId(arrayListTestId));
+      await waitForElement(() => getAllByTestId(arrayListItemTestId));
       expect(getByTestId(entryWrapTestId).getAttribute('class')).toMatch(new RegExp(symbolSimpleObject.type));
       expect(getByTestId(entryLabelTestId).textContent).toBe(symbolSimpleObject.label);
       expect(getByTestId(entryValueTestId).textContent).toBe(symbolSimpleObject.value);
@@ -789,23 +800,33 @@ describe('content-diff-dialog helper methods', () => {
 
   describe('createHtmlForParagraphLines(lines = [{ nodeType, value }, [{ id, type, value, arrayType, label }]])', () => {
     describe('returns html for all lines', () => {
-      test('if lines are of type text', () => {
-        const { getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: createHtmlForParagraphLines(paragraphLines)}} />);
+      test('if lines are of type text', async () => {
+        const { getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createHtmlForParagraphLines(paragraphLines, sdk.space)}} />);
+        await waitForElement(() => getAllByTestId(entryTextTestId));
         expect(queryByTestId(embeddedWrapTestId)).toBeNull();
         expect(getAllByTestId(entryTextTestId).length).toBe(paragraphLines.length);
         expect(getAllByTestId(entryTextTestId).every((item, i) => item.textContent === paragraphLines[i].value)).toBeTruthy();
       });
 
-      test('if lines are arrays of type symbol', () => {
-        const { getByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: createHtmlForParagraphLines([[symbolSimpleObject]])}} />);
+      test('if lines are arrays of type symbol', async () => {
+        const { getByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createHtmlForParagraphLines([[symbolSimpleObject]], sdk.space)}} />);
+        await waitForElement(() => getByTestId(embeddedWrapTestId));
+        await waitForElement(() => getByTestId(entryWrapTestId));
+        await waitForElement(() => getByTestId(entryLabelTestId));
+        await waitForElement(() => getByTestId(entryValueTestId));
         expect(queryByTestId(embeddedWrapTestId)).toBeTruthy();
         expect(getByTestId(entryWrapTestId).getAttribute('class')).toMatch(new RegExp(symbolSimpleObject.type));
         expect(getByTestId(entryLabelTestId).textContent).toBe(symbolSimpleObject.label);
         expect(getByTestId(entryValueTestId).textContent).toBe(symbolSimpleObject.value);
       });
 
-      test('if lines are arrays of type array', () => {
-        const { getByTestId, getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: createHtmlForParagraphLines([[arraySimpleObject]])}} />);
+      test('if lines are arrays of type array', async () => {
+        const { getByTestId, getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createHtmlForParagraphLines([[arraySimpleObject]], sdk.space)}} />);
+        await waitForElement(() => getByTestId(embeddedWrapTestId));
+        await waitForElement(() => getByTestId(arrayWrapTestId));
+        await waitForElement(() => getByTestId(arrayLabelTestId));
+        await waitForElement(() => getByTestId(arrayListTestId));
+        await waitForElement(() => getAllByTestId(arrayListItemTestId));
         expect(queryByTestId(embeddedWrapTestId)).toBeTruthy();
         expect(getByTestId(arrayWrapTestId).getAttribute('class')).toMatch(new RegExp(arraySimpleObject.type));
         expect(getByTestId(arrayLabelTestId).textContent).toBe(arraySimpleObject.label);
@@ -868,7 +889,7 @@ describe('content-diff-dialog helper methods', () => {
         test('has no embedded entry inline and no snapshot date', async () => {
           const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space)}} />);
           await waitForElement(() => getByTestId(entryTextTestId));
-  
+          
           expect(sdk.space.getEntry).not.toHaveBeenCalled();
           expect(sdk.space.getContentType).not.toHaveBeenCalled();
           expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
