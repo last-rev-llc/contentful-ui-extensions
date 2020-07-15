@@ -31,7 +31,8 @@ const richTextFieldTypes = {
 
 const paragraphFieldTypes = {
   text: 'text',
-  inlineEntry: 'embedded-entry-inline'
+  inlineEntry: 'embedded-entry-inline',
+  hyperlink: 'hyperlink',
 };
 
 const getTextDiff = ({id, oldText, newText, fieldType}) => {
@@ -70,13 +71,11 @@ const getTextDiffLines = (oldLines, newLines, fieldType) => {
 const createAssetHtml = (asset) => {
   if (!asset || _.isUndefined(_.get(asset, 'fields'))) return '';
 
-  return `
-    <div class='entry-name' data-test-id="cdd-asset-title">${asset.fields.title['en-US']}</div>
+  return `<div class='entry-name' data-test-id="cdd-asset-title">${asset.fields.title['en-US']}</div>
       <ul class='field-list-wrap'>
         <li className="diff-field-wrap"><img src="${asset.fields.file['en-US'].url}" data-test-id="cdd-asset-image"/></li>
       </ul>
-    </div>
-  `;
+    </div>`;
 };
 
 const getFields = (field) => {
@@ -102,7 +101,8 @@ const getFields = (field) => {
   
   case fieldTypes.array:
     if (field.arrayType === fieldTypes.symbol) {
-      result = getTextDiffLines(_.get(field, 'oldValue', []), _.get(field, 'currentValue', []), field.type);
+      // result = getTextDiffLines(_.get(field, 'oldValue', []), _.get(field, 'currentValue', []), field.type);
+      result = getTextDiff({ id: 0, oldText: getArrayValue(_.get(field, 'oldValue', [])), newText: getArrayValue(_.get(field, 'currentValue', [])), fieldType: field.type });
     }
     break;
 
@@ -165,6 +165,7 @@ export class DialogExtension extends React.Component {
 
   render() {
     // this.props.sdk.parameters.invocation.fields = [];  // uncomment to check no fields
+
     return this.props.sdk.parameters.invocation.fields.length > 0 
       ? (
         <div>
@@ -185,11 +186,13 @@ const createContentSimpleObjects = async (space, entry) => {
   const controls = (editorInterface && editorInterface.controls) || [];
   objects = contentType.fields.map(field => {
     control = field.type === fieldTypes.text && controls.filter(c => c.fieldId === field.id)[firstIndex];
+    // console.log('control', control, field);
+    // if(!control) return false;
     return {
       id: field.id,
       type: field.type, 
       textType: control && control.widgetId,
-      value: entry.fields[field.id]['en-US'],
+      value: _.get(entry, `fields[${field.id}]['en-US']`, "<i>This field did not exist at the selected date</i>"),
       arrayType: field.items && field.items.type,
       label: field.name
     };
@@ -203,17 +206,20 @@ const createSimpleObjects = async (space, controls, entry, locale) => {
       let asset;
       let textType;
       let id = '';
+      
       switch (control.field.type) {
       case fieldTypes.link:
         id = locale ? _.get(entry, `[${control.fieldId}]['en-US'].sys.id`) : _.get(entry, `[${control.fieldId}]._fieldLocales['en-US']._value.sys.id`);
         if (!id) break;
         asset = await space.getAsset(id);
         break;
+        
       case fieldTypes.text:
         textType = control.widgetId;
         break;
 
       default:
+        break;
       }
       const value = entry[control.fieldId] && (entry[control.fieldId][locale] || entry[control.fieldId].getValue());
       return { 
@@ -250,16 +256,25 @@ const getValue = (field) => {
 };
 
 const createHtmlForEntry = (entry) => {
-  return `
-    <li class="embedded-${entry.type} diff-field-wrap" key="${entry.id}" data-test-id="cdd-entry-wrap">
+  return `<li class="embedded-${entry.type} diff-field-wrap" key="${entry.id}" data-test-id="cdd-entry-wrap">
       <label htmlFor="name" data-test-id="cdd-entry-label">${entry.label}</label>
-      <span data-test-id="cdd-entry-value">${getValue(entry)}</span>
-    </li>
-  `;
+      <p data-test-id="cdd-entry-value">${getValue(entry)}</p>
+    </li>`;
+};
+
+const createHtmlForAsset = (asset) => {
+  if (!asset || _.isUndefined(_.get(asset, 'fields'))) return '';
+
+  return `<li class="embedded-asset diff-field-wrap" key="${asset.sys.id}" data-test-id="cdd-entry-wrap">
+      <label htmlFor="name" data-test-id="cdd-entry-label">${_.get(asset, "fields.title['en-US']", "No Label")}</label>
+      <div data-test-id="cdd-entry-value"><img src="${_.get(asset, "fields.file['en-US'].url", "Not founds")}" data-test-id="cdd-asset-image"/></div>
+    </li>`;
 };
 
 const getArrayValue = (arrayField) => {
-  const arrayValues = arrayField.value.map(value => `<li class='array-value' data-test-id="cdd-array-list-item">${value}</li>`).join('');
+  const values = _.isArray(arrayField) ? arrayField : _.get(arrayField, 'value', []);
+  if (!values.length) return 'adam';
+  const arrayValues = values.map(value => `<li class='array-value' data-test-id="cdd-array-list-item">${value}</li>`).join('');
   return `<ul class='array-field-wrap' data-test-id="cdd-array-list">${arrayValues}</ul>`;
 };
 
@@ -280,6 +295,9 @@ const createHtmlForParagraphLines = async (lines, space, snapshotDate, isEmbedde
     if (line.nodeType === paragraphFieldTypes.text) {
       if (line.value.trim() === '') return '';
       return `<p data-test-id="cdd-entry-text">${line.value}</p>`;
+    } if (line.nodeType === paragraphFieldTypes.hyperlink) {
+      if (!_.has(line, 'data.uri') || !_.has(line, 'content[0].value')) return '';
+      return `<a data-test-id="cdd-entry-hyperlink" href="${_.get(line, 'data.uri')}">${_.get(line, 'content[0].value')}</a>`;
     }
     let paragraphLines = await createHtmlForEmbeddedEntryLines(line, space, snapshotDate, isEmbedded);
     paragraphLines = isEmbedded ? paragraphLines.join('') : paragraphLines;
@@ -308,16 +326,18 @@ const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
       if (!entry) break;
       content = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
       result = await createHtmlForEmbeddedEntryLines(content, space, snapshotDate, isEmbedded);
-      
-      contentType = _.startCase(_.get(entry, 'sys.contentType.sys.id', ''));
-      result.unshift(`<div class="${line.nodeType}" data-test-id="cdd-embedded-entry-wrap"><div class='entry-name' data-test-id="cdd-embedded-entry-name">${contentType}</div><ul class="field-list-wrap">`);
+      contentType = _.startCase(_.get(entry, 'snapshot.sys.contentType.sys.id', _.get(entry, 'sys.contentType.sys.id', '')));
+      result.unshift(`<div class="${line.nodeType}" data-test-id="cdd-embedded-entry-wrap"><div class='entry-name' data-test-id="cdd-embedded-entry-name" data-entry-id="${_.get(line, 'data.target.sys.id', '')}">${contentType}</div><ul class="field-list-wrap">`);
       result.push('</ul></div>');
+      result = _.isArray(result) ? result.join('') : result;
+      console.log(isEmbedded, result);
       break;
 
     case richTextFieldTypes.paragraph:
       if (line.content.length > 1) {
         content = await Promise.all(line.content.map(async inlineContent => {
           let inlineResult = inlineContent;
+          
           if (inlineContent.nodeType === paragraphFieldTypes.inlineEntry) {
             entry = await getEntryByDate(space, inlineContent.data.target.sys.id, snapshotDate);
             if (!entry) return Promise.resolve();
@@ -337,7 +357,10 @@ const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
     
     return Promise.resolve(result);
   }));
-
+  // console.log('isEmbedded', isEmbedded, rtfContentLines);
+  if (isEmbedded) {
+    // rtfContentLines = rtfContentLines.map(content => content.join(''));
+  }
   return Promise.resolve(rtfContentLines);
 };
 
@@ -345,30 +368,27 @@ const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
   // return <div>{createRichTextLines(field.value.content, space, snapshotDate, true)}</div>;
   const lines = await createRichTextLines(field.value.content, space, snapshotDate, true);
   lines.join('');
-  return `
-    <li className="diff-field-wrap">
+  return `<li class="emebbed-rich-text diff-field-wrap">
       <label htmlFor="fieldLabel" 
         data-test-id="cdd-embedded-field-label">
         ${field.label}
       </label>
       ${lines}
-    </li>
-  `;
+    </li>`;
 };
 
 const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => {
   let value = '';
+  let asset = '';
+    
   switch (field.type) {
   case fieldTypes.richText:
     if (isEmbedded) {
-      value = `
-        <li>
-          <label htmlFor="fieldLabel" 
-            data-test-id="cdd-field-label">
+      value = `<li>
+          <label htmlFor="fieldLabel" data-test-id="cdd-field-label">
             ${field.label}
           </label>
-        </li>
-      `;
+        </li>`;
     }
     else {
       value = await createEmbeddedRichTextLines(field, space, snapshotDate);
@@ -388,8 +408,18 @@ const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => 
       value = createHtmlForArray(field);
     }
     break;
+
+  case fieldTypes.link:
+    if (field.arrayType === fieldTypes.symbol) {
+      value = createHtmlForArray(field);
+    } else {
+      asset = await space.getAsset(field.value.sys.id);
+      value = createHtmlForAsset(asset);
+    }
+    break;
   default:
   }
+
   return value;
 };
 
@@ -417,6 +447,7 @@ const getContent = async (field, space, snapshotDate, snapshot) => {
     currentValue: _.compact(currentContent).map(content => content.join('')).join(''),
     oldValue: _.compact(oldContent).map(content => content.join('')).join(''),
   };
+
   return result;
 };
 
@@ -424,7 +455,7 @@ const createDiffFields = async (fields, snapshots, space, snapshotDate) => {
   const diffFields = await Promise.all(fields.map(async field => {
     const type = getType(field);
     const isRichText = type === fieldTypes.richText;
-    const snapshot = snapshots.filter(shot => shot.id === field.id)[0];
+    const snapshot = _.head(snapshots.filter(shot => shot.id === field.id));
     return {
       id: getId(field),
       type,
@@ -486,7 +517,7 @@ export class SidebarExtension extends React.Component {
     const oldFields = await createSimpleObjects(this.props.sdk.space, controls, version.snapshot.fields, 'en-US');
     let fields = await createDiffFields(currentFields, oldFields, this.props.sdk.space, new Date(version.sys.updatedAt));
     fields = addRemovedOldFields(fields, oldFields);
-    console.log('sdk', this.props.sdk);
+    
     await this.props.sdk.dialogs.openExtension({
       width: 'fullWidth',
       title: 'Last Rev Content Diff UIE',

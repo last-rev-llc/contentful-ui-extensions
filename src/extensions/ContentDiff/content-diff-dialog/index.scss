@@ -10,11 +10,9 @@ div {
 }
 
 pre {
-  white-space: pre-wrap;       /* css-3 */
-  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-  white-space: -pre-wrap;      /* Opera 4-6 */
-  white-space: -o-pre-wrap;    /* Opera 7 */
-  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+  font-size: 0.75rem;
   
   code {
     position: relative;
@@ -90,6 +88,7 @@ label {
   font-size: 0.875rem !important;
   display: block;
   color: #606c7c;
+  margin-bottom: 0.25rem;
 }
 
 .field-list-wrap {
@@ -98,12 +97,9 @@ label {
   width: 100%;
 
   > .diff-field-wrap {
-    padding: 0.875rem;
-    border-bottom: solid 1px rgb(238, 238, 238);
-
-    &:last-of-type {
-      border-bottom: none;
-    }
+    padding: 0.5rem 0.5rem;
+    margin: 1rem 1rem;
+    border-left: solid 3px rgb(211, 220, 224);
   }
 
   .embedded-inline-entry {
@@ -132,29 +128,37 @@ label {
   }
 }
 
-.diff-field-line-wrap {
-  display: flex;
-}
-
 .diff-text {
   width: 100%;
   flex-basis: 0;
   flex-grow: 1;
   padding-left: 1rem;
   padding-right: 1rem;
+  font-size: 0.875rem;
 
   &_snapshot,
   &_current {
-    //display: none;
+    display: none;
   }
 
   &:last-of-type {
     border-bottom: none;
+    padding-right: 0;
+  }
+
+  &:first-of-type {
+    padding-left: 0;
   }
 
   p {
     line-height: 1.25em;
-    margin-bottom: .25rem;
+    display: inline;
+    
+    + p {
+      display: block;
+      margin-bottom: 0.25rem;
+      margin-top: 0.5rem;
+    }
   }
 
   .embedded-entry-block,
@@ -163,14 +167,15 @@ label {
     display: block;
     border: solid 1px rgb(238, 238, 238);
     margin: 1.75rem 0;
-
-    &:first-of-type {
-      margin-top: 0;
-    }
+    background-color: white;
 
     > * {
       background-color: white;
       padding: 0.875rem;
+
+      &:first-child {
+        margin-top: 0;
+      }
     }
   }
 
@@ -181,17 +186,24 @@ label {
   }
 
   .entry-name {
-    color: #606c7c;
-    font-size: 1rem;
-    line-height: 1rem;
-    padding-bottom: 0;
+      position: relative;
+      width: 100%;
+      display: block;
+      padding: 0.25rem;
+      margin: 1rem 0 0 0;
+      font-size: 0.75rem;
+      border: solid 1px rgb(238, 238, 238);
+      background-color: rgb(238, 238, 238);
+      text-transform: uppercase;
   }
 }
 
 .diff-field-line-wrap {
+  display: flex;
+
   &[data-field-type=RichText] {
     background: rgb(247, 249, 250);
-    padding: 1.75rem;
+    padding: 1.25rem;
   }
 
   &[data-field-type=Link] {
