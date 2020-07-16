@@ -78,6 +78,13 @@ const createAssetHtml = (asset) => {
     </div>`;
 };
 
+const getArrayValue = (arrayField) => {
+  const values = _.isArray(arrayField) ? arrayField : _.get(arrayField, 'value', []);
+  if (!values.length) return '';
+  const arrayValues = values.map(value => `<li class='array-value' data-test-id="cdd-array-list-item">${value}</li>`).join('');
+  return `<ul class='array-field-wrap' data-test-id="cdd-array-list">${arrayValues}</ul>`;
+};
+
 const getFields = (field) => {
   if (_.isNil(field) || _.isNil(_.get(field, 'type'))) return '';
   let result;
@@ -186,7 +193,6 @@ const createContentSimpleObjects = async (space, entry) => {
   const controls = (editorInterface && editorInterface.controls) || [];
   objects = contentType.fields.map(field => {
     control = field.type === fieldTypes.text && controls.filter(c => c.fieldId === field.id)[firstIndex];
-    
     return {
       id: field.id,
       contentId: entry.sys.id,
@@ -271,19 +277,71 @@ const createHtmlForAsset = (asset) => {
     </li>`;
 };
 
-const getArrayValue = (arrayField) => {
-  const values = _.isArray(arrayField) ? arrayField : _.get(arrayField, 'value', []);
-  if (!values.length) return 'adam';
-  const arrayValues = values.map(value => `<li class='array-value' data-test-id="cdd-array-list-item">${value}</li>`).join('');
-  return `<ul class='array-field-wrap' data-test-id="cdd-array-list">${arrayValues}</ul>`;
-};
-
 const createHtmlForArray = (field) => {
   return `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}" data-test-id="cdd-array-wrap">
       <label htmlFor="name" data-test-id="cdd-array-label">${field.label}</label>
       ${getArrayValue(field)}
     </li>
   `;
+};
+
+const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
+  const lines = await createRichTextLines(field.value.content, space, snapshotDate, true);
+  
+  return `<li class="embedded-rich-text diff-field-wrap">
+      <label htmlFor="fieldLabel" 
+        data-test-id="cdd-embedded-field-label">
+        ${field.label}
+      </label>
+      ${lines.join('')}
+    </li>`;
+};
+
+const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => {
+  let value = '';
+  let asset = '';
+  switch (field.type) {
+  case fieldTypes.richText:
+    if (isEmbedded) {
+      value = `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}" data-test-id="cdd-entry-wrap">
+          <label htmlFor="fieldLabel" data-test-id="cdd-field-label">
+            ${field.label} - ID: ${field.contentId}
+          </label>
+          <div class='diff-level-max diff-field-wrap'><p>Diff level too deep. Content not available.</p></div>
+        </li>`;
+    }
+    else {
+      value = await createEmbeddedRichTextLines(field, space, snapshotDate);
+    }
+    break;
+  case fieldTypes.symbol:
+    value = createHtmlForEntry(field);
+    break;
+  case fieldTypes.text:
+    value = createHtmlForEntry(field);
+    break;
+  case fieldTypes.object:
+    // value = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
+    break;
+  case fieldTypes.array:
+    if (field.arrayType === fieldTypes.symbol) {
+      value = createHtmlForArray(field);
+    }
+    break;
+
+  case fieldTypes.link:
+    if (field.arrayType === fieldTypes.symbol) {
+      value = createHtmlForArray(field);
+    } else {
+      asset = await space.getAsset(field.value.sys.id);
+      value = createHtmlForAsset(asset);
+    }
+    break;
+  default:
+    value = field.value;
+  }
+
+  return value;
 };
 
 const createHtmlForEmbeddedEntryLines = async (lines, space, snapshotDate, isEmbedded) => {
@@ -364,66 +422,6 @@ const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
   }));
   
   return Promise.resolve(rtfContentLines);
-};
-
-const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
-  const lines = await createRichTextLines(field.value.content, space, snapshotDate, true);
-  
-  return `<li class="embedded-rich-text diff-field-wrap">
-      <label htmlFor="fieldLabel" 
-        data-test-id="cdd-embedded-field-label">
-        ${field.label}
-      </label>
-      ${lines.join('')}
-    </li>`;
-};
-
-const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => {
-  let value = '';
-  let asset = '';
-    
-  switch (field.type) {
-  case fieldTypes.richText:
-    if (isEmbedded) {
-      value = `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}" data-test-id="cdd-entry-wrap">
-          <label htmlFor="fieldLabel" data-test-id="cdd-field-label">
-            ${field.label} - ID: ${field.contentId}
-          </label>
-          <div class='diff-level-max diff-field-wrap'><p>Diff level too deep. Content not available.</p></div>
-        </li>`;
-    }
-    else {
-      value = await createEmbeddedRichTextLines(field, space, snapshotDate);
-    }
-    break;
-  case fieldTypes.symbol:
-    value = createHtmlForEntry(field);
-    break;
-  case fieldTypes.text:
-    value = createHtmlForEntry(field);
-    break;
-  case fieldTypes.object:
-    // value = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
-    break;
-  case fieldTypes.array:
-    if (field.arrayType === fieldTypes.symbol) {
-      value = createHtmlForArray(field);
-    }
-    break;
-
-  case fieldTypes.link:
-    if (field.arrayType === fieldTypes.symbol) {
-      value = createHtmlForArray(field);
-    } else {
-      asset = await space.getAsset(field.value.sys.id);
-      value = createHtmlForAsset(asset);
-    }
-    break;
-  default:
-    value = field.value;
-  }
-
-  return value;
 };
 
 const getId = (field) => {

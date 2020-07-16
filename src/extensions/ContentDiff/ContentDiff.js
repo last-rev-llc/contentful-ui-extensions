@@ -1,5 +1,4 @@
 import React from 'react';
-// import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { locations } from 'contentful-ui-extensions-sdk';
 import { SidebarExtension, DialogExtension } from './content-diff-dialog/index';
