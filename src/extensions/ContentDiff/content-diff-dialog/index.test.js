@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { render, cleanup, configure, waitForElement, fireEvent } from '@testing-library/react';
 import diff from 'node-htmldiff';
+import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
 import SidebarExtension, { 
   DialogExtension,
   getTextDiff,
@@ -398,9 +399,9 @@ const testSnapshot = {
   textMultiLineSnapshotObject
 };
 
-const paragraphLineOne = { nodeType: 'text', value: 'line 1' };
+const paragraphLineOne = { nodeType: 'text', value: 'line 1', marks: [] };
 
-const paragraphLineTwo = { nodeType: 'text', value: 'line 2' };
+const paragraphLineTwo = { nodeType: 'text', value: 'line 2', marks: [] };
 
 const paragraphLines = [paragraphLineOne, paragraphLineTwo];
 
@@ -435,6 +436,7 @@ const paragraphLine = {
       }
     }
   },
+  marks: [],
   content: [paragraphLineOne]
 };
 
@@ -463,6 +465,7 @@ const paragraphEmbeddedEntryInline = {
 
 const richTextEntryField = {
   value: {
+    nodeType: 'document',
     content: [paragraphLine]
   }
 };
@@ -844,26 +847,32 @@ describe('content-diff-dialog helper methods', () => {
       const embeddedEntryNameTestId = "cdd-embedded-entry-name";
       const embeddedEntryWrapTestId = "cdd-embedded-entry-wrap";
       test('if line is of type embedded-asset-block without snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.space)}} />);
-        await waitForElement(() => getByTestId(embeddedAssetBlockTestId));
+        const lines = await createRichTextLines([embeddedAssetLine], sdk.space);
         expect(sdk.space.getAsset).toHaveBeenCalledTimes(1);
         expect(sdk.space.getAsset).toHaveBeenCalledWith(embeddedAssetLine.data.target.sys.id);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: lines[0].formatted}} />);
+        await waitForElement(() => getByTestId(embeddedAssetBlockTestId));
+        expect(JSON.stringify(lines)).toBe(JSON.stringify([embeddedAssetLine]));
         expect(getByTestId(embeddedAssetBlockTestId).getAttribute('class')).toBe(embeddedAssetLine.nodeType);
       });
 
       test('if line is of type embedded-asset-block with snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedAssetLine], sdk.space, new Date())}} />);
-        await waitForElement(() => getByTestId(embeddedAssetBlockTestId));
+        const lines = await createRichTextLines([embeddedAssetLine], sdk.space, new Date());
         expect(sdk.space.getAsset).toHaveBeenCalledTimes(1);
         expect(sdk.space.getAsset).toHaveBeenCalledWith(embeddedAssetLine.data.target.sys.id);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: lines[0].formatted}} />);
+        await waitForElement(() => getByTestId(embeddedAssetBlockTestId));
+        expect(JSON.stringify(lines)).toBe(JSON.stringify([embeddedAssetLine]));
         expect(getByTestId(embeddedAssetBlockTestId).getAttribute('class')).toBe(embeddedAssetLine.nodeType);
       });
 
       test('if line is of type embedded-entry-block without snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.space)}} />);
+        const lines = await createRichTextLines([embeddedEntryLine], sdk.space);
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: lines[0].formatted}} />);
         await waitForElement(() => getByTestId(embeddedEntryWrapTestId));
         await waitForElement(() => getByTestId(embeddedEntryNameTestId));
 
+        expect(JSON.stringify(lines)).toBe(JSON.stringify([embeddedEntryLine]));
         expect(sdk.space.getEntry).toHaveBeenCalledTimes(1);
         expect(sdk.space.getEntry).toHaveBeenCalledWith(embeddedEntryLine.data.target.sys.id);
         expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
@@ -873,10 +882,12 @@ describe('content-diff-dialog helper methods', () => {
       });
 
       test('if line is of type embedded-entry-block with snapshot date', async () => {
-        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([embeddedEntryLine], sdk.space, new Date(snapshotOne.sys.updatedAt))}} />);
+        const lines = await createRichTextLines([embeddedEntryLine], sdk.space, new Date(snapshotOne.sys.updatedAt));
+        const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: lines[0].formatted}} />);
         await waitForElement(() => getByTestId(embeddedEntryWrapTestId));
         await waitForElement(() => getByTestId(embeddedEntryNameTestId));
 
+        expect(JSON.stringify(lines)).toBe(JSON.stringify([embeddedEntryLine]));
         expect(sdk.space.getEntrySnapshots).toHaveBeenCalledTimes(1);
         expect(sdk.space.getEntrySnapshots).toHaveBeenCalledWith(embeddedEntryLine.data.target.sys.id);
         expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
@@ -887,45 +898,49 @@ describe('content-diff-dialog helper methods', () => {
 
       describe('if line is of type paragraph', () => {
         test('has no embedded entry inline and no snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space)}} />);
-          await waitForElement(() => getByTestId(entryTextTestId));
-          
+          const lines = await createRichTextLines([paragraphLine], sdk.space);
+
+          expect(JSON.stringify(lines)).toBe(JSON.stringify([paragraphLine]));
           expect(sdk.space.getEntry).not.toHaveBeenCalled();
           expect(sdk.space.getContentType).not.toHaveBeenCalled();
-          expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
         });
   
         test('has no embedded entry inline but has snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphLine], sdk.space, new Date(snapshotOne.sys.updatedAt))}} />);
-          await waitForElement(() => getByTestId(entryTextTestId));
-  
+          const lines = await createRichTextLines([paragraphLine], sdk.space, new Date(snapshotOne.sys.updatedAt));
+
+          expect(JSON.stringify(lines)).toBe(JSON.stringify([paragraphLine]));
           expect(sdk.space.getEntry).not.toHaveBeenCalled();
           expect(sdk.space.getContentType).not.toHaveBeenCalled();
-          expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
         });
 
         test('has embedded entry inline but no snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space)}} />);
-          await waitForElement(() => getByTestId(entryTextTestId));
-          await waitForElement(() => getByTestId(embeddedWrapTestId));
-
-          expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
+          const lines = await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space);
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: lines[0].content[1].formatted}} />);
+          await waitForElement(() => getByTestId(embeddedEntryWrapTestId));
+          await waitForElement(() => getByTestId(embeddedEntryNameTestId));
+          
+          expect(JSON.stringify(lines)).toBe(JSON.stringify([paragraphEmbeddedEntryInline]));
           expect(sdk.space.getEntry).toHaveBeenCalledTimes(1);
           expect(sdk.space.getEntry).toHaveBeenCalledWith(embeddedEntryInline.data.target.sys.id);
           expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
           expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
+          expect(getByTestId(embeddedEntryWrapTestId).getAttribute('class')).toBe(embeddedEntryInline.nodeType);
+          expect(getByTestId(embeddedEntryNameTestId).textContent).toBe('Entry One');
         });
   
         test('has embedded entry inline and has snapshot date', async () => {
-          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space, new Date(snapshotOne.sys.updatedAt))}} />);
-          await waitForElement(() => getByTestId(entryTextTestId));
-          await waitForElement(() => getByTestId(embeddedWrapTestId));
-
-          expect(getByTestId(entryTextTestId).textContent).toBe(paragraphLineOne.value);
+          const lines = await createRichTextLines([paragraphEmbeddedEntryInline], sdk.space, new Date(snapshotOne.sys.updatedAt));
+          const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: lines[0].content[1].formatted}} />);
+          await waitForElement(() => getByTestId(embeddedEntryWrapTestId));
+          await waitForElement(() => getByTestId(embeddedEntryNameTestId));
+          
+          expect(JSON.stringify(lines)).toBe(JSON.stringify([paragraphEmbeddedEntryInline]));
           expect(sdk.space.getEntrySnapshots).toHaveBeenCalledTimes(1);
           expect(sdk.space.getEntrySnapshots).toHaveBeenCalledWith(embeddedEntryInline.data.target.sys.id);
           expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
           expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
+          expect(getByTestId(embeddedEntryWrapTestId).getAttribute('class')).toBe(embeddedEntryInline.nodeType);
+          expect(getByTestId(embeddedEntryNameTestId).textContent).toBe('Entry One');
         });
       });
     });

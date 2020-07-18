@@ -9,6 +9,28 @@ div {
   vertical-align: baseline;
 }
 
+.error-message {
+  background-color: rgba(255, 0, 0, .35);
+  border: 1px solid rgba(255, 0, 0, 1);
+  
+  p {
+    margin: 0.5rem 0;
+    text-align: center;
+    font-size: 0.75rem;
+  }
+}
+
+.loading-message {
+  background-color: #edf4fc;
+  border: 1px solid #84b9f5;
+  
+  p {
+    margin: 0.5rem 0;
+    text-align: center;
+    font-size: 0.75rem;
+  }
+}
+
 pre {
   white-space: pre-wrap; 
   word-wrap: break-word;
@@ -61,7 +83,7 @@ del {
   display: inline-block;
 
   &::before {
-    background-color: rgba(255, 0, 0, .25);
+    background-color: rgba(255, 0, 0, .35);
     position: absolute;
     top: 0;
     left: 0;
@@ -74,10 +96,30 @@ del {
 ins {
   text-decoration: none;
   border-bottom: solid 2px green;
+  position: relative;
+  display: inline-block;
+
+  &::before {
+    background-color: rgba(0, 255, 0, .35);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: '';
+  }
+
+  .embedded-asset-block & {
+    border-bottom: none;
+
+    &::before {
+      content: none;
+    }
+  }
 
   .entry-name & {
     border-bottom: none;
-  }
+  } 
 
   [data-field-type=Link] & {
     display: inline-block;

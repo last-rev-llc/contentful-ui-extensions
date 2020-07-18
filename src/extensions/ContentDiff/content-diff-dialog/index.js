@@ -11,6 +11,8 @@ import { init, locations } from 'contentful-ui-extensions-sdk';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './index.scss';
 import diff from 'node-htmldiff';
+import { BLOCKS, INLINES } from '@contentful/rich-text-types';
+import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
 
 const firstIndex = 0;
 
@@ -26,7 +28,14 @@ const fieldTypes = {
 const richTextFieldTypes = {
   asset: 'embedded-asset-block',
   entry: 'embedded-entry-block',
-  paragraph: 'paragraph'
+  paragraph: 'paragraph',
+  unorderedList: 'unordered-list',
+  headingOne: 'heading-1',
+  headingTwo: 'heading-2',
+  headingThree: 'heading-3',
+  headingFour: 'heading-4',
+  headingFive: 'heading-5',
+  listItem: 'list-item',
 };
 
 const paragraphFieldTypes = {
@@ -108,7 +117,6 @@ const getFields = (field) => {
   
   case fieldTypes.array:
     if (field.arrayType === fieldTypes.symbol) {
-      // result = getTextDiffLines(_.get(field, 'oldValue', []), _.get(field, 'currentValue', []), field.type);
       result = getTextDiff({ id: 0, oldText: getArrayValue(_.get(field, 'oldValue', [])), newText: getArrayValue(_.get(field, 'currentValue', [])), fieldType: field.type });
     }
     break;
@@ -149,7 +157,7 @@ const getEntryByDate = async (space, entryId, snapshotDate) => {
 
 const getLoading = () => {
   return (
-    <div>
+    <div className='loading-message'>
       <p>Loading...</p>
     </div>
   );
@@ -157,8 +165,8 @@ const getLoading = () => {
 
 const getError = message => {
   return (
-    <div>
-      <h4>{message}</h4>
+    <div className='error-message'>
+      <p>{message}</p>
     </div>
   );
 };
@@ -172,7 +180,6 @@ export class DialogExtension extends React.Component {
 
   render() {
     // this.props.sdk.parameters.invocation.fields = [];  // uncomment to check no fields
-
     return this.props.sdk.parameters.invocation.fields.length > 0 
       ? (
         <div>
@@ -198,7 +205,7 @@ const createContentSimpleObjects = async (space, entry) => {
       contentId: entry.sys.id,
       type: field.type, 
       textType: control && control.widgetId,
-      value: _.get(entry, `fields[${field.id}]['en-US']`, { content: [{ nodeType: "paragraph", content: [{ nodeType: "text", value: "<i class='blank-value'>No value entered</i>" }] }]}),
+      value: _.get(entry, `fields[${field.id}]['en-US']`, { nodeType: "document", marks: [], content: [{ nodeType: "paragraph", marks: [], content: [{ nodeType: "text", marks: [], value: "<i class='blank-value'>No value entered</i>" }] }]}),
       arrayType: field.items && field.items.type,
       label: field.name
     };
@@ -286,14 +293,18 @@ const createHtmlForArray = (field) => {
 };
 
 const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
+  const fieldValue = field.value;
   const lines = await createRichTextLines(field.value.content, space, snapshotDate, true);
+  
+  fieldValue.content = lines;
+  const rtfLines = parseRichTextToHtml(fieldValue);
   
   return `<li class="embedded-rich-text diff-field-wrap">
       <label htmlFor="fieldLabel" 
         data-test-id="cdd-embedded-field-label">
         ${field.label}
       </label>
-      ${lines.join('')}
+      ${rtfLines}
     </li>`;
 };
 
@@ -348,11 +359,11 @@ const createHtmlForEmbeddedEntryLines = async (lines, space, snapshotDate, isEmb
   return Promise.all(_.compact(lines).map(async line => getEmbeddedEntryValue(line, space, snapshotDate, isEmbedded)));
 };
 
-const createHtmlForParagraphLines = async (lines, space, snapshotDate, isEmbedded) => {
+const createHtmlForParagraphLines = async (lines, space, snapshotDate, isEmbedded, heading) => {
   return Promise.all(_.compact(lines).map(async line => {
     if (line.nodeType === paragraphFieldTypes.text) {
-      if (line.value.trim() === '') return '';
-      return `<p data-test-id="cdd-entry-text">${line.value}</p>`;
+      if (line.value.trim() === '') return 'hello';
+      return heading ? `${heading[0]}${line.value}${heading[1]}` : `<p data-test-id="cdd-entry-text">${line.value}</p>`;
     } if (line.nodeType === paragraphFieldTypes.hyperlink) {
       if (!_.has(line, 'data.uri') || !_.has(line, 'content[0].value')) return '';
       return `<a data-test-id="cdd-entry-hyperlink" href="${_.get(line, 'data.uri')}">${_.get(line, 'content[0].value')}</a>`;
@@ -363,62 +374,60 @@ const createHtmlForParagraphLines = async (lines, space, snapshotDate, isEmbedde
   }));
 };
 
+const formatEntry = async (line, space, snapshotDate, isEmbedded) => {
+  let contentType;
+  let result;
+  if (isEmbedded) {
+    result = ['<div class="diff-level-max diff-field-wrap"><p>Diff level too deep. Content not available.</p></div>'];
+    contentType = `Embedded Entry ID: ${line.data.target.sys.id}`;
+  } else {
+    const entry = await getEntryByDate(space, line.data.target.sys.id, snapshotDate);
+    if (!entry) return line;
+    const content = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
+    
+    result = await createHtmlForEmbeddedEntryLines(content, space, snapshotDate, isEmbedded);
+    contentType = _.startCase(_.get(entry, 'snapshot.sys.contentType.sys.id', _.get(entry, 'sys.contentType.sys.id', '')));
+  }
+  
+  result.unshift(`<div class="${line.nodeType}" data-test-id="cdd-embedded-entry-wrap"><div class='entry-name' data-test-id="cdd-embedded-entry-name" data-entry-id="${_.get(line, 'data.target.sys.id', '')}">${contentType}</div><ul class="field-list-wrap">`);
+  result.push('</ul></div>');
+  return _.isArray(result) ? result.join('') : result;
+};
+
 const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
   const rtfContentLines = await Promise.all(lines.map(async (line) => {
     let result;
-    let entry;
     let asset;
-    let content;
-    let contentType;
+    let node = line;
 
     switch (line.nodeType) {
     case richTextFieldTypes.asset:
       asset = await space.getAsset(line.data.target.sys.id);
       result = `<div class="${line.nodeType}" data-test-id="cdd-embedded-asset-block">${createAssetHtml(asset, line.nodeType)}</div>`;
       result = isEmbedded ? result : [result];
+      node.formatted = result;
       break;
 
     case richTextFieldTypes.entry:
-      if (isEmbedded) {
-        result = ['<div class="diff-level-max diff-field-wrap"><p>Diff level too deep. Content not available.</p></div>'];
-        contentType = `Embedded Entry ID: ${line.data.target.sys.id}`;
-      } else {
-        entry = await getEntryByDate(space, line.data.target.sys.id, snapshotDate);
-        if (!entry) break;
-        content = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
-        
-        result = await createHtmlForEmbeddedEntryLines(content, space, snapshotDate, isEmbedded);
-        contentType = _.startCase(_.get(entry, 'snapshot.sys.contentType.sys.id', _.get(entry, 'sys.contentType.sys.id', '')));
-      }
-      
-      result.unshift(`<div class="${line.nodeType}" data-test-id="cdd-embedded-entry-wrap"><div class='entry-name' data-test-id="cdd-embedded-entry-name" data-entry-id="${_.get(line, 'data.target.sys.id', '')}">${contentType}</div><ul class="field-list-wrap">`);
-      result.push('</ul></div>');
-      result = _.isArray(result) ? result.join('') : result;
+      node.formatted = await formatEntry(line, space, snapshotDate, isEmbedded);
       break;
 
     case richTextFieldTypes.paragraph:
-      if (line.content.length > 1) {
-        content = await Promise.all(line.content.map(async inlineContent => {
-          let inlineResult = inlineContent;
-          
-          if (inlineContent.nodeType === paragraphFieldTypes.inlineEntry) {
-            entry = await getEntryByDate(space, inlineContent.data.target.sys.id, snapshotDate);
-            if (!entry) return Promise.resolve();
-            inlineResult = await createContentSimpleObjects(space, snapshotDate ? entry.snapshot : entry);
-          }
-          return Promise.resolve(inlineResult);
-        }));
-        result = await createHtmlForParagraphLines(content, space, snapshotDate, isEmbedded);
-      } else {
-        result = await createHtmlForParagraphLines(line.content, space, snapshotDate, isEmbedded);
-      }
-      result = isEmbedded ? result.join('') : result;
+      result = await Promise.all(line.content.map(async inlineContent => {
+        const inlineResult = inlineContent;
+        if (inlineContent.nodeType === paragraphFieldTypes.inlineEntry) {
+          inlineResult.formatted = await formatEntry(inlineContent, space, snapshotDate, isEmbedded);
+        }
+        return Promise.resolve(inlineResult);
+      }));
+      node.content = result;
       break;
         
     default:
+      node = line;
     }
     
-    return Promise.resolve(result);
+    return Promise.resolve(node);
   }));
   
   return Promise.resolve(rtfContentLines);
@@ -440,13 +449,33 @@ const getArrayType = (field) => {
   return field.arrayType;
 };
 
+const formatRichTextNode = (node) => {
+  return node.formatted;
+};
+
+const parseRichTextToHtml = (document) => {
+  const options = {
+    renderNode: {
+      [BLOCKS.EMBEDDED_ASSET]: formatRichTextNode,
+      [BLOCKS.EMBEDDED_ENTRY]: formatRichTextNode,
+      [INLINES.EMBEDDED_ENTRY]: formatRichTextNode,
+    },
+  };
+  return documentToHtmlString(document, options);
+};
+
 const getContent = async (field, space, snapshotDate, snapshot) => {
+  const fieldValue = field.value;
+  const snapshotValue = snapshot.value;
   const currentContent = await createRichTextLines(field.value.content, space);
   const oldContent = await createRichTextLines(snapshot.value.content, space, snapshotDate);
-        
+  fieldValue.content = currentContent;
+  snapshotValue.content = oldContent;
+  const currentRichTextHtml = parseRichTextToHtml(fieldValue);
+  const oldRichTextHtml = parseRichTextToHtml(snapshotValue);
   const result = {
-    currentValue: _.compact(currentContent).map(content => _.isArray(content) ? content.join('') : content).join(''),
-    oldValue: _.compact(oldContent).map(content =>  _.isArray(content) ? content.join('') : content).join(''),
+    currentValue: currentRichTextHtml,
+    oldValue: oldRichTextHtml
   };
 
   return result;
@@ -514,8 +543,10 @@ export class SidebarExtension extends React.Component {
   onButtonClick = async () => {
     const version = this.version || this.state.versions[0];
     const controls = this.props.sdk.editor.editorInterface.controls.filter(({ field }) => !field.disabled);
+
     const currentFields = await createSimpleObjects(this.props.sdk.space, controls, this.props.sdk.entry.fields);
     const oldFields = await createSimpleObjects(this.props.sdk.space, controls, version.snapshot.fields, 'en-US');
+
     let fields = await createDiffFields(currentFields, oldFields, this.props.sdk.space, new Date(version.sys.updatedAt));
     fields = addRemovedOldFields(fields, oldFields);
     
@@ -557,7 +588,7 @@ export class SidebarExtension extends React.Component {
   }
 
   getLoadedInfo() {
-    return this.state.versions.length > 0 ? this.getDropdownAndButton() : getError('No versions returned');
+    return this.state.versions.length > 0 ? this.getDropdownAndButton() : getError('No past versions to diff.');
   }
 
   getVersion(event) {
