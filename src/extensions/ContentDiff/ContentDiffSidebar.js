@@ -321,12 +321,12 @@ const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
   const rtfContentLines = await Promise.all(lines.map(async (line) => {
     let result;
     let asset;
-    let node = line;
+    const node = line;
 
     switch (line.nodeType) {
     case richTextFieldTypes.asset:
       asset = await getAsset(line.data.target.sys.id, space);
-      result = `<div class="${line.nodeType}" data-test-id="cdd-embedded-asset-block">${createAssetHtml(asset, line.nodeType)}</div>`;
+      result = `<div class="${line.nodeType}" data-test-id="cdd-embedded-asset-block">${createAssetHtml(asset)}</div>`;
       result = isEmbedded ? result : [result];
       node.formatted = result;
       break;
@@ -347,7 +347,6 @@ const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
       break;
         
     default:
-      node = line;
     }
     
     return Promise.resolve(node);

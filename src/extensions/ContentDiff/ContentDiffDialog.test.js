@@ -1,7 +1,7 @@
 import React from 'react';
-import { render, cleanup, configure, fireEvent } from '@testing-library/react';
+import { render, cleanup, configure } from '@testing-library/react';
 import diff from 'node-htmldiff';
-import ContentDiffDialog, {
+import {
   getTextDiff,
   createAssetHtml,
   getFields,

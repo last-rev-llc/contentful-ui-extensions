@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
-import { render, cleanup, configure, waitForElement, fireEvent } from '@testing-library/react';
-import ContentDiffSidebar, {
+import { render, cleanup, configure, waitForElement } from '@testing-library/react';
+import {
   resetLookups,
   createAssetHtml,
   getEntryByDate,
