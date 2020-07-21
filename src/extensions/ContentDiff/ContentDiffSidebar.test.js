@@ -1,16 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
 import { render, cleanup, configure, waitForElement, fireEvent } from '@testing-library/react';
-import diff from 'node-htmldiff';
-import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
-import SidebarExtension, { 
-  DialogExtension,
-  getTextDiff,
-  getTextDiffLines,
+import ContentDiffSidebar, {
+  resetLookups,
   createAssetHtml,
-  getFields,
-  getFieldInfo,
-  getFieldTables,
   getEntryByDate,
   createContentSimpleObjects,
   createSimpleObjects,
@@ -20,7 +13,6 @@ import SidebarExtension, {
   createHtmlForArray,
   getEmbeddedEntryValue,
   createHtmlForEmbeddedEntryLines,
-  createHtmlForParagraphLines,
   createRichTextLines,
   getId,
   getType,
@@ -30,7 +22,7 @@ import SidebarExtension, {
   createDiffFields,
   addRemovedOldFields,
   getTextValue
-} from './index';
+} from './ContentDiffSidebar';
 import sdk, {
   assetFieldOne,
   contentTypeSymbolFieldOne,
@@ -38,7 +30,7 @@ import sdk, {
   entryOne,
   snapshotOne,
   snapshotTwo
-} from '../mockSdk';
+} from './mockSdk';
 
 configure({
   testIdAttribute: 'data-test-id',
@@ -67,13 +59,9 @@ sdk.space.getAsset = jest.fn(async () => assetFieldOne);
 afterEach(() => {
   cleanup();
   jest.clearAllMocks();
+  resetLookups();
 });
 
-const diffFieldsTestId = "cdd-diff-fields";
-const oldTextTestId = "cdd-old-text";
-const newTextTestId = "cdd-new-text";
-const diffTextTestId = "cdd-diff-text";
-const fieldLabelTestId = "cdd-field-label";
 const entryWrapTestId = "cdd-entry-wrap";
 const entryLabelTestId = "cdd-entry-label";
 const entryValueTestId = "cdd-entry-value";
@@ -81,55 +69,6 @@ const arrayListTestId = "cdd-array-list";
 const arrayListItemTestId = "cdd-array-list-item";
 const arrayWrapTestId = "cdd-array-wrap";
 const arrayLabelTestId = "cdd-array-label";
-const entryTextTestId = "cdd-entry-text";
-const embeddedWrapTestId = "cdd-embedded-wrap";
-
-const richTextFieldInfo = {
-  id: 'richTextFieldInfo',
-  type: 'RichText',
-  label: 'Rich Text Field',
-  content: {
-    currentValue: 'currentValue',
-    oldValue: 'oldValue'
-  },
-  currentValue: null,
-  oldValue: null,
-  arrayType: null,
-};
-
-const linkFieldInfo = {
-  id: 'linkFieldInfo',
-  type: 'Link',
-  label: 'Link Field',
-  content: null,
-  currentValue: 'current symbol value',
-  oldValue: 'old symbol value',
-  arrayType: null,
-};
-
-const symbolFieldInfo = {
-  id: 'symbolFieldInfo',
-  type: 'Symbol',
-  label: 'Symbol Field',
-  content: null,
-  currentValue: 'current symbol value',
-  oldValue: 'old symbol value',
-  arrayType: null,
-};
-
-const arrayFieldInfo = {
-  id: 'arrayFieldInfo',
-  type: 'Array',
-  label: 'Array Field',
-  content: null,
-  currentValue: ['current', 'array', 'value'],
-  oldValue: ['old', 'array', 'value'],
-  arrayType: 'Symbol',
-};
-
-const arrayFieldLength = arrayFieldInfo.currentValue.length >= arrayFieldInfo.oldValue.length 
-  ? arrayFieldInfo.currentValue.length 
-  : arrayFieldInfo.oldValue.length;
 
 const richTextEmbeddedEntryInfo = {
   nodeType: 'embedded-entry-block',
@@ -401,10 +340,6 @@ const testSnapshot = {
 
 const paragraphLineOne = { nodeType: 'text', value: 'line 1', marks: [] };
 
-const paragraphLineTwo = { nodeType: 'text', value: 'line 2', marks: [] };
-
-const paragraphLines = [paragraphLineOne, paragraphLineTwo];
-
 const embeddedAssetLine = {
   nodeType: 'embedded-asset-block',
   data: {
@@ -470,58 +405,9 @@ const richTextEntryField = {
   }
 };
 
-const testFields = [richTextFieldInfo, symbolFieldInfo, arrayFieldInfo, linkFieldInfo];
-
 const testSimpleObjects = [symbolSimpleObject, arraySimpleObject];
 
 describe('content-diff-dialog helper methods', () => {
-  describe('getTextDiff(textInfo = {id, oldText, newText})', () => {
-    const textInfo = {
-      id: 'textInfo',
-      keyId: 0,
-      oldText: 'old',
-      newText: 'new'
-    };
-    test('shows a div with the value of oldText', () => {
-      const { getByTestId } = render(getTextDiff(textInfo));
-      const oldText = getByTestId(oldTextTestId);
-      expect(oldText.textContent).toBe(textInfo.oldText);
-    });
-
-    test('shows a div with the value of newText', () => {
-      const { getByTestId } = render(getTextDiff(textInfo));
-      const newText = getByTestId(newTextTestId);
-      expect(newText.textContent).toBe(textInfo.newText);
-    });
-
-    test('shows a div with the value of diff(oldText, newText)', () => {
-      const { getByTestId } = render(getTextDiff(textInfo));
-      const diffTextDiv = getByTestId(diffTextTestId);
-      const diffSpan = render(<span data-test-id="test"
-        dangerouslySetInnerHTML={{__html: diff(textInfo.oldText, textInfo.newText)}} />);
-      const diffHtmlText = diffSpan.getByTestId('test').textContent;
-
-      expect(diffTextDiv.textContent).toBe(diffHtmlText);
-    });
-  });
-
-  describe('getTextDiffLines(oldLines, newLines)', () => {
-    const threeLines = ['line 1', 'line 2', 'line 3'];
-    const twoLines = ['line 1', 'line 2'];
-
-    describe('shows as many diff fields as longest array', () => {
-      test('diff fields equal same as oldLines length if oldLines are longest array', () => {
-        const { getAllByTestId } = render(getTextDiffLines(threeLines, twoLines));
-        expect(getAllByTestId('cdd-diff-fields').length).toBe(threeLines.length);
-      });
-
-      test('diff fields equal same as newLines length if newLines are longest array', () => {
-        const { getAllByTestId } = render(getTextDiffLines(twoLines, threeLines));
-        expect(getAllByTestId('cdd-diff-fields').length).toBe(threeLines.length);
-      });
-    });
-  });
-
   describe('createAssetHtml(asset = { fields: { title: { en-US }, file: { en-US: { url } } } })', () => {
     const assetTitleTestId = "cdd-asset-title";
     const assetImageTestId = "cdd-asset-image";
@@ -543,86 +429,6 @@ describe('content-diff-dialog helper methods', () => {
         expect(queryByTestId(assetTitleTestId)).toBeNull();
         expect(queryByTestId(assetImageTestId)).toBeNull();
       });
-    });
-  });
-
-  describe('getFields(field = { id, type, label, content: { currentValue, oldValue }, currentValue, oldValue, arrayType })', () => {
-    test('shows rich text field info', () => {
-      const { getByTestId } = render(getFields(richTextFieldInfo));
-      expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(richTextFieldInfo.type);
-      expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(newTextTestId).textContent).not.toBeNull();
-    });
-
-    test('shows symbol field info', () => {
-      const { getByTestId } = render(getFields(symbolFieldInfo));
-      expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(symbolFieldInfo.type);
-      expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(newTextTestId).textContent).not.toBeNull();
-    });
-
-    test('shows array field info', () => {
-      const { getByTestId, getAllByTestId } = render(getFields(arrayFieldInfo));
-      expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(arrayFieldInfo.type);
-      expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
-    });
-
-    test('shows link field info', () => {
-      const { getByTestId } = render(getFields(linkFieldInfo));
-      expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(linkFieldInfo.type);
-      expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(newTextTestId).textContent).not.toBeNull();
-    });
-    
-  });
-
-  describe('getFieldInfo(id, field)', () => {
-    test('shows rich text fields with label', () => {
-      const { getByTestId } = render(getFieldInfo(0, richTextFieldInfo));
-      expect(getByTestId(fieldLabelTestId).textContent).toBe(richTextFieldInfo.label);
-      expect(getByTestId(diffFieldsTestId).textContent).not.toBeNull();
-      expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(newTextTestId).textContent).not.toBeNull();
-    });
-
-    test('shows symbol fields with label', () => {
-      const { getByTestId } = render(getFieldInfo(0, symbolFieldInfo));
-      expect(getByTestId(fieldLabelTestId).textContent).toBe(symbolFieldInfo.label);
-      expect(getByTestId(diffFieldsTestId).textContent).not.toBeNull();
-      expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(newTextTestId).textContent).not.toBeNull();
-    });
-
-    test('shows array fields with label', () => {
-      const { getByTestId, getAllByTestId } = render(getFieldInfo(0, arrayFieldInfo));
-      expect(getByTestId(fieldLabelTestId).textContent).toBe(arrayFieldInfo.label);
-      expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
-    });
-
-    test('shows link fields with label', () => {
-      const { getByTestId } = render(getFieldInfo(0, linkFieldInfo));
-      expect(getByTestId(fieldLabelTestId).textContent).toBe(linkFieldInfo.label);
-      expect(getByTestId(diffFieldsTestId).textContent).not.toBeNull();
-      expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
-      expect(getByTestId(newTextTestId).textContent).not.toBeNull();
-    });
-    
-  });
-
-  describe('getFieldTables(fields = [{ id, type, label, content: { currentValue, oldValue }, currentValue, oldValue, arrayType }])', () => {
-    test('shows all enabled fields and contents', () => {
-      const { getAllByTestId } = render(getFieldTables(testFields));
-      expect(getAllByTestId(fieldLabelTestId).length).toBe(testFields.length);
-      expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
-      expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
     });
   });
 
@@ -801,46 +607,6 @@ describe('content-diff-dialog helper methods', () => {
     });
   });
 
-  describe('createHtmlForParagraphLines(lines = [{ nodeType, value }, [{ id, type, value, arrayType, label }]])', () => {
-    describe('returns html for all lines', () => {
-      test('if lines are of type text', async () => {
-        const { getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createHtmlForParagraphLines(paragraphLines, sdk.space)}} />);
-        await waitForElement(() => getAllByTestId(entryTextTestId));
-        expect(queryByTestId(embeddedWrapTestId)).toBeNull();
-        expect(getAllByTestId(entryTextTestId).length).toBe(paragraphLines.length);
-        expect(getAllByTestId(entryTextTestId).every((item, i) => item.textContent === paragraphLines[i].value)).toBeTruthy();
-      });
-
-      test('if lines are arrays of type symbol', async () => {
-        const { getByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createHtmlForParagraphLines([[symbolSimpleObject]], sdk.space)}} />);
-        await waitForElement(() => getByTestId(embeddedWrapTestId));
-        await waitForElement(() => getByTestId(entryWrapTestId));
-        await waitForElement(() => getByTestId(entryLabelTestId));
-        await waitForElement(() => getByTestId(entryValueTestId));
-        expect(queryByTestId(embeddedWrapTestId)).toBeTruthy();
-        expect(getByTestId(entryWrapTestId).getAttribute('class')).toMatch(new RegExp(symbolSimpleObject.type));
-        expect(getByTestId(entryLabelTestId).textContent).toBe(symbolSimpleObject.label);
-        expect(getByTestId(entryValueTestId).textContent).toBe(symbolSimpleObject.value);
-      });
-
-      test('if lines are arrays of type array', async () => {
-        const { getByTestId, getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: await createHtmlForParagraphLines([[arraySimpleObject]], sdk.space)}} />);
-        await waitForElement(() => getByTestId(embeddedWrapTestId));
-        await waitForElement(() => getByTestId(arrayWrapTestId));
-        await waitForElement(() => getByTestId(arrayLabelTestId));
-        await waitForElement(() => getByTestId(arrayListTestId));
-        await waitForElement(() => getAllByTestId(arrayListItemTestId));
-        expect(queryByTestId(embeddedWrapTestId)).toBeTruthy();
-        expect(getByTestId(arrayWrapTestId).getAttribute('class')).toMatch(new RegExp(arraySimpleObject.type));
-        expect(getByTestId(arrayLabelTestId).textContent).toBe(arraySimpleObject.label);
-        expect(queryByTestId(arrayListTestId)).toBeTruthy();
-        expect(getAllByTestId(arrayListItemTestId).length).toBe(arraySimpleObject.value.length);
-        expect(getAllByTestId(arrayListItemTestId).every((item, i) => item.textContent === arraySimpleObject.value[i])).toBeTruthy();
-      });
-      
-    });
-  });
-
   describe('createRichTextLines(lines = [{ nodeType, content, data: { target: { sys: { id } } } }], space, environment, snapshotDate)', () => {
     describe('returns html for all rich text field lines of all types', () => {
       const embeddedAssetBlockTestId = "cdd-embedded-asset-block";
@@ -878,7 +644,7 @@ describe('content-diff-dialog helper methods', () => {
         expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
         expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
         expect(getByTestId(embeddedEntryWrapTestId).getAttribute('class')).toBe(embeddedEntryLine.nodeType);
-        expect(getByTestId(embeddedEntryNameTestId).textContent).toBe('Entry One');
+        expect(getByTestId(embeddedEntryNameTestId).textContent.trim()).toBe('Entry One');
       });
 
       test('if line is of type embedded-entry-block with snapshot date', async () => {
@@ -893,7 +659,7 @@ describe('content-diff-dialog helper methods', () => {
         expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
         expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
         expect(getByTestId(embeddedEntryWrapTestId).getAttribute('class')).toBe(embeddedEntryLine.nodeType);
-        expect(getByTestId(embeddedEntryNameTestId).textContent).toBe('Entry One');
+        expect(getByTestId(embeddedEntryNameTestId).textContent.trim()).toBe('Entry One');
       });
 
       describe('if line is of type paragraph', () => {
@@ -925,7 +691,7 @@ describe('content-diff-dialog helper methods', () => {
           expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
           expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
           expect(getByTestId(embeddedEntryWrapTestId).getAttribute('class')).toBe(embeddedEntryInline.nodeType);
-          expect(getByTestId(embeddedEntryNameTestId).textContent).toBe('Entry One');
+          expect(getByTestId(embeddedEntryNameTestId).textContent.trim()).toBe('Entry One');
         });
   
         test('has embedded entry inline and has snapshot date', async () => {
@@ -940,7 +706,7 @@ describe('content-diff-dialog helper methods', () => {
           expect(sdk.space.getContentType).toHaveBeenCalledTimes(1);
           expect(sdk.space.getContentType).toHaveBeenCalledWith(entryOne.sys.contentType.sys.id);
           expect(getByTestId(embeddedEntryWrapTestId).getAttribute('class')).toBe(embeddedEntryInline.nodeType);
-          expect(getByTestId(embeddedEntryNameTestId).textContent).toBe('Entry One');
+          expect(getByTestId(embeddedEntryNameTestId).textContent.trim()).toBe('Entry One');
         });
       });
     });
@@ -1149,4 +915,14 @@ describe('content-diff-dialog helper methods', () => {
     });
   });
 
+});
+
+describe('<DialogExtension sdk={sdk} />', () => {
+  describe('initialize()', () => {
+
+  });
+
+  describe('render()', () => {
+
+  });
 });

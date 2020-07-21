@@ -1,7 +1,3 @@
-const richTextField = {
-
-};
-
 const entrySymbolFieldOne = {
   'en-US': 'symbol field 1'
 };
@@ -22,10 +18,6 @@ const contentTypeSymbolFieldTwo = {
   type: 'Symbol',
   name: 'Content Type Symbol Field Two',
   'en-US': 'symbol field 2'
-};
-
-const arrayField = {
-
 };
 
 const assetFieldOne = {
@@ -146,12 +138,10 @@ const sdk = {
 
 export {
   assetFieldOne,
-  richTextField,
   entrySymbolFieldOne,
   entrySymbolFieldTwo,
   contentTypeSymbolFieldOne,
   contentTypeSymbolFieldTwo,
-  arrayField,
   entryOne,
   snapshotOne,
   snapshotTwo
