@@ -6,8 +6,15 @@ import '@contentful/forma-36-react-components/dist/styles.css';
 import './ContentDiff.scss';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
+import { createAssetHtml, getArrayValue } from './shared/helpers';
 
 const firstIndex = 0;
+
+const entryWrapTestId = "cdd-entry-wrap";
+const entryLabelTestId = "cdd-entry-label";
+const entryValueTestId = "cdd-entry-value";
+const arrayWrapTestId = "cdd-array-wrap";
+const arrayLabelTestId = "cdd-array-label";
 
 let entryLookup = {};
 let assetLookup = {};
@@ -101,31 +108,24 @@ const getValue = (field) => {
 };
 
 const createHtmlForEntry = (entry) => {
-  return `<li class="embedded-${entry.type} diff-field-wrap" key="${entry.id}" data-test-id="cdd-entry-wrap">
-      <label htmlFor="name" data-test-id="cdd-entry-label">${entry.label}</label>
-      <p data-test-id="cdd-entry-value">${getValue(entry)}</p>
+  return `<li class="embedded-${entry.type} diff-field-wrap" key="${entry.id}" data-test-id="${entryWrapTestId}">
+      <label htmlFor="name" data-test-id="${entryLabelTestId}">${entry.label}</label>
+      <p data-test-id="${entryValueTestId}">${getValue(entry)}</p>
     </li>`;
 };
 
 const createHtmlForAsset = (asset) => {
   if (!asset || _.isUndefined(_.get(asset, 'fields'))) return '';
 
-  return `<li class="embedded-asset diff-field-wrap" key="${asset.sys.id}" data-test-id="cdd-entry-wrap">
-      <label htmlFor="name" data-test-id="cdd-entry-label">${_.get(asset, "fields.title['en-US']", "No Label")}</label>
-      <div data-test-id="cdd-entry-value"><img src="${_.get(asset, "fields.file['en-US'].url", "Not founds")}" data-test-id="cdd-asset-image"/></div>
+  return `<li class="embedded-asset diff-field-wrap" key="${asset.sys.id}" data-test-id="${entryWrapTestId}">
+      <label htmlFor="name" data-test-id="${entryLabelTestId}">${_.get(asset, "fields.title['en-US']", "No Label")}</label>
+      <div data-test-id="${entryValueTestId}"><img src="${_.get(asset, "fields.file['en-US'].url", "Not founds")}" data-test-id="cdd-asset-image"/></div>
     </li>`;
 };
 
-const getArrayValue = (arrayField) => {
-  const values = _.isArray(arrayField) ? arrayField : _.get(arrayField, 'value', []);
-  if (!values.length) return '';
-  const arrayValues = values.map(value => `<li class='array-value' data-test-id="cdd-array-list-item">${value}</li>`).join('');
-  return `<ul class='array-field-wrap' data-test-id="cdd-array-list">${arrayValues}</ul>`;
-};
-
 const createHtmlForArray = (field) => {
-  return `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}" data-test-id="cdd-array-wrap">
-      <label htmlFor="name" data-test-id="cdd-array-label">${field.label}</label>
+  return `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}" data-test-id="${arrayWrapTestId}">
+      <label htmlFor="name" data-test-id="${arrayLabelTestId}">${field.label}</label>
       ${getArrayValue(field)}
     </li>
   `;
@@ -184,7 +184,7 @@ const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => 
   switch (field.type) {
   case fieldTypes.richText:
     if (isEmbedded) {
-      value = `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}" data-test-id="cdd-entry-wrap">
+      value = `<li class="embedded-${field.type} diff-field-wrap" key="${field.id}" data-test-id="${entryWrapTestId}">
           <label htmlFor="fieldLabel" data-test-id="cdd-field-label">
             ${field.label} - ID: ${field.contentId}
           </label>
@@ -305,16 +305,6 @@ const formatEntry = async (line, space, snapshotDate, isEmbedded) => {
   result.unshift(embeddedEntryWrap);
   result.push('</ul></div>');
   return _.isArray(result) ? result.join('') : result;
-};
-
-const createAssetHtml = (asset) => {
-  if (!asset || _.isUndefined(_.get(asset, 'fields'))) return '';
-
-  return `<div class='entry-name' data-test-id="cdd-asset-title">${asset.fields.title['en-US']}</div>
-      <ul class='field-list-wrap'>
-        <li className="diff-field-wrap"><img src="${asset.fields.file['en-US'].url}" data-test-id="cdd-asset-image"/></li>
-      </ul>
-    </div>`;
 };
 
 const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
@@ -600,14 +590,17 @@ ContentDiffSidebar.propTypes = {
 };
 
 export {
+  entryWrapTestId,
+  entryLabelTestId,
+  entryValueTestId,
+  arrayWrapTestId,
+  arrayLabelTestId,
   resetLookups,
-  createAssetHtml,
   getEntryByDate,
   createContentSimpleObjects,
   createSimpleObjects,
   getValue,
   createHtmlForEntry,
-  getArrayValue,
   createHtmlForArray,
   getEmbeddedEntryValue,
   createHtmlForEmbeddedEntryLines,

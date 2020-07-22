@@ -3,44 +3,15 @@ import { render, cleanup, configure } from '@testing-library/react';
 import diff from 'node-htmldiff';
 import {
   getTextDiff,
-  createAssetHtml,
   getFields,
   getFieldInfo,
-  getFieldTables,
-  getArrayValue
+  getFieldTables
 } from './ContentDiffDialog';
-import sdk, {
-  assetFieldOne,
-  contentTypeSymbolFieldOne,
-  contentTypeSymbolFieldTwo,
-  entryOne,
-  snapshotOne,
-  snapshotTwo
-} from './mockSdk';
+import { arrayListTestId, arrayListItemTestId } from './shared/helpers';
 
 configure({
   testIdAttribute: 'data-test-id',
 });
-
-const testContentType = {
-  sys: {
-    id: 'Testid123'
-  },
-  fields: [contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo]
-};
-
-const testEditorInterface = {
-  controls: [{
-    fieldId: 'textMultiLineSimpleObject',
-    widgetId: 'multipleLine'
-  }]
-};
-
-sdk.space.getEntry = jest.fn(async () => entryOne);
-sdk.space.getEntrySnapshots = jest.fn(async () => ({ items: [snapshotOne, snapshotTwo] }));
-sdk.space.getContentType = jest.fn(async () => testContentType);
-sdk.space.getEditorInterface = jest.fn(async () => testEditorInterface);
-sdk.space.getAsset = jest.fn(async () => assetFieldOne);
 
 afterEach(() => {
   cleanup();
@@ -52,8 +23,6 @@ const oldTextTestId = "cdd-old-text";
 const newTextTestId = "cdd-new-text";
 const diffTextTestId = "cdd-diff-text";
 const fieldLabelTestId = "cdd-field-label";
-const arrayListTestId = "cdd-array-list";
-const arrayListItemTestId = "cdd-array-list-item";
 
 const richTextFieldInfo = {
   id: 'richTextFieldInfo',
@@ -102,114 +71,6 @@ const arrayFieldLength = arrayFieldInfo.currentValue.length >= arrayFieldInfo.ol
   ? arrayFieldInfo.currentValue.length 
   : arrayFieldInfo.oldValue.length;
 
-const richTextEmbeddedEntryInfo = {
-  nodeType: 'embedded-entry-block',
-  data: {
-    target: {
-      sys: {
-        id: 'Test123456'
-      }
-    }
-  }
-};
-
-const richTextEmbeddedAssetInfo = {
-  nodeType: 'embedded-asset-block',
-  data: {
-    target: {
-      sys: {
-        id: 'Test6789076654'
-      }
-    }
-  }
-};
-
-const richTextParagraphTextInfo = {
-  value: 'Rich Text Paragraph Text Info',
-  nodeType: 'text'
-};
-
-const richTextParagraphEmbeddedEntryInfo = {
-  nodeType: 'embedded-entry-inline',
-  data: {
-    target: {
-      sys: {
-        id: 'Test678907'
-      }
-    }
-  }
-};
-
-const richTextEmbeddedParagraphInfo = {
-  content: [richTextParagraphTextInfo, richTextParagraphEmbeddedEntryInfo]
-};
-
-const richTextParagraphInfo = {
-  content: [richTextParagraphTextInfo]
-};
-
-const richTextFieldContent = {
-  content: [richTextEmbeddedEntryInfo, richTextEmbeddedAssetInfo, richTextParagraphInfo, richTextEmbeddedParagraphInfo]
-};
-
-const richTextSimpleObject = {
-  id: 'richTextSimpleObject',
-  type: 'RichText', 
-  value: richTextFieldContent, 
-  label: 'Rich Text Simple Object',
-  getValue: jest.fn(() => richTextSimpleObject.value)
-};
-
-const symbolSimpleObject = {
-  id: 'symbolSimpleObject',
-  type: 'Symbol', 
-  value: 'this is test text', 
-  label: 'Symbol Simple Object',
-  getValue: jest.fn(() => symbolSimpleObject.value)
-};
-
-const textMultiLineSimpleObject = {
-  id: 'textMultiLineSimpleObject',
-  type: 'Text',
-  textType: 'multipleLine',
-  value: `
-    this is multiLine text text
-    here is another line
-  `, 
-  label: 'Text Multi Line Simple Object',
-  getValue: jest.fn(() => textMultiLineSimpleObject.value)
-};
-
-const arraySimpleObject = {
-  id: 'arraySimpleObject',
-  type: 'Array', 
-  value: ['test', 'testing', 'tested'], 
-  arrayType: 'Symbol',
-  label: 'Array Simple Object',
-  getValue: jest.fn(() => arraySimpleObject.value),
-  items: {
-    type: 'Symbol'
-  }
-};
-
-const linkSimpleObject = {
-  id: 'linkSimpleObject',
-  type: 'Link', 
-  value: 'linkSimpleObject', 
-  label: 'Link Simple Object',
-  asset: assetFieldOne,
-  getValue: jest.fn(() => linkSimpleObject.value),
-  '_fieldLocales': {
-    'en-US': {
-      _value: {
-        sys: {
-          id: 'TestAssetID123456'
-        }
-      }
-    }
-  }
-};
-
 const testFields = [richTextFieldInfo, symbolFieldInfo, arrayFieldInfo, linkFieldInfo];
 
 describe('content-diff-dialog helper methods', () => {
@@ -240,30 +101,6 @@ describe('content-diff-dialog helper methods', () => {
       const diffHtmlText = diffSpan.getByTestId('test').textContent;
 
       expect(diffTextDiv.textContent).toBe(diffHtmlText);
-    });
-  });
-
-  describe('createAssetHtml(asset = { fields: { title: { en-US }, file: { en-US: { url } } } })', () => {
-    const assetTitleTestId = "cdd-asset-title";
-    const assetImageTestId = "cdd-asset-image";
-    test('shows asset image and title', () => {
-      const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: createAssetHtml(assetFieldOne)}} />);
-      expect(getByTestId(assetTitleTestId).textContent).toBe(assetFieldOne.fields.title['en-US']);
-      expect(getByTestId(assetImageTestId).src).toBe(assetFieldOne.fields.file['en-US'].url);
-    });
-
-    describe('doesn\'t show asset image or title', () => {
-      test('if there is no asset', () => {
-        const { queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: createAssetHtml(null)}} />);
-        expect(queryByTestId(assetTitleTestId)).toBeNull();
-        expect(queryByTestId(assetImageTestId)).toBeNull();
-      });
-
-      test('if there is no asset.fields', () => {
-        const { queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: createAssetHtml({})}} />);
-        expect(queryByTestId(assetTitleTestId)).toBeNull();
-        expect(queryByTestId(assetImageTestId)).toBeNull();
-      });
     });
   });
 
@@ -344,15 +181,6 @@ describe('content-diff-dialog helper methods', () => {
       expect(getAllByTestId(fieldLabelTestId).length).toBe(testFields.length);
       expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
       expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
-    });
-  });
-
-  describe('getArrayValue(arrayField = { id, type, value, arrayType, label, asset })', () => {
-    test('returns html for array and all of its values in a list', () => {
-      const { getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: getArrayValue(arraySimpleObject)}} />);
-      expect(queryByTestId(arrayListTestId)).toBeTruthy();
-      expect(getAllByTestId(arrayListItemTestId).length).toBe(arraySimpleObject.value.length);
-      expect(getAllByTestId(arrayListItemTestId).every((item, i) => item.textContent === arraySimpleObject.value[i])).toBeTruthy();
     });
   });
 

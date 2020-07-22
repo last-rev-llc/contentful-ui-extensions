@@ -103,6 +103,18 @@ const entryOne = {
   fields: { contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo }
 };
 
+const arraySimpleObject = {
+  id: 'arraySimpleObject',
+  type: 'Array', 
+  value: ['test', 'testing', 'tested'], 
+  arrayType: 'Symbol',
+  label: 'Array Simple Object',
+  getValue: async () => arraySimpleObject.value,
+  items: {
+    type: 'Symbol'
+  }
+};
+
 const sdk = {
   space: {
     getEntrySnapshots: async () => ({ items: [snapshotOne, snapshotTwo] }),
@@ -138,6 +150,7 @@ const sdk = {
 
 export {
   assetFieldOne,
+  arraySimpleObject,
   entrySymbolFieldOne,
   entrySymbolFieldTwo,
   contentTypeSymbolFieldOne,

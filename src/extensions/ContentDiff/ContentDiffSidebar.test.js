@@ -3,13 +3,11 @@ import _ from 'lodash';
 import { render, cleanup, configure, waitForElement } from '@testing-library/react';
 import {
   resetLookups,
-  createAssetHtml,
   getEntryByDate,
   createContentSimpleObjects,
   createSimpleObjects,
   getValue,
   createHtmlForEntry,
-  getArrayValue,
   createHtmlForArray,
   getEmbeddedEntryValue,
   createHtmlForEmbeddedEntryLines,
@@ -25,12 +23,14 @@ import {
 } from './ContentDiffSidebar';
 import sdk, {
   assetFieldOne,
+  arraySimpleObject,
   contentTypeSymbolFieldOne,
   contentTypeSymbolFieldTwo,
   entryOne,
   snapshotOne,
   snapshotTwo
 } from './mockSdk';
+import { arrayListTestId, arrayListItemTestId } from './shared/helpers';
 
 configure({
   testIdAttribute: 'data-test-id',
@@ -50,6 +50,7 @@ const testEditorInterface = {
   }]
 };
 
+arraySimpleObject.getValue = jest.fn(() => arraySimpleObject.value);
 sdk.space.getEntry = jest.fn(async () => entryOne);
 sdk.space.getEntrySnapshots = jest.fn(async () => ({ items: [snapshotOne, snapshotTwo] }));
 sdk.space.getContentType = jest.fn(async () => testContentType);
@@ -65,8 +66,6 @@ afterEach(() => {
 const entryWrapTestId = "cdd-entry-wrap";
 const entryLabelTestId = "cdd-entry-label";
 const entryValueTestId = "cdd-entry-value";
-const arrayListTestId = "cdd-array-list";
-const arrayListItemTestId = "cdd-array-list-item";
 const arrayWrapTestId = "cdd-array-wrap";
 const arrayLabelTestId = "cdd-array-label";
 
@@ -146,18 +145,6 @@ const textMultiLineSimpleObject = {
   `, 
   label: 'Text Multi Line Simple Object',
   getValue: jest.fn(() => textMultiLineSimpleObject.value)
-};
-
-const arraySimpleObject = {
-  id: 'arraySimpleObject',
-  type: 'Array', 
-  value: ['test', 'testing', 'tested'], 
-  arrayType: 'Symbol',
-  label: 'Array Simple Object',
-  getValue: jest.fn(() => arraySimpleObject.value),
-  items: {
-    type: 'Symbol'
-  }
 };
 
 const linkSimpleObject = {
@@ -408,30 +395,6 @@ const richTextEntryField = {
 const testSimpleObjects = [symbolSimpleObject, arraySimpleObject];
 
 describe('content-diff-dialog helper methods', () => {
-  describe('createAssetHtml(asset = { fields: { title: { en-US }, file: { en-US: { url } } } })', () => {
-    const assetTitleTestId = "cdd-asset-title";
-    const assetImageTestId = "cdd-asset-image";
-    test('shows asset image and title', () => {
-      const { getByTestId } = render(<div dangerouslySetInnerHTML={{__html: createAssetHtml(assetFieldOne)}} />);
-      expect(getByTestId(assetTitleTestId).textContent).toBe(assetFieldOne.fields.title['en-US']);
-      expect(getByTestId(assetImageTestId).src).toBe(assetFieldOne.fields.file['en-US'].url);
-    });
-
-    describe('doesn\'t show asset image or title', () => {
-      test('if there is no asset', () => {
-        const { queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: createAssetHtml(null)}} />);
-        expect(queryByTestId(assetTitleTestId)).toBeNull();
-        expect(queryByTestId(assetImageTestId)).toBeNull();
-      });
-
-      test('if there is no asset.fields', () => {
-        const { queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: createAssetHtml({})}} />);
-        expect(queryByTestId(assetTitleTestId)).toBeNull();
-        expect(queryByTestId(assetImageTestId)).toBeNull();
-      });
-    });
-  });
-
   describe('getEntryByDate(space, entryId, snapshotDate)', () => {
 
     test('returns entry object if a date is not passed in', async () => {
@@ -538,15 +501,6 @@ describe('content-diff-dialog helper methods', () => {
       expect(getByTestId(entryWrapTestId).getAttribute('class')).toMatch(new RegExp(symbolSimpleObject.type));
       expect(getByTestId(entryLabelTestId).textContent).toBe(symbolSimpleObject.label);
       expect(getByTestId(entryValueTestId).textContent).toBe(symbolSimpleObject.value);
-    });
-  });
-
-  describe('getArrayValue(arrayField = { id, type, value, arrayType, label, asset })', () => {
-    test('returns html for array and all of its values in a list', () => {
-      const { getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: getArrayValue(arraySimpleObject)}} />);
-      expect(queryByTestId(arrayListTestId)).toBeTruthy();
-      expect(getAllByTestId(arrayListItemTestId).length).toBe(arraySimpleObject.value.length);
-      expect(getAllByTestId(arrayListItemTestId).every((item, i) => item.textContent === arraySimpleObject.value[i])).toBeTruthy();
     });
   });
 
