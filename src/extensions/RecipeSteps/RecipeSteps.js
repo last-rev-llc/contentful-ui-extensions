@@ -9,7 +9,8 @@ import {
   TableHead,
   TableBody,
   TableCell,
-  TableRow
+  TableRow,
+  Modal,
 } from '@contentful/forma-36-react-components';
 
 const getTextArea = (textValue, onChange) => {
@@ -56,12 +57,31 @@ const RecipeSteps = ({ sdk }) => {
   const [steps, setSteps] = useState([]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [editPosition, setEditPosition] = useState(-1);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
     if(sdk.field.getValue()) {
       setSteps(sdk.field.getValue());
     }
   }, [sdk.field]);
+
+  const openAddModal = () => {
+    setTitle('');
+    setBody('');
+    setIsAddOpen(true);
+  };
+
+  const openEditModal = (stepIndex) => {
+    const step = steps[stepIndex];
+    if (step) {
+      setTitle(step.title);
+      setBody(step.body);
+      setEditPosition(stepIndex);
+      setIsEditOpen(true);
+    }
+  };
 
   const addStep = () => {
     const updatedSteps = steps;
@@ -70,10 +90,20 @@ const RecipeSteps = ({ sdk }) => {
     setSteps(updatedSteps);
     setTitle('');
     setBody('');
+    setIsAddOpen(false);
   };
 
-  const editStep = (stepIndex) => {
-    
+  const editStep = () => {
+    const updatedSteps = steps;
+    if (updatedSteps[editPosition]) {
+      updatedSteps[editPosition].title = title;
+      updatedSteps[editPosition].body = body;
+      setSteps(updatedSteps);
+      setTitle('');
+      setBody('');
+      setIsEditOpen(false);
+      setEditPosition(-1);
+    }
   };
 
   const deleteStep = (stepIndex) => {
@@ -91,10 +121,50 @@ const RecipeSteps = ({ sdk }) => {
         <TableRow key={keyId}>
           <TableCell>{step.title}</TableCell>
           <TableCell>{step.body}</TableCell>
-          <TableCell>{getButton('Edit', 'primary', () => editStep(index))}{getButton('Delete', 'negative', () => deleteStep(index))}</TableCell>
+          <TableCell>{getButton('Edit', 'primary', () => openEditModal(index))}{getButton('Delete', 'negative', () => deleteStep(index))}</TableCell>
         </TableRow>
       );
     });
+  };
+
+  const getAddModal = () => {
+    return (
+      <Modal title="Add Step"
+        isShown={isAddOpen}
+        position="center">
+        <Modal.Header title="Add Step" />
+        <Modal.Content>
+          <div>
+            {getTextInput(title, (event) => setTitle(event.currentTarget.value))}
+            {getTextArea(body, (event) => setBody(event.currentTarget.value))}
+          </div>
+        </Modal.Content>
+        <Modal.Controls>
+          {getButton('Add', 'positive', addStep)}
+          {getButton('Close', 'muted', () => setIsAddOpen(false))}
+        </Modal.Controls>
+      </Modal>
+    );
+  };
+
+  const getEditModal = () => {
+    return (
+      <Modal title="Edit Step"
+        isShown={isEditOpen}
+        position="center">
+        <Modal.Header title="Edit Step" />
+        <Modal.Content>
+          <div>
+            {getTextInput(title, (event) => setTitle(event.currentTarget.value))}
+            {getTextArea(body, (event) => setBody(event.currentTarget.value))}
+          </div>
+        </Modal.Content>
+        <Modal.Controls>
+          {getButton('Edit', 'primary', editStep)}
+          {getButton('Close', 'muted', () => setIsAddOpen(false))}
+        </Modal.Controls>
+      </Modal>
+    );
   };
   
   const getStepsTable = () => {
@@ -121,12 +191,14 @@ const RecipeSteps = ({ sdk }) => {
   return (
     <>
       <div>
-        {getTextInput(title, (event) => setTitle(event.currentTarget.value))}
-        {getTextArea(body, (event) => setBody(event.currentTarget.value))}
-        {getButton('Add', 'positive', addStep)}
+        {getButton('Add', 'positive', openAddModal)}
       </div>
       <div>
-        {getStepsTable(steps, editStep, deleteStep)}
+        {getStepsTable()}
+      </div>
+      <div>
+        {getAddModal()}
+        {getEditModal()}
       </div>
     </>
   );
