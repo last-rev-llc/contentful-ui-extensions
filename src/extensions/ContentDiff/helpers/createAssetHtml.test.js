@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, configure } from '@testing-library/react';
-import { assetFieldOne, arraySimpleObject } from '../mockSdk';
-import { createAssetHtml, arrayListTestId, arrayListItemTestId, getArrayValue } from './helpers';
+import { assetFieldOne } from '../mockSdk';
+import { createAssetHtml } from './index';
 
 configure({
   testIdAttribute: 'data-test-id',
@@ -29,15 +29,6 @@ describe('helper methods', () => {
         expect(queryByTestId(assetTitleTestId)).toBeNull();
         expect(queryByTestId(assetImageTestId)).toBeNull();
       });
-    });
-  });
-
-  describe('getArrayValue(arrayField = { id, type, value, arrayType, label, asset })', () => {
-    test('returns html for array and all of its values in a list', () => {
-      const { getAllByTestId, queryByTestId } = render(<div dangerouslySetInnerHTML={{__html: getArrayValue(arraySimpleObject)}} />);
-      expect(queryByTestId(arrayListTestId)).toBeTruthy();
-      expect(getAllByTestId(arrayListItemTestId).length).toBe(arraySimpleObject.value.length);
-      expect(getAllByTestId(arrayListItemTestId).every((item, i) => item.textContent === arraySimpleObject.value[i])).toBeTruthy();
     });
   });
 });

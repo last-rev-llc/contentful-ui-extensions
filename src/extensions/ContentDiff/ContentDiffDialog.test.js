@@ -7,7 +7,7 @@ import {
   getFieldInfo,
   getFieldTables
 } from './ContentDiffDialog';
-import { arrayListTestId, arrayListItemTestId } from './shared/helpers';
+import { arrayListTestId, arrayListItemTestId } from './helpers/index';
 
 configure({
   testIdAttribute: 'data-test-id',
@@ -73,7 +73,7 @@ const arrayFieldLength = arrayFieldInfo.currentValue.length >= arrayFieldInfo.ol
 
 const testFields = [richTextFieldInfo, symbolFieldInfo, arrayFieldInfo, linkFieldInfo];
 
-describe('content-diff-dialog helper methods', () => {
+describe('<ContentDiffDialog sdk={sdk}', () => {
   describe('getTextDiff(textInfo = {id, oldText, newText})', () => {
     const textInfo = {
       id: 'textInfo',
@@ -182,36 +182,5 @@ describe('content-diff-dialog helper methods', () => {
       expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
       expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
     });
-  });
-
-});
-
-describe('<ContentDiffSidebar sdk={sdk} />', () => {
-  describe('useEffect()', () => {
-
-  });
-
-  describe('onButtonClick()', () => {
-
-  });
-
-  describe('getDropdownAndButton()', () => {
-
-  });
-
-  describe('getLoadedInfo()', () => {
-
-  });
-
-  describe('getVersion()', () => {
-
-  });
-
-  describe('getOptions(options)', () => {
-
-  });
-
-  describe('render()', () => {
-
   });
 });

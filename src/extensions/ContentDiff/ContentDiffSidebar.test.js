@@ -30,7 +30,7 @@ import sdk, {
   snapshotOne,
   snapshotTwo
 } from './mockSdk';
-import { arrayListTestId, arrayListItemTestId } from './shared/helpers';
+import { arrayListTestId, arrayListItemTestId } from './helpers/index';
 
 configure({
   testIdAttribute: 'data-test-id',
@@ -394,7 +394,7 @@ const richTextEntryField = {
 
 const testSimpleObjects = [symbolSimpleObject, arraySimpleObject];
 
-describe('content-diff-dialog helper methods', () => {
+describe('ContentDiffSidebar helper methods', () => {
   describe('getEntryByDate(space, entryId, snapshotDate)', () => {
 
     test('returns entry object if a date is not passed in', async () => {
@@ -871,12 +871,33 @@ describe('content-diff-dialog helper methods', () => {
 
 });
 
-describe('<DialogExtension sdk={sdk} />', () => {
-  describe('initialize()', () => {
-
+describe('<ContentDiffSidebar sdk={sdk} />', () => {
+  describe('useEffect()', () => {
+    test.todo('test initial load');
   });
 
-  describe('render()', () => {
+  describe('refresh()', () => {
+    test.todo('test refresh fireEvent');
+  });
 
+  describe('onButtonClick()', () => {
+    test.todo('test onButtonClick fireEvent');
+  });
+
+  describe('getDropdownAndButton()', () => {
+    test.todo('test getDropdownAndButton is rendered with correct information');
+  });
+
+  describe('getLoadedInfo()', () => {
+    test.todo('test when versions length is <= 0');
+    test.todo('test when versions length is > 0');
+  });
+
+  describe('getVersion()', () => {
+    test.todo('test getVersion is fired when a version is selected');
+  });
+
+  describe('getOptions(options)', () => {
+    test.todo('test getOptions to make sure correct information is rendered');
   });
 });

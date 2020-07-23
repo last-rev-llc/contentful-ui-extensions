@@ -4,7 +4,7 @@ import _ from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import diff from 'node-htmldiff';
 import './ContentDiff.scss';
-import { createAssetHtml, getArrayValue } from './shared/helpers';
+import { createAssetHtml, getArrayValue } from './helpers/index';
 
 const fieldTypes = {
   richText: 'RichText', 
@@ -61,7 +61,7 @@ const getFields = (field) => {
     break;
   
   case fieldTypes.object:
-    // result = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
+    // TODO: need to add an object diff tool
     break;
   
   case fieldTypes.array:

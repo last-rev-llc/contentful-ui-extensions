@@ -5,9 +5,7 @@
   "dependencies": {
     "@contentful/forma-36-fcss": "0.0.34",
     "@contentful/forma-36-react-components": "^3.42.2",
-    "@contentful/forma-36-tokens": "^0.5.2",
     "@contentful/rich-text-html-renderer": "^14.1.1",
-    "@contentful/rich-text-react-renderer": "^14.1.1",
     "@contentful/rich-text-types": "^14.1.1",
     "@sentry/react": "^5.20.0",
     "@testing-library/jest-dom": "^4.2.4",

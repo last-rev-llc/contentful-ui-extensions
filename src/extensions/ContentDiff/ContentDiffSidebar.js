@@ -6,7 +6,7 @@ import '@contentful/forma-36-react-components/dist/styles.css';
 import './ContentDiff.scss';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
-import { createAssetHtml, getArrayValue } from './shared/helpers';
+import { createAssetHtml, getArrayValue } from './helpers/index';
 
 const firstIndex = 0;
 
@@ -202,7 +202,7 @@ const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => 
     value = createHtmlForEntry(field);
     break;
   case fieldTypes.object:
-    // value = renderTextInfo({ id: 0, oldText: oldFields[field.id]["en-US"], newText: field.value });
+    // TODO: need to add an object diff tool
     break;
   case fieldTypes.array:
     if (field.arrayType === fieldTypes.symbol) {
