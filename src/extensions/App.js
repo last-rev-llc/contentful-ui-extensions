@@ -6,11 +6,13 @@ import {Router, Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
 import LocalizationLookup from './LocalizationLookup';
+import ContentDiff from './ContentDiff';
 import Seo from './Seo';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
 import localizationLookupMockSdk from './LocalizationLookup/mockSdk';
+import contentDiffMockSdk from './ContentDiff/mockSdk';
 import colorPickerMockSdk from './ColorPicker/mockSdk';
 
 const App = ({ sdk, locations }) => {
@@ -28,11 +30,15 @@ const App = ({ sdk, locations }) => {
           exact
           component={() => <LocalizationLookup sdk={sdk || localizationLookupMockSdk}
             locations={locations} />} />
+        <Route path="/content-diff"
+          exact
+          component={() => <ContentDiff sdk={sdk || contentDiffMockSdk}
+            locations={locations} />} />
         <Route path="/seo"
           exact
           component={() => {
             const usedSdk = sdk;
-            if(usedSdk.location.is(locations.LOCATION_APP)) {
+            if(usedSdk.location.is(locations.LOCATION_APP_CONFIG)) {
               return <SeoConfig sdk={usedSdk}
                 locations={locations} />;
             }
@@ -53,7 +59,7 @@ App.propTypes = {
     LOCATION_DIALOG: PropTypes.string.isRequired,
     LOCATION_ENTRY_EDITOR: PropTypes.string.isRequired,
     LOCATION_PAGE: PropTypes.string.isRequired,
-    LOCATION_APP: PropTypes.string.isRequired,
+    LOCATION_APP_CONFIG: PropTypes.string.isRequired,
   })
 };
 

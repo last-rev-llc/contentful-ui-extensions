@@ -211,7 +211,8 @@ class SeoConfig extends Component {
     const { contentTypeConfig, contentTypes } = this.state;
     if(isEmpty(contentTypeConfig)) return null;
     return (
-      <Table className="fieldset" testId="SeoConfig-table-contentType">
+      <Table className="fieldset"
+        testId="SeoConfig-table-contentType">
         <TableHead>
           <TableRow testId="SeoConfig-tablehead-contentType">
             <TableCell testId="SeoConfig-tablehead-contentType-delete"/>
