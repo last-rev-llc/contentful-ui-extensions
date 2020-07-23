@@ -38,7 +38,7 @@ const App = ({ sdk, locations }) => {
           exact
           component={() => {
             const usedSdk = sdk;
-            if(usedSdk.location.is(locations.LOCATION_APP)) {
+            if(usedSdk.location.is(locations.LOCATION_APP_CONFIG)) {
               return <SeoConfig sdk={usedSdk}
                 locations={locations} />;
             }
@@ -59,7 +59,7 @@ App.propTypes = {
     LOCATION_DIALOG: PropTypes.string.isRequired,
     LOCATION_ENTRY_EDITOR: PropTypes.string.isRequired,
     LOCATION_PAGE: PropTypes.string.isRequired,
-    LOCATION_APP: PropTypes.string.isRequired,
+    LOCATION_APP_CONFIG: PropTypes.string.isRequired,
   })
 };
 
