@@ -7,11 +7,13 @@ import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
 import LocalizationLookup from './LocalizationLookup';
 import Seo from './Seo';
+import RecipeSteps from './RecipeSteps';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
 import localizationLookupMockSdk from './LocalizationLookup/mockSdk';
 import colorPickerMockSdk from './ColorPicker/mockSdk';
+import recipeStepsMockSdk from './RecipeSteps/mockSdk';
 
 const App = ({ sdk, locations }) => {
   return (
@@ -27,6 +29,10 @@ const App = ({ sdk, locations }) => {
         <Route path="/localization-lookup"
           exact
           component={() => <LocalizationLookup sdk={sdk || localizationLookupMockSdk}
+            locations={locations} />} />
+        <Route path="/recipe-steps"
+          exact
+          component={() => <RecipeSteps sdk={sdk || recipeStepsMockSdk}
             locations={locations} />} />
         <Route path="/seo"
           exact

@@ -11,6 +11,8 @@ export default function ExtensionsList() {
           className="">Seo</Link></li>
         <li><Link to="/localization-lookup"
           className="">Localization Lookup</Link></li>
+        <li><Link to="/recipe-steps"
+          className="">Recipe Steps</Link></li>
       </ul>
     </div>
   );
