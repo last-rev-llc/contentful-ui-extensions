@@ -6,7 +6,7 @@ import App from './extensions/App';
 import mockLocations from './__mocks__/mockLocations';
 
 (()=> {
-  Sentry.init({dsn: "https://745cf65377674adbaf85942851bbb125@o267347.ingest.sentry.io/5320754"});
+  Sentry.init({dsn: process.env.REACT_APP_SENTRY_URL});
   if(window.self !== window.top) {
     // Being loaded by an iFrame (Contentful)
     init(sdk => {
