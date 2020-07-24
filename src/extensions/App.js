@@ -59,7 +59,7 @@ App.propTypes = {
     LOCATION_DIALOG: PropTypes.string.isRequired,
     LOCATION_ENTRY_EDITOR: PropTypes.string.isRequired,
     LOCATION_PAGE: PropTypes.string.isRequired,
-    LOCATION_APP: PropTypes.string.isRequired,
+    LOCATION_APP_CONFIG: PropTypes.string.isRequired,
   })
 };
 
