@@ -13,6 +13,8 @@ export default function ExtensionsList() {
           className="">Localization Lookup</Link></li>
         <li><Link to="/recipe-steps"
           className="">Recipe Steps</Link></li>
+        <li><Link to="/content-diff"
+          className="">Content Diff</Link></li>
       </ul>
     </div>
   );
