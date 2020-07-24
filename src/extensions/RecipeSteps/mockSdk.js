@@ -15,6 +15,17 @@ const sdk = {
       return value;
     }
   },
+  location: {
+    is: () => true
+  },
+  parameters: {
+    invocation: {
+      step: null
+    }
+  },
+  close: (value) => value
 };
 
 export default sdk;
+
+export const sdkList = { ...sdk, location: { is: () => false } };

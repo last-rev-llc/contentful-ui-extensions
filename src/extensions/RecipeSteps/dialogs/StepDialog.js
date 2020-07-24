@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { 
-  Form, 
-  FieldGroup, 
+import {
+  Form,
+  FieldGroup,
 } from '@contentful/forma-36-react-components';
 import { getTextInputWithLabel, getTextAreaWithLabel, getButton } from '../helpers/index';
 
@@ -16,22 +16,24 @@ const StepDialog = ({ sdk }) => {
       setBody(sdk.parameters.invocation.step.body);
     }
   }, [sdk]);
-  
+
   const closeDialog = () => {
     sdk.close();
   };
-  
+
   const saveStep = () => {
     sdk.close({ title, body });
   };
 
   return (
-    <div id='dialog-step-wrap'>
-      <Form spacing="default">
+    <div id='dialog-step-wrap'
+      data-test-id="StepDialog">
+      <Form spacing="default"
+        data-test-id="StepDialog-Form">
         <FieldGroup>
           {getTextInputWithLabel(title, 'Title', (event) => setTitle(event.currentTarget.value))}
-        </FieldGroup>
-        <FieldGroup>
+        </FieldGroup >
+        <FieldGroup >
           {getTextAreaWithLabel(body, 'Body', (event) => setBody(event.currentTarget.value))}
         </FieldGroup>
         <FieldGroup row>
@@ -41,7 +43,7 @@ const StepDialog = ({ sdk }) => {
       </Form>
     </div>
   );
-  
+
 };
 
 StepDialog.propTypes = {
