@@ -14,6 +14,7 @@ const StepList = ({ sdk }) => {
   }, [sdk.field]);
 
   const addStep = (step) => {
+    console.log('step', step);
     if (step) {
       const updatedSteps = [ ...steps ];
       updatedSteps.push(step);
@@ -24,6 +25,7 @@ const StepList = ({ sdk }) => {
 
   const openAddModal = async () => {
     const result = await openDialog(sdk, 'Add Step');
+    console.log('result', result);
     addStep(result && result.step);
   };
 

@@ -118,8 +118,7 @@ const getStepRows = (steps, edit, remove) => {
 };
 
 const getStepsTable = (steps, edit, remove) => {
-  const stepsFiltered = steps.filter(step => step); // Added in case a step is null;
-  return stepsFiltered.length === 0
+  return steps.length === 0
     ? null 
     : (
       <>
@@ -132,7 +131,7 @@ const getStepsTable = (steps, edit, remove) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {getStepRows(stepsFiltered, edit, remove)}
+            {getStepRows(steps, edit, remove)}
           </TableBody>
         </Table>
       </>
