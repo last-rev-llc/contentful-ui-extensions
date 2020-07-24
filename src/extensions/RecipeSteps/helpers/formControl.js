@@ -7,7 +7,9 @@ import {
   TableHead,
   TableBody,
   TableCell,
-  TableRow
+  TableRow,
+  IconButton,
+  FormLabel,
 } from '@contentful/forma-36-react-components';
 
 const getTextArea = (textValue, onChange) => {
@@ -22,7 +24,28 @@ const getTextArea = (textValue, onChange) => {
     rows={4}
     testId="cf-ui-body-textarea"
     value={textValue}
-    width="large" />;
+    width="full" />;
+};
+
+const getTextAreaWithLabel = (textValue, labelText, onChange) => {
+  return  <>
+    <FormLabel htmlFor="body"
+      required>
+      {labelText}
+    </FormLabel>
+    <Textarea
+      className=""
+      id="body"
+      maxLength={500}
+      name="body"
+      placeholder="Body"
+      onChange={event => onChange(event)}
+      required
+      rows={4}
+      testId="cf-ui-body-textarea"
+      value={textValue}
+      width="full" />
+  </>;
 };
 
 const getTextInput = (textValue, onChange) => {
@@ -35,7 +58,26 @@ const getTextInput = (textValue, onChange) => {
     required
     testId='cf-ui-text-input-title'
     value={textValue}
-    width="large" />;
+    width="full" />;
+};
+
+const getTextInputWithLabel = (textValue, labelText, onChange) => {
+  return <>
+    <FormLabel htmlFor="title"
+      required>
+      {labelText}
+    </FormLabel>
+    <TextInput
+      className=""
+      id="title"
+      name="title"
+      placeholder="Title"
+      onChange={event => onChange(event)}
+      required
+      testId='cf-ui-text-input-title'
+      value={textValue}
+      width="full" />
+  </>;
 };
 
 const getButton = (label, buttonType, onClick) => {
@@ -50,6 +92,15 @@ const getButton = (label, buttonType, onClick) => {
   </Button>;
 };
 
+const getIconButton = (label, buttonType, iconType, iconSize, onClick) => {
+  return <IconButton
+    buttonType={buttonType}
+    iconProps={{ icon:iconType, size:iconSize }}
+    label={label}
+    onClick={onClick}
+    testId={`cf-ui-button-${label}`}/>;
+};
+
 const getStepRows = (steps, edit, remove) => {
   return steps.map((step, index) => {
     const keyId = index;
@@ -57,9 +108,9 @@ const getStepRows = (steps, edit, remove) => {
       <TableRow key={keyId}>
         <TableCell>{step.title}</TableCell>
         <TableCell>{step.body}</TableCell>
-        <TableCell>
-          {getButton('Edit', 'primary', () => edit(index))}
-          {getButton('Delete', 'negative', () => remove(index))}
+        <TableCell className='col-actions'>
+          {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
+          {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
         </TableCell>
       </TableRow>
     );
@@ -67,20 +118,21 @@ const getStepRows = (steps, edit, remove) => {
 };
 
 const getStepsTable = (steps, edit, remove) => {
-  return steps.length === 0
+  const stepsFiltered = steps.filter(step => step); // Added in case a step is null;
+  return stepsFiltered.length === 0
     ? null 
     : (
       <>
-        <Table>
-          <TableHead>
+        <Table className='steps-table'>
+          <TableHead isSticky>
             <TableRow>
               <TableCell>Title</TableCell>
               <TableCell>Body</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell className='col-actions' />
             </TableRow>
           </TableHead>
           <TableBody>
-            {getStepRows(steps, edit, remove)}
+            {getStepRows(stepsFiltered, edit, remove)}
           </TableBody>
         </Table>
       </>
@@ -89,8 +141,11 @@ const getStepsTable = (steps, edit, remove) => {
 
 export {
   getTextInput,
+  getTextInputWithLabel,
   getTextArea,
+  getTextAreaWithLabel,
   getButton,
+  getIconButton,
   getStepRows,
   getStepsTable
 };

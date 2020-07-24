@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { getButton, getStepsTable } from './helpers/index';
+
+import { getIconButton, getStepsTable } from './helpers/index';
 import { openDialog } from './dialogs/index';
 
 const StepList = ({ sdk }) => {
@@ -28,7 +29,7 @@ const StepList = ({ sdk }) => {
 
   const editStep = (step, stepIndex) => {
     const updatedSteps = [ ...steps ];
-    if (updatedSteps[stepIndex]) {
+    if (step && updatedSteps[stepIndex]) {
       updatedSteps[stepIndex] = step;
       sdk.field.setValue(updatedSteps);
       setSteps(updatedSteps);
@@ -50,8 +51,10 @@ const StepList = ({ sdk }) => {
 
   return (
     <>
-      {getButton('Add', 'positive', openAddModal)}
       {getStepsTable(steps, openEditModal, deleteStep)}
+      <div id='add-table-row-wrap'>
+        {getIconButton('Click to add a new row', 'positive', 'PlusCircle', 'large', openAddModal)}
+      </div>
     </>
   );
   

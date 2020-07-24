@@ -1,6 +1,6 @@
 const openDialog = (sdk, title, parameters) => {
   return sdk.dialogs.openExtension({
-    width: 'fullWidth',
+    width: 'large',
     title,
     allowHeightOverflow: true,
     parameters

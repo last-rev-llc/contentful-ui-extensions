@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { getTextInput, getTextArea, getButton } from '../helpers/index';
+import { 
+  Form, 
+  FieldGroup, 
+} from '@contentful/forma-36-react-components';
+import { getTextInputWithLabel, getTextAreaWithLabel, getButton } from '../helpers/index';
 
 const StepDialog = ({ sdk }) => {
   const [title, setTitle] = useState('');
@@ -14,7 +18,7 @@ const StepDialog = ({ sdk }) => {
   }, [sdk]);
   
   const closeDialog = (step) => {
-    sdk.close({ step });
+    sdk.close({step});
   };
   
   const saveStep = () => {
@@ -22,12 +26,20 @@ const StepDialog = ({ sdk }) => {
   };
 
   return (
-    <>
-      {getTextInput(title, (event) => setTitle(event.currentTarget.value))}
-      {getTextArea(body, (event) => setBody(event.currentTarget.value))}
-      {getButton('Save', 'positive', saveStep)}
-      {getButton('Close', 'muted', closeDialog)}
-    </>
+    <div id='dialog-step-wrap'>
+      <Form spacing="default">
+        <FieldGroup>
+          {getTextInputWithLabel(title, 'Title', (event) => setTitle(event.currentTarget.value))}
+        </FieldGroup>
+        <FieldGroup>
+          {getTextAreaWithLabel(body, 'Body', (event) => setBody(event.currentTarget.value))}
+        </FieldGroup>
+        <FieldGroup row>
+          {getButton('Save', 'positive', saveStep)}
+          {getButton('Cancel', 'muted', closeDialog)}
+        </FieldGroup>
+      </Form>
+    </div>
   );
   
 };

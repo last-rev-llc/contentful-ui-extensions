@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { locations } from 'contentful-ui-extensions-sdk';
 import StepList from './StepList';
+import './RecipeSteps.scss';
 import { StepDialog } from './dialogs/index';
 
 const RecipeSteps = ({ sdk }) => {
