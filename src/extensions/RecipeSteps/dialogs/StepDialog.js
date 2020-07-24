@@ -17,17 +17,12 @@ const StepDialog = ({ sdk }) => {
     }
   }, [sdk]);
   
-  const closeDialog = (event, step) => {
-    if (event) {
-      sdk.close();
-    }
-    else {
-      sdk.close({ step });
-    }
+  const closeDialog = () => {
+    sdk.close();
   };
   
   const saveStep = () => {
-    closeDialog(null, { title, body });
+    sdk.close({ title, body });
   };
 
   return (
