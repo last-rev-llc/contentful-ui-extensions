@@ -3,15 +3,14 @@ import {
   Select, 
   Option,
   TextInput, 
-  Button,
   Table,
   TableHead,
   TableBody,
   TableCell,
   TableRow,
-  IconButton,
   FormLabel,
 } from '@contentful/forma-36-react-components';
+import { getIconButton } from '../../../shared/helpers';
 
 const getTextInput = (textValue, onChange, { id = 'input1', name = id, type = 'text', placeholder = id }) => {
   return <TextInput
@@ -65,27 +64,6 @@ const withLabel = (id, labelText, control) => {
   </>;
 };
 
-const getButton = (label, buttonType, onClick) => {
-  return <Button
-    buttonType={buttonType}
-    isFullWidth={false}
-    loading={false}
-    onClick={onClick}
-    testId={`cf-ui-button-${label}`}
-    type="button">
-    {label}
-  </Button>;
-};
-
-const getIconButton = (label, buttonType, iconType, iconSize, onClick) => {
-  return <IconButton
-    buttonType={buttonType}
-    iconProps={{ icon:iconType, size:iconSize }}
-    label={label}
-    onClick={onClick}
-    testId={`cf-ui-button-${label}`}/>;
-};
-
 const getIngredientRows = (ingredients, edit, remove) => {
   return ingredients.map((ingredient, index) => {
     const keyId = index;
@@ -132,8 +110,6 @@ export {
   getOptions,
   getSelect,
   withLabel,
-  getButton,
-  getIconButton,
   getIngredientRows,
   getIngredientsTable
 };

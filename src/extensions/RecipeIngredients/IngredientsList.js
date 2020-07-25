@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { getIconButton, getIngredientsTable } from './helpers/index';
-import { openDialog } from './dialogs/index';
+import { getIngredientsTable } from './helpers';
+import { getIconButton } from '../../shared/helpers';
+import { openDialog } from './dialogs';
 
 
 const IngredientsList = ({ sdk }) => {

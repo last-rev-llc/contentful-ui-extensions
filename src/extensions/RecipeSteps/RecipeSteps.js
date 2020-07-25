@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { locations } from 'contentful-ui-extensions-sdk';
 import StepList from './StepList';
 import './RecipeSteps.scss';
-import { StepDialog } from './dialogs/index';
+import { StepDialog } from './dialogs';
 
 const RecipeSteps = ({ sdk }) => {
   return !sdk.location.is(locations.LOCATION_DIALOG) 
