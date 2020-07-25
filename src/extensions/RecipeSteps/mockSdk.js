@@ -1,4 +1,4 @@
-const sdk = {
+const mockSdk = {
   field: {
     getValue: () => {
       return [
@@ -17,4 +17,4 @@ const sdk = {
   },
 };
 
-export default sdk;
+export default mockSdk;

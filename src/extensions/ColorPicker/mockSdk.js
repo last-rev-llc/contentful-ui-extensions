@@ -1,4 +1,4 @@
-const sdk = {
+const mockSdk = {
   field: {
     validations: [
       {
@@ -18,4 +18,4 @@ const sdk = {
   },
 };
 
-export default sdk;
+export default mockSdk;
