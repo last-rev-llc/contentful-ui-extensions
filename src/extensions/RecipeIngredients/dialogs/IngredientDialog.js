@@ -33,22 +33,34 @@ const IngredientDialog = ({ sdk }) => {
     sdk.close({ step: +step, ingredient, imperialMeasure, imperialQuantity: +imperialQuantity, metricMeasure, metricQuantity: +metricQuantity });
   };
 
+  const stepInput = () => getTextInput(step, (event) => setStep(event.currentTarget.value), { id: 'step', type: 'number', placeholder: 'Step' });
+
+  const ingredientInput = () => getTextInput(ingredient, (event) => setIngredient(event.currentTarget.value), { id: 'ingredient', placeholder: 'Ingredient' });
+
+  const imperialQuantityInput = () => getTextInput(imperialQuantity, (event) => setImperialQuantity(event.currentTarget.value), { id: 'imperialQuantity', type: 'number', placeholder: 'Imperial Quantity' });
+
+  const imperialMeasureSelect = () => getSelect(imperialUnits, (event) => setImperialMeasure(event.currentTarget.value), { id: 'imperialMeasure' });
+
+  const metricQuantityInput = () => getTextInput(metricQuantity, (event) => setMetricQuantity(event.currentTarget.value), { id: 'metricQuantity', type: 'number', placeholder: 'Metric Quantity' });
+
+  const metricMeasureSelect = () => getSelect(metricUnits, (event) => setMetricMeasure(event.currentTarget.value), { id: 'metricMeasure' });
+
   return (
     <div id='dialog-step-wrap'>
       <Form spacing="default">
         <FieldGroup>
-          {withLabel('step', 'Step', () => getTextInput(step, (event) => setStep(event.currentTarget.value), { id: 'step', type: 'number', placeholder: 'Step' }))}
+          {withLabel('step', 'Step', stepInput)}
         </FieldGroup>
         <FieldGroup>
-          {withLabel('ingredient', 'Ingredient', () => getTextInput(ingredient, (event) => setIngredient(event.currentTarget.value), { id: 'ingredient', placeholder: 'Ingredient' }))}
+          {withLabel('ingredient', 'Ingredient', ingredientInput)}
         </FieldGroup>
         <FieldGroup row>
-          {withLabel('imperialQuantity', 'Imperial Quantity', () => getTextInput(imperialQuantity, (event) => setImperialQuantity(event.currentTarget.value), { id: 'imperialQuantity', type: 'number', placeholder: 'Imperial Quantity' }))}
-          {withLabel('imperialMeasure', 'Imperial Measure', () => getSelect(imperialUnits, (event) => setImperialMeasure(event.currentTarget.value), { id: 'imperialMeasure' }))}
+          {withLabel('imperialQuantity', 'Imperial Quantity', imperialQuantityInput)}
+          {withLabel('imperialMeasure', 'Imperial Measure', imperialMeasureSelect)}
         </FieldGroup>
         <FieldGroup row>
-          {withLabel('metricQuantity', 'Metric Quantity', () => getTextInput(metricQuantity, (event) => setMetricQuantity(event.currentTarget.value), { id: 'metricQuantity', type: 'number', placeholder: 'Metric Quantity' }))}
-          {withLabel('metricMeasure', 'Metric Measure', () => getSelect(metricUnits, (event) => setMetricMeasure(event.currentTarget.value), { id: 'metricMeasure' }))}
+          {withLabel('metricQuantity', 'Metric Quantity', metricQuantityInput)}
+          {withLabel('metricMeasure', 'Metric Measure', metricMeasureSelect)}
         </FieldGroup>
         <FieldGroup row>
           {getButton('Save', 'positive', saveStep)}
