@@ -3,8 +3,6 @@ import {
   getOptions,
   getSelect,
   withLabel,
-  getButton,
-  getIconButton,
   getIngredientRows, 
   getIngredientsTable 
 } from './formControl';
@@ -14,8 +12,6 @@ export {
   getOptions,
   getSelect,
   withLabel,
-  getButton,
-  getIconButton,
   getIngredientRows,
   getIngredientsTable
 };

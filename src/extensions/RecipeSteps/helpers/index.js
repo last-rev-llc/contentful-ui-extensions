@@ -3,8 +3,6 @@ import {
   getTextInputWithLabel, 
   getTextArea, 
   getTextAreaWithLabel, 
-  getButton,
-  getIconButton,
   getStepRows, 
   getStepsTable 
 } from './formControl';
@@ -14,8 +12,6 @@ export {
   getTextInputWithLabel,
   getTextArea, 
   getTextAreaWithLabel,
-  getButton,
-  getIconButton,
   getStepRows,
   getStepsTable
 };
