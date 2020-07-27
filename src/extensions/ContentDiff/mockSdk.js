@@ -115,7 +115,7 @@ const arraySimpleObject = {
   }
 };
 
-const sdk = {
+const mockSdk = {
   space: {
     getEntrySnapshots: async () => ({ items: [snapshotOne, snapshotTwo] }),
     getEntry: async (entryId) => entryOne,
@@ -160,4 +160,4 @@ export {
   snapshotTwo
 };
 
-export default sdk;
+export default mockSdk;

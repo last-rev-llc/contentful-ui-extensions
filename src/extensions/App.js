@@ -8,12 +8,16 @@ import ColorPicker from './ColorPicker';
 import LocalizationLookup from './LocalizationLookup';
 import ContentDiff from './ContentDiff';
 import Seo from './Seo';
+import RecipeSteps from './RecipeSteps';
+import RecipeIngredients from './RecipeIngredients';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
 import history from '../history';
 import localizationLookupMockSdk from './LocalizationLookup/mockSdk';
 import contentDiffMockSdk from './ContentDiff/mockSdk';
 import colorPickerMockSdk from './ColorPicker/mockSdk';
+import recipeStepsMockSdk from './RecipeSteps/mockSdk';
+import recipeIngredientsMockSdk from './RecipeIngredients/mockSdk';
 
 const App = ({ sdk, locations }) => {
   return (
@@ -29,6 +33,14 @@ const App = ({ sdk, locations }) => {
         <Route path="/localization-lookup"
           exact
           component={() => <LocalizationLookup sdk={sdk || localizationLookupMockSdk}
+            locations={locations} />} />
+        <Route path="/recipe-ingredients"
+          exact
+          component={() => <RecipeIngredients sdk={sdk || recipeIngredientsMockSdk}
+            locations={locations} />} />
+        <Route path="/recipe-steps"
+          exact
+          component={() => <RecipeSteps sdk={sdk || recipeStepsMockSdk}
             locations={locations} />} />
         <Route path="/content-diff"
           exact
