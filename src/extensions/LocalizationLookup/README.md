@@ -9,7 +9,7 @@ The Last Rev LocalizationLookup extension can be used to create a simple JSON ob
     - Name: LocalizationLookup
     - Field Types: Object
     - Hosting: Self-hosted(src)
-    - Self-Hosted URL: [https://your-extension-domain.netlify.com/localizationLookup](https://your-extension-domain.netlify.com/localizationLookup)
+    - Self-Hosted URL: [https://your-extension-domain.netlify.com/localization-lookup](https://your-extension-domain.netlify.com/localization-lookup)
 3. Create an Object (JSON) field in your content model where you want to use the LocalizationLookup field
 4. On the Content Model page, select "Settings" on the new JSON field you added
 5. Go to Appearance and select your new UI Extension
