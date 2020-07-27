@@ -62,7 +62,7 @@ const getTextInput = (textValue, onChange) => {
     width="full" />;
 };
 
-const getTextInputWithLabel = (textValue, labelText, onChange) => {
+const getTextInputWithLabel = (textValue, labelText, onChange, options = { type: 'text', id: 'title', name: 'title', placeholder: 'Title' }) => {
   return <>
     <FormLabel htmlFor="title"
       data-test-id="FormLabel-Title"
@@ -72,9 +72,10 @@ const getTextInputWithLabel = (textValue, labelText, onChange) => {
     <TextInput
       data-test-id="TextInput-Title"
       className=""
-      id="title"
-      name="title"
-      placeholder="Title"
+      id={options.id}
+      name={options.name}
+      placeholder={options.placeholder}
+      type={options.type}
       onChange={event => onChange(event)}
       required
       testId='cf-ui-text-input-title'
@@ -84,14 +85,16 @@ const getTextInputWithLabel = (textValue, labelText, onChange) => {
 };
 
 const getStepRows = (steps, edit, remove) => {
-  return steps.map((step, index) => {
+  return steps.sort((stepA, stepB) => stepA.step - stepB.step).map((step, index) => {
     const keyId = index;
     return (
       <TableRow key={keyId}>
+        <TableCell data-test-id="Steps-Table-Cell-Step">{step.step}</TableCell>
         <TableCell data-test-id="Steps-Table-Cell-Title">{step.title}</TableCell>
         <TableCell data-test-id="Steps-Table-Cell-Body">{step.body}</TableCell>
-        <TableCell className='col-actions'
-          data-test-id="Steps-Table-Cell-Actions">
+        <TableCell>{step.title}</TableCell>
+        <TableCell>{step.body}</TableCell>
+        <TableCell className='col-actions'>
           {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
           {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
         </TableCell>
@@ -109,6 +112,7 @@ const getStepsTable = (steps, edit, remove) => {
           data-test-id="Steps-Table">
           <TableHead isSticky>
             <TableRow>
+              <TableCell>Step</TableCell>
               <TableCell>Title</TableCell>
               <TableCell>Body</TableCell>
               <TableCell className='col-actions' />
