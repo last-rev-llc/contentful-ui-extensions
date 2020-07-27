@@ -65,12 +65,12 @@ const getTextInput = (textValue, onChange) => {
 const getTextInputWithLabel = (textValue, labelText, onChange, options = { type: 'text', id: 'title', name: 'title', placeholder: 'Title' }) => {
   return <>
     <FormLabel htmlFor="title"
-      data-test-id="FormLabel-Title"
+      data-test-id={`FormLabel-${labelText}`}
       required>
       {labelText}
     </FormLabel>
     <TextInput
-      data-test-id="TextInput-Title"
+      data-test-id={`TextInput-${labelText}`}
       className=""
       id={options.id}
       name={options.name}
@@ -92,9 +92,8 @@ const getStepRows = (steps, edit, remove) => {
         <TableCell data-test-id="Steps-Table-Cell-Step">{step.step}</TableCell>
         <TableCell data-test-id="Steps-Table-Cell-Title">{step.title}</TableCell>
         <TableCell data-test-id="Steps-Table-Cell-Body">{step.body}</TableCell>
-        <TableCell>{step.title}</TableCell>
-        <TableCell>{step.body}</TableCell>
-        <TableCell className='col-actions'>
+        <TableCell className='col-actions'
+          data-test-id="Steps-Table-Cell-Actions">
           {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
           {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
         </TableCell>
