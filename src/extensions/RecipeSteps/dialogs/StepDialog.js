@@ -32,7 +32,7 @@ const StepDialog = ({ sdk }) => {
     <div id='dialog-step-wrap'>
       <Form spacing="default">
         <FieldGroup>
-          {getTextInputWithLabel(step, 'Step', (event) => setStep(event.currentTarget.value), { type: 'number', id: 'step', name: 'step', placeholder: 'Step' })}
+          {getTextInputWithLabel(step, 'Step Number', (event) => setStep(event.currentTarget.value), { type: 'number', id: 'stepNumber', name: 'stepNumber', placeholder: 'Step Number' })}
         </FieldGroup>
         <FieldGroup>
           {getTextInputWithLabel(title, 'Title', (event) => setTitle(event.currentTarget.value))}
