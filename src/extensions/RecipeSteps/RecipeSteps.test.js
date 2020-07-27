@@ -47,15 +47,15 @@ describe('<RecipeSteps />', () => {
     });
     test('Button Save renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('Button-Save')).toBeDefined();
+      expect(getByTestId('cf-ui-button-Save')).toBeDefined();
     });
     test('Button Cancel renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('Button-Cancel')).toBeDefined();
+      expect(getByTestId('cf-ui-button-Cancel')).toBeDefined();
     });
     test('Button Save triggers correctly', () => {
       const { getByTestId } = renderComponent();
-      fireEvent.click(getByTestId('Button-Save'));
+      fireEvent.click(getByTestId('cf-ui-button-Save'));
     });
   });
   describe('StepList', () => {
@@ -77,7 +77,7 @@ describe('<RecipeSteps />', () => {
     });
     test('Icon Button renders correctly', () => {
       const { getByTestId } = renderComponent(sdkList);
-      expect(getByTestId('IconButton-Click to add a new row')).toBeDefined();
+      expect(getByTestId('cf-ui-button-Click to add a new row')).toBeDefined();
     });
   });
 });
