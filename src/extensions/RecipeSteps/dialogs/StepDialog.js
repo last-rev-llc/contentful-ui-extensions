@@ -8,11 +8,13 @@ import { getTextInputWithLabel, getTextAreaWithLabel } from '../helpers';
 import { getButton } from '../../../shared/helpers';
 
 const StepDialog = ({ sdk }) => {
+  const [step, setStep] = useState('');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
 
   useEffect(() => {
     if (sdk.parameters.invocation.step) {
+      setStep(sdk.parameters.invocation.step.step);
       setTitle(sdk.parameters.invocation.step.title);
       setBody(sdk.parameters.invocation.step.body);
     }
@@ -23,12 +25,15 @@ const StepDialog = ({ sdk }) => {
   };
   
   const saveStep = () => {
-    sdk.close({ title, body });
+    sdk.close({ step: +step, title, body });
   };
 
   return (
     <div id='dialog-step-wrap'>
       <Form spacing="default">
+        <FieldGroup>
+          {getTextInputWithLabel(step, 'Step', (event) => setStep(event.currentTarget.value), { type: 'number', id: 'step', name: 'step', placeholder: 'Step' })}
+        </FieldGroup>
         <FieldGroup>
           {getTextInputWithLabel(title, 'Title', (event) => setTitle(event.currentTarget.value))}
         </FieldGroup>
@@ -51,6 +56,7 @@ StepDialog.propTypes = {
     parameters: PropTypes.shape({
       invocation: PropTypes.shape({
         step: PropTypes.shape({
+          step: PropTypes.string,
           title: PropTypes.string,
           body: PropTypes.string
         })

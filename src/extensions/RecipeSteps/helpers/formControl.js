@@ -60,17 +60,18 @@ const getTextInput = (textValue, onChange) => {
     width="full" />;
 };
 
-const getTextInputWithLabel = (textValue, labelText, onChange) => {
+const getTextInputWithLabel = (textValue, labelText, onChange, options = { type: 'text', id: 'title', name: 'title', placeholder: 'Title' }) => {
   return <>
-    <FormLabel htmlFor="title"
+    <FormLabel htmlFor={options.id}
       required>
       {labelText}
     </FormLabel>
     <TextInput
       className=""
-      id="title"
-      name="title"
-      placeholder="Title"
+      id={options.id}
+      name={options.name}
+      placeholder={options.placeholder}
+      type={options.type}
       onChange={event => onChange(event)}
       required
       testId='cf-ui-text-input-title'
@@ -80,10 +81,11 @@ const getTextInputWithLabel = (textValue, labelText, onChange) => {
 };
 
 const getStepRows = (steps, edit, remove) => {
-  return steps.map((step, index) => {
+  return steps.sort((stepA, stepB) => stepA.step - stepB.step).map((step, index) => {
     const keyId = index;
     return (
       <TableRow key={keyId}>
+        <TableCell>{step.step}</TableCell>
         <TableCell>{step.title}</TableCell>
         <TableCell>{step.body}</TableCell>
         <TableCell className='col-actions'>
@@ -103,6 +105,7 @@ const getStepsTable = (steps, edit, remove) => {
         <Table className='steps-table'>
           <TableHead isSticky>
             <TableRow>
+              <TableCell>Step</TableCell>
               <TableCell>Title</TableCell>
               <TableCell>Body</TableCell>
               <TableCell className='col-actions' />
