@@ -1,4 +1,4 @@
-const sdk = {
+const mockSdk = {
   field: {
     getValue: () => {
       return [
@@ -26,6 +26,5 @@ const sdk = {
   close: (value) => value
 };
 
-export default sdk;
-
-export const sdkList = { ...sdk, location: { is: () => false } };
+export const sdkList = { ...mockSdk, location: { is: () => false } };
+export default mockSdk;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-
-import { getIconButton, getStepsTable } from './helpers/index';
-import { openDialog } from './dialogs/index';
+import { getStepsTable } from './helpers';
+import { openDialog } from './dialogs';
+import { getIconButton } from '../../shared/helpers';
 
 const StepList = ({ sdk }) => {
   const [steps, setSteps] = useState([]);

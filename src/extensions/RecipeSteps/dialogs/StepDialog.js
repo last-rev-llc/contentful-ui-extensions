@@ -4,7 +4,8 @@ import {
   Form,
   FieldGroup,
 } from '@contentful/forma-36-react-components';
-import { getTextInputWithLabel, getTextAreaWithLabel, getButton } from '../helpers/index';
+import { getTextInputWithLabel, getTextAreaWithLabel } from '../helpers';
+import { getButton } from '../../../shared/helpers';
 
 const StepDialog = ({ sdk }) => {
   const [title, setTitle] = useState('');

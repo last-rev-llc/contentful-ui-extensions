@@ -1,26 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { locations } from 'contentful-ui-extensions-sdk';
-import StepList from './StepList';
-import './RecipeSteps.scss';
-import { StepDialog } from './dialogs';
+import IngredientsList from './IngredientsList';
+import './RecipeIngredients.scss';
+import { IngredientDialog } from './dialogs';
 
-const RecipeSteps = ({ sdk }) => {
+const RecipeIngredients = ({ sdk }) => {
   return !sdk.location.is(locations.LOCATION_DIALOG) 
     ? (
       <>
-        <StepList sdk={sdk} />
+        <IngredientsList sdk={sdk} />
       </>
     ) 
     : (
       <>
-        <StepDialog sdk={sdk} />
+        <IngredientDialog sdk={sdk} />
       </>
     );
 
 };
 
-RecipeSteps.propTypes = {
+RecipeIngredients.propTypes = {
   sdk: PropTypes.shape({
     field: PropTypes.shape({
       getValue: PropTypes.func.isRequired,
@@ -32,4 +32,4 @@ RecipeSteps.propTypes = {
   }).isRequired
 };
 
-export default RecipeSteps;
+export default RecipeIngredients;

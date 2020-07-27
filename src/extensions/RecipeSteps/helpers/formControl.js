@@ -2,15 +2,14 @@ import React from 'react';
 import {
   Textarea,
   TextInput,
-  Button,
   Table,
   TableHead,
   TableBody,
   TableCell,
   TableRow,
-  IconButton,
   FormLabel,
 } from '@contentful/forma-36-react-components';
+import { getIconButton } from '../../../shared/helpers';
 
 const getTextArea = (textValue, onChange) => {
   return <Textarea
@@ -84,29 +83,6 @@ const getTextInputWithLabel = (textValue, labelText, onChange) => {
   </>;
 };
 
-const getButton = (label, buttonType, onClick) => {
-  return <Button
-    data-test-id={`Button-${label}`}
-    buttonType={buttonType}
-    isFullWidth={false}
-    loading={false}
-    onClick={onClick}
-    testId={`cf-ui-button-${label}`}
-    type="button">
-    {label}
-  </Button>;
-};
-
-const getIconButton = (label, buttonType, iconType, iconSize, onClick) => {
-  return <IconButton
-    data-test-id={`IconButton-${label}`}
-    buttonType={buttonType}
-    iconProps={{ icon: iconType, size: iconSize }}
-    label={label}
-    onClick={onClick}
-    testId={`cf-ui-button-${label}`} />;
-};
-
 const getStepRows = (steps, edit, remove) => {
   return steps.map((step, index) => {
     const keyId = index;
@@ -151,8 +127,6 @@ export {
   getTextInputWithLabel,
   getTextArea,
   getTextAreaWithLabel,
-  getButton,
-  getIconButton,
   getStepRows,
   getStepsTable
 };
