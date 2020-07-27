@@ -37,7 +37,12 @@ const StepList = ({ sdk }) => {
   };
 
   const openEditModal = async (stepIndex) => {
-    const result = await openDialog(sdk, 'Edit Step', { step: steps[stepIndex] });
+    const stepToEdit = steps[stepIndex];
+    const stepNumber = steps[stepIndex] && steps[stepIndex].step;
+    if (stepToEdit) {
+      stepToEdit.step = stepNumber && stepNumber.toString();
+    }
+    const result = await openDialog(sdk, 'Edit Step', { step: stepToEdit });
     editStep(result, stepIndex);
   };
 
