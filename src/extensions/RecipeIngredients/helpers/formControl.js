@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  Select, 
+import {
+  Select,
   Option,
-  TextInput, 
+  TextInput,
   Table,
   TableHead,
   TableBody,
@@ -21,13 +21,13 @@ const getTextInput = (textValue, onChange, { id = 'input1', name = id, type = 't
     onChange={event => onChange(event)}
     required
     type={type}
-    testId='cf-ui-text-input-title'
+    testId={`cf-ui-text-input-${id}`}
     value={textValue}
     width="full" />;
 };
 
 const getOptions = options => {
-  return options.length > 0 
+  return options.length > 0
     ? options.map(option => {
       return (
         <Option
@@ -57,6 +57,7 @@ const getSelect = (options, onChange, { id = 'select1', name = id }) => {
 const withLabel = (id, labelText, control) => {
   return <>
     <FormLabel htmlFor={id}
+      testId={`cf-ui-label-${id}`}
       required>
       {labelText}
     </FormLabel>
@@ -69,11 +70,12 @@ const getIngredientRows = (ingredients, edit, remove) => {
     const keyId = index;
     return (
       <TableRow key={keyId}>
-        <TableCell>{ingredient.step}</TableCell>
-        <TableCell>{ingredient.ingredient}</TableCell>
-        <TableCell>{`${ingredient.imperialQuantity} ${ingredient.imperialMeasure}`}</TableCell>
-        <TableCell>{`${ingredient.metricQuantity} ${ingredient.metricMeasure}`}</TableCell>
-        <TableCell className='col-actions'>
+        <TableCell data-test-id="Ingredients-Table-Cell-Step">{ingredient.step}</TableCell>
+        <TableCell data-test-id="Ingredients-Table-Cell-Ingredient">{ingredient.ingredient}</TableCell>
+        <TableCell data-test-id="Ingredients-Table-Cell-ImperialQuantity">{`${ingredient.imperialQuantity} ${ingredient.imperialMeasure}`}</TableCell>
+        <TableCell data-test-id="Ingredients-Table-Cell-MetricQuantity">{`${ingredient.metricQuantity} ${ingredient.metricMeasure}`}</TableCell>
+        <TableCell className='col-actions'
+          data-test-id="Ingredients-Table-Cell-Actions">
           {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
           {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
         </TableCell>
@@ -84,10 +86,11 @@ const getIngredientRows = (ingredients, edit, remove) => {
 
 const getIngredientsTable = (ingredients, edit, remove) => {
   return ingredients.length === 0
-    ? null 
+    ? null
     : (
       <>
-        <Table className='steps-table'>
+        <Table className='steps-table'
+          data-test-id="Ingredients-Table">
           <TableHead isSticky>
             <TableRow>
               <TableCell>Step</TableCell>

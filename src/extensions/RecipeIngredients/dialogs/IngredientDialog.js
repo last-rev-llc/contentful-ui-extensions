@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Form, FieldGroup } from '@contentful/forma-36-react-components';
 import { withLabel, getTextInput, getSelect } from '../helpers';
-import { getButton } from '../../../shared/helpers'; 
+import { getButton } from '../../../shared/helpers';
 
-const imperialUnits = ['Teaspoon','Teaspoons','Tablespoon','Tablespoons','Cup','Cups','Ounce','Ounces','Pound','Pounds','Gram','Grams','Pinch','Each','As needed','To serve','To Taste','Bunch','Bunches','Can','Cans','Clove','Cloves','Leaf','Leaves','Package','Packages','Recipe','Recipes','Rib','Ribs','Slice','Slices','Wedge','Wedges'];
-const metricUnits = ['Milliliter','Milliliters','Liter','Liters','Ounce','Ounces','Gram','Grams','Pinch','Each','As needed','To serve','To Taste','Bunch','Bunches','Can','Cans','Clove','Cloves','Leaf','Leaves','Package','Packages','Recipe','Recipes','Rib','Ribs','Slice','Slices','Wedge','Wedges'];
+const imperialUnits = ['Teaspoon', 'Teaspoons', 'Tablespoon', 'Tablespoons', 'Cup', 'Cups', 'Ounce', 'Ounces', 'Pound', 'Pounds', 'Gram', 'Grams', 'Pinch', 'Each', 'As needed', 'To serve', 'To Taste', 'Bunch', 'Bunches', 'Can', 'Cans', 'Clove', 'Cloves', 'Leaf', 'Leaves', 'Package', 'Packages', 'Recipe', 'Recipes', 'Rib', 'Ribs', 'Slice', 'Slices', 'Wedge', 'Wedges'];
+const metricUnits = ['Milliliter', 'Milliliters', 'Liter', 'Liters', 'Ounce', 'Ounces', 'Gram', 'Grams', 'Pinch', 'Each', 'As needed', 'To serve', 'To Taste', 'Bunch', 'Bunches', 'Can', 'Cans', 'Clove', 'Cloves', 'Leaf', 'Leaves', 'Package', 'Packages', 'Recipe', 'Recipes', 'Rib', 'Ribs', 'Slice', 'Slices', 'Wedge', 'Wedges'];
 
 const IngredientDialog = ({ sdk }) => {
   const [step, setStep] = useState('');
@@ -25,11 +25,11 @@ const IngredientDialog = ({ sdk }) => {
       setMetricQuantity(sdk.parameters.invocation.ingredient.metricQuantity);
     }
   }, [sdk]);
-  
+
   const closeDialog = () => {
     sdk.close();
   };
-  
+
   const saveStep = () => {
     sdk.close({ step: +step, ingredient, imperialMeasure, imperialQuantity: +imperialQuantity, metricMeasure, metricQuantity: +metricQuantity });
   };
@@ -47,8 +47,10 @@ const IngredientDialog = ({ sdk }) => {
   const metricMeasureSelect = () => getSelect(metricUnits, (event) => setMetricMeasure(event.currentTarget.value), { id: 'metricMeasure' });
 
   return (
-    <div id='dialog-step-wrap'>
-      <Form spacing="default">
+    <div id='dialog-step-wrap'
+      data-test-id="IngredientDialog">
+      <Form spacing="default"
+        data-test-id="IngredientDialog-Form">
         <FieldGroup>
           {withLabel('step', 'Step', stepInput)}
         </FieldGroup>
@@ -70,7 +72,7 @@ const IngredientDialog = ({ sdk }) => {
       </Form>
     </div>
   );
-  
+
 };
 
 IngredientDialog.propTypes = {
