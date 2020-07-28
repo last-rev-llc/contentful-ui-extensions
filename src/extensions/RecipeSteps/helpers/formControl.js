@@ -28,8 +28,7 @@ const getTextArea = (textValue, onChange) => {
 
 const getTextAreaWithLabel = (textValue, labelText, onChange) => {
   return  <>
-    <FormLabel htmlFor="body"
-      required>
+    <FormLabel htmlFor="body">
       {labelText}
     </FormLabel>
     <Textarea
@@ -39,7 +38,6 @@ const getTextAreaWithLabel = (textValue, labelText, onChange) => {
       name="body"
       placeholder="Body"
       onChange={event => onChange(event)}
-      required
       rows={4}
       testId="cf-ui-body-textarea"
       value={textValue}
@@ -105,7 +103,7 @@ const getStepsTable = (steps, edit, remove) => {
         <Table className='steps-table'>
           <TableHead isSticky>
             <TableRow>
-              <TableCell>Step</TableCell>
+              <TableCell>Step Number</TableCell>
               <TableCell>Title</TableCell>
               <TableCell>Body</TableCell>
               <TableCell className='col-actions' />

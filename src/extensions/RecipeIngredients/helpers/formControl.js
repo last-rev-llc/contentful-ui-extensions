@@ -12,14 +12,14 @@ import {
 } from '@contentful/forma-36-react-components';
 import { getIconButton } from '../../../shared/helpers';
 
-const getTextInput = (textValue, onChange, { id = 'input1', name = id, type = 'text', placeholder = id }) => {
+const getTextInput = (textValue, onChange, { id = 'input1', name = id, type = 'text', placeholder = id, required = false }) => {
   return <TextInput
     className=""
     id={id}
     name={name}
     placeholder={placeholder}
     onChange={event => onChange(event)}
-    required
+    required={required}
     type={type}
     testId='cf-ui-text-input-title'
     value={textValue}
@@ -54,10 +54,10 @@ const getSelect = (options, onChange, { id = 'select1', name = id }) => {
   </Select>;
 };
 
-const withLabel = (id, labelText, control) => {
+const withLabel = (id, labelText, control, required = false) => {
   return <>
     <FormLabel htmlFor={id}
-      required>
+      required={required}>
       {labelText}
     </FormLabel>
     {control()}

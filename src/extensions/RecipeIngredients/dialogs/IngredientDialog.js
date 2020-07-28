@@ -34,9 +34,9 @@ const IngredientDialog = ({ sdk }) => {
     sdk.close({ step: +step, ingredient, imperialMeasure, imperialQuantity: +imperialQuantity, metricMeasure, metricQuantity: +metricQuantity });
   };
 
-  const stepInput = () => getTextInput(step, (event) => setStep(event.currentTarget.value), { id: 'step', type: 'number', placeholder: 'Step' });
+  const stepInput = () => getTextInput(step, (event) => setStep(event.currentTarget.value), { id: 'stepNumber', type: 'number', placeholder: 'Step Number' });
 
-  const ingredientInput = () => getTextInput(ingredient, (event) => setIngredient(event.currentTarget.value), { id: 'ingredient', placeholder: 'Ingredient' });
+  const ingredientInput = () => getTextInput(ingredient, (event) => setIngredient(event.currentTarget.value), { id: 'ingredient', placeholder: 'Ingredient', required: true });
 
   const imperialQuantityInput = () => getTextInput(imperialQuantity, (event) => setImperialQuantity(event.currentTarget.value), { id: 'imperialQuantity', type: 'number', placeholder: 'Imperial Quantity' });
 
@@ -50,10 +50,10 @@ const IngredientDialog = ({ sdk }) => {
     <div id='dialog-step-wrap'>
       <Form spacing="default">
         <FieldGroup>
-          {withLabel('step', 'Step', stepInput)}
+          {withLabel('stepNumber', 'Step Number', stepInput)}
         </FieldGroup>
         <FieldGroup>
-          {withLabel('ingredient', 'Ingredient', ingredientInput)}
+          {withLabel('ingredient', 'Ingredient', ingredientInput, true)}
         </FieldGroup>
         <FieldGroup row>
           {withLabel('imperialQuantity', 'Imperial Quantity', imperialQuantityInput)}
