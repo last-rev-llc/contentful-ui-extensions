@@ -4,10 +4,6 @@ import PropTypes from 'prop-types';
 import { TextInput } from '@contentful/forma-36-react-components';
 import { getSelect, getButton } from '../../shared/helpers';
 
-const buttonStyle = {
-  marginTop: '-3px'
-};
-
 export const localeRequiredErrorMessage = 'A locale must be selected.';
 export const zoomIdRequiredErrorMessage = 'A Zoom ID is required.';
 export const zoomIdLengthErrorMessage = 'The Zoom ID must be at least 10 or 11 digits.';
@@ -37,20 +33,30 @@ export const hasDuplicate = (jsonObject, newName, oldName) => {
 
 const LocaleZooms = ({ sdk }) => {
   const [jsonObject, setJsonObject] = useState({});
+  const [availableLocales, setAvailableLocales] = useState(_.keys(sdk.locales.names));
   const [locale, setLocale] = useState('');
   const [zoomId, setZoomId] = useState('');
   const [editKey, setEditKey] = useState('');
   const [editLocale, setEditLocale] = useState('');
   const [editZoomId, setEditZoomId] = useState('');
+  const [noLocale, setNoLocale] = useState(false);
+
+  const adjustLocales = (locales) => {
+    setAvailableLocales(locales);
+    setLocale(locales[0]);
+    setNoLocale(!locales[0]);
+  };
 
   useEffect(() => {
     if(sdk.field.getValue()) {
       setJsonObject(sdk.field.getValue());
+      const usedLocales = _.keys(sdk.field.getValue());
+      const filteredLocales = _.keys(sdk.locales.names).filter(name => usedLocales.every(usedLocale => usedLocale !== name));
+      adjustLocales(filteredLocales);
     }
-  }, [sdk.field]);
+  }, [sdk.field, sdk.locales.names]);
 
   const onSelectedLocaleChange = event => {
-    console.log(event.currentTarget.value);
     setLocale(event.currentTarget.value);
   };
 
@@ -59,46 +65,42 @@ const LocaleZooms = ({ sdk }) => {
   };
 
   const addProperty = () => {
-    console.log('locale', locale);
-    const keyValue = _.camelCase(locale);
-    const blankName = !locale;
-    const duplicateName = hasDuplicate(jsonObject, keyValue, '');
-
-    // setNameRequiredErrorInFactory(blankName);
-    // setUniqueErrorInFactory(hasDuplicate(jsonObject, keyValue));
-
-    if (!blankName && !duplicateName) {
-      const newJson = updateJson(jsonObject, keyValue, zoomId);
+    const localeValue = locale;
+    const blankLocale = !locale;
+    const duplicateLocale = hasDuplicate(jsonObject, localeValue, '');
+    if (!blankLocale && !duplicateLocale) {
+      const newJson = updateJson(jsonObject, localeValue, zoomId);
 
       sdk.field.setValue(newJson);
       setJsonObject(newJson);
-      setLocale('');
       setZoomId('');
+      const newLocales = [ ...availableLocales ];
+      adjustLocales(newLocales.filter(l => l !== localeValue));
     }
   };
   
-  const getZoomIdField = (zoomIdField, onValueChange) => {
+  const getZoomIdField = (zoomIdField, onValueChange, position) => {
     return <TextInput
       className=""
-      id="zoomId"
-      name="zoomId"
+      id={`zoomId-${position}`}
+      name={`zoomId-${position}`}
       placeholder="Zoom ID"
       onChange={event => onValueChange(event)}
       required={false}
-      testId="cf-ui-text-input-key-value"
+      testId={`cf-ui-text-input-zoom-id-${position}`}
       value={zoomIdField}
       width="medium" />;
   };
   
-  const getFieldProperty = (localeField, zoomIdField, onLocaleChange, onZoomChange, readOnly) => {
+  const getFieldProperty = (localeField, zoomIdField, onLocaleChange, onZoomChange, readOnly, selectOptions, position) => {
     return (
       <div className="my-2">
         <div className="d-inline-block">
-          {getSelect(_.keys(sdk.locales.names), onLocaleChange, { id: 'locales', disabled: readOnly })}
+          {getSelect(selectOptions, onLocaleChange, { id: 'locales', disabled: readOnly, optionObject: sdk.locales.names }, localeField)}
         </div>
         <span className="d-inline-block mx-3">:</span>
         <div className="d-inline-block">
-          {getZoomIdField(zoomIdField, onZoomChange)}
+          {getZoomIdField(zoomIdField, onZoomChange, position)}
         </div>
       </div>
     );
@@ -108,32 +110,35 @@ const LocaleZooms = ({ sdk }) => {
     return (
       <div>
         <div className="d-inline-block">
-          {getFieldProperty(locale, zoomId, onSelectedLocaleChange, onZoomIdChange, false)}
+          {getFieldProperty(locale, zoomId, onSelectedLocaleChange, onZoomIdChange, false, availableLocales, 'factory')}
         </div>
         <div className="d-inline-block ml-3">
           {getButton('+', 'positive', addProperty)}
         </div>
-        {/* {renderFactoryErrors()} */}
       </div>
     );
   };
 
-  const getFieldItem = (nameIn, valueIn) => {
-    const name = nameIn;
-    let value = valueIn;
-    let oldName = name;
-    const disable = !(editKey === name);
+  const getFieldItem = (localeIn, zoomIdIn, position) => {
+    const currentLocale = localeIn;
+    let currentZoomId = zoomIdIn;
+    let oldLocale = currentLocale;
+    const disable = !(editKey === currentLocale);
   
     const onDelete = () => {
-      const newObject = _.omit(jsonObject, [name]);
-  
+      const newObject = _.omit(jsonObject, [currentLocale]);
+      const newLocales = [ ...availableLocales ];
+      
+      newLocales.push(currentLocale);
+      adjustLocales(newLocales);
+
       sdk.field.setValue(newObject);
       setJsonObject(newObject);
-      oldName = '';
+      oldLocale = '';
     };
 
     const onCancel = () => {
-      const newValue = updateJson(jsonObject, oldName, editZoomId);
+      const newValue = updateJson(jsonObject, oldLocale, editZoomId);
   
       sdk.field.setValue(newValue);
       setJsonObject(newValue);
@@ -141,9 +146,9 @@ const LocaleZooms = ({ sdk }) => {
     };
 
     const onEditClick = () => {
-      setEditLocale(name);
-      setEditZoomId(value);
-      setEditKey(name);
+      setEditLocale(currentLocale);
+      setEditZoomId(currentZoomId);
+      setEditKey(currentLocale);
     };
 
     const clearEdit = () => {
@@ -153,48 +158,50 @@ const LocaleZooms = ({ sdk }) => {
     };
   
     const onEditSave = () => {
-      // const keyValue = _.camelCase(editName);
+      const keyValue = editLocale;
 
-      // if (keyValue !== oldName) {
-      //   const blankName = !editName;
-      //   const duplicateName = hasDuplicate(jsonObject, keyValue, oldName);
+      if (keyValue !== oldLocale) {
+        const blankName = !editLocale;
+        const duplicateName = hasDuplicate(jsonObject, keyValue, oldLocale);
 
-      //   // setNameRequiredError(!editName);
-      //   // setUniqueError(hasDuplicate(jsonObject, keyValue, oldName));
-        
-      //   if (!blankName && !duplicateName) {
-      //     const newObject = _.omit(jsonObject, [oldName]);
-      //     const newValue = updateJson(newObject, keyValue, editValue);
+        if (!blankName && !duplicateName) {
+          const newObject = _.omit(jsonObject, [oldLocale]);
+          const newValue = updateJson(newObject, keyValue, editZoomId);
           
-      //     sdk.field.setValue(newValue);
-      //     oldName = name;
-      //     setJsonObject(newValue);
-      //     clearEdit();
-      //   }
-      // } else {
-      //   const newValue = updateJson(jsonObject, oldName, editValue);
+          sdk.field.setValue(newValue);
+          oldLocale = currentLocale;
+          
+          const usedLocales = _.keys(newValue);
+          const filteredLocales = _.keys(sdk.locales.names).filter(name => usedLocales.every(usedLocale => usedLocale !== name));
+          adjustLocales(filteredLocales);
+
+          setJsonObject(newValue);
+          clearEdit();
+        }
+      } else {
+        const newValue = updateJson(jsonObject, oldLocale, editZoomId);
   
-      //   sdk.field.setValue(newValue);
-      //   setJsonObject(newValue);
-      //   clearEdit();
-      // }    
+        sdk.field.setValue(newValue);
+        setJsonObject(newValue);
+        clearEdit();
+      }    
     };
   
     const onValueChange = event => {
       if (!editKey) {
-        const newValue = updateJson(jsonObject, name, event.currentTarget.value);
+        const newValue = updateJson(jsonObject, currentLocale, event.currentTarget.value);
   
         sdk.field.setValue(newValue);
         setJsonObject(newValue);
       }
       else {
-        const newValue = updateJson(jsonObject, oldName, event.currentTarget.value);
+        const newValue = updateJson(jsonObject, oldLocale, event.currentTarget.value);
   
         sdk.field.setValue(newValue);
         setJsonObject(newValue);
       }
       setEditZoomId(event.currentTarget.value);
-      value = event.currentTarget.value;
+      currentZoomId = event.currentTarget.value;
     };
 
     const onEditLocaleChange = event => {
@@ -204,11 +211,14 @@ const LocaleZooms = ({ sdk }) => {
     const onEditZoomIdChange = event => {
       setEditZoomId(event.currentTarget.value);
     };
+
+    const currentLocales = [ ...availableLocales ];
+    currentLocales.push(currentLocale);
     
     return disable ? (
       <div>
         <div className="d-inline-block">
-          {getFieldProperty(name, value, () => {}, onValueChange, disable)}
+          {getFieldProperty(currentLocale, currentZoomId, () => {}, onValueChange, disable, currentLocales, position)}
         </div>
         <div className="d-inline-block ml-3">
           {getButton('Edit', 'primary', onEditClick)}
@@ -220,7 +230,7 @@ const LocaleZooms = ({ sdk }) => {
     ) : (
       <div>
         <div className="d-inline-block">
-          {getFieldProperty(editLocale, editZoomId, onEditLocaleChange, onEditZoomIdChange, disable)}
+          {getFieldProperty(editLocale, editZoomId, onEditLocaleChange, onEditZoomIdChange, disable, currentLocales, position)}
         </div>
         <div className="d-inline-block ml-3">
           {getButton('Save', 'primary', onEditSave)}
@@ -228,13 +238,11 @@ const LocaleZooms = ({ sdk }) => {
         <div className="d-inline-block ml-1">
           {getButton('Cancel', 'muted', onCancel)}
         </div>
-        {/* {renderErrors()} */}
       </div>
     );
   };
 
   const getFieldList = () => {
-
     const renderedList = _.keys(jsonObject).map((key, id) => {
       const divKey = id;
       const fieldValue = key ? jsonObject[key] : '';
@@ -259,7 +267,7 @@ const LocaleZooms = ({ sdk }) => {
   return (
     <>
       <div>
-        {getFieldFactory()}
+        {noLocale ? getError(true, 'No more locales available') : getFieldFactory()}
       </div>
       <div className="mt-4">
         {getFieldList()}

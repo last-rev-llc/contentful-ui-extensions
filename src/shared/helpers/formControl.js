@@ -22,8 +22,7 @@ const getIconButton = (label, buttonType, iconType, iconSize, onClick) => {
     testId={`cf-ui-button-${label}`}/>;
 };
 
-const getOptions = options => {
-  console.log('options', options);
+const getOptions = (options, optionObject) => {
   return options.length > 0 
     ? options.map(option => {
       return (
@@ -31,14 +30,14 @@ const getOptions = options => {
           key={option}
           testId={`cf-ui-select-option-${option}`}
           value={option}>
-          {option}
+          {(optionObject && optionObject[option]) || option}
         </Option>
       );
     })
     : [<Option />];
 };
 
-const getSelect = (options, onChange, { id = 'select1', name = id, disabled = false }) => {
+const getSelect = (options, onChange, { id = 'select1', name = id, disabled = false, optionObject }, defaultValue) => {
   return <Select
     className=""
     id={id}
@@ -47,8 +46,9 @@ const getSelect = (options, onChange, { id = 'select1', name = id, disabled = fa
     testId={`cf-ui-select-${id}`}
     width="full"
     disabled={disabled}
-    willBlurOnEsc>
-    {getOptions(options)}
+    willBlurOnEsc
+    value={defaultValue || (optionObject ? optionObject[options[0]] : options[0]) }>
+    {getOptions(options, optionObject)}
   </Select>;
 };
 
