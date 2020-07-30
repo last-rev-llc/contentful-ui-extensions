@@ -1,3 +1,3 @@
-import { getButton, getIconButton } from './formControl';
+import { getButton, getIconButton, getTextField } from './formControl';
 
-export { getButton, getIconButton };
+export { getButton, getIconButton, getTextField };

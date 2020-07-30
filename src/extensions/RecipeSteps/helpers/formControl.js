@@ -7,7 +7,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
-  FormLabel,
+  FormLabel
 } from '@contentful/forma-36-react-components';
 import { getIconButton } from '../../../shared/helpers';
 

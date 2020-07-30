@@ -18,21 +18,21 @@ export function setIfEmpty(sdk, fieldId, value) {
 
 const BynderImage = ({ sdk }) => {
   const [value, setValue] = useState(sdk.field.getValue() || "");
-  const fields = sdk.entry.fields;
+  const {fields} = sdk.entry;
 
   const onBynderImageChange = value => {
     if (!Array.isArray(value)) return;
     if (value.length === 0) {
-      fields["bynderId"].setValue("");
-      fields["imageName"].setValue("");
-      fields["altText"].setValue("");
+      fields.bynderId.setValue("");
+      fields.imageName.setValue("");
+      fields.altText.setValue("");
     } else {
       const bynderData = get(value, "[0]", {});
       const description = get(bynderData, "description", "");
       const title = get(bynderData, "name", "");
-      fields["bynderId"].setValue(get(bynderData, "id", ""));
-      fields["imageName"].setValue(title);
-      fields["altText"].setValue(description);
+      fields.bynderId.setValue(get(bynderData, "id", ""));
+      fields.imageName.setValue(title);
+      fields.altText.setValue(description);
       setIfEmpty(sdk, "internalTitle", title);
       setIfEmpty(sdk, "altTextOverride", description);
     }
@@ -50,7 +50,7 @@ const BynderImage = ({ sdk }) => {
   };
 
   const onChange = e => {
-    const value = e.currentTarget.value;
+    const {value} = e.currentTarget;
     setValue(value);
     if (value) {
       sdk.field.setValue(value);
@@ -78,8 +78,7 @@ const BynderImage = ({ sdk }) => {
         id="bynderImageId"
         data-testid="bynderImageTestId"
         value={value}
-        onChange={onChange}
-      />
+        onChange={onChange}/>
     </>
   );
 };
@@ -88,9 +87,9 @@ BynderImage.propTypes = {
   sdk: PropTypes.object.isRequired
 };
 
-init(sdk => {
-  ReactDOM.render(<BynderImage sdk={sdk} />, document.getElementById("root"));
-});
+// init(sdk => {
+//   ReactDOM.render(<BynderImage sdk={sdk} />, document.getElementById("root"));
+// });
 
 /**
  * By default, iframe of the extension is fully reloaded on every save of a source file.
