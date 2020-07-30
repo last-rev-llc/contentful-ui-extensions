@@ -64,6 +64,7 @@ You need an account for Contentful to use these extensions.
 ├── src
 │   ├── __mocks__
 │   ├── extensions
+│   ├── ├── BynderImages
 │   ├── ├── ColorPicker
 │   ├── ├── Seo
 │   ├── shared
