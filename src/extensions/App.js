@@ -64,7 +64,7 @@ const App = ({ sdk, locations }) => {
                exact
                component={() => (
                  <BynderImage
-                   sdk={sdk || localizationLookupMockSdk}
+                   sdk={createMockSDK()|| localizationLookupMockSdk}
                    locations={locations}
                  />
                )}
