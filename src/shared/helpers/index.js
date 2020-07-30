@@ -8,7 +8,8 @@ import {
 import {
   updateJson,
   getError,
-  hasDuplicate
+  hasDuplicate,
+  getInfo
 } from './utility';
 
 export { 
@@ -19,5 +20,6 @@ export {
   withLabel,
   updateJson,
   getError,
-  hasDuplicate
+  hasDuplicate,
+  getInfo
 };

@@ -31,14 +31,14 @@ describe('utility helpers methods', () => {
 
   describe('getError(hasError, message)', () => {
     const message = 'message';
-    const testId = 'error';
+    const testId = 'error-test';
 
     test('doesn\'t show message when hasError is false', () => {
       const { queryByTestId } = render(getError(false, message));
       expect(queryByTestId(testId)).toBeNull();
     });
     test('shows message when hasError is true ', () => {
-      const errorDiv = render(getError(true, message));
+      const errorDiv = render(getError(true, message, 'test'));
       expect(errorDiv.queryByTestId(testId)).toBeTruthy();
       expect(errorDiv.queryByTestId(testId).textContent).toBe(message);
     });

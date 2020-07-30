@@ -18,6 +18,16 @@ const getError = (error, message, position) => {
   ) : null;
 };
 
+const getInfo = (message) => {
+  return (
+    <div 
+      className="alert alert-info"
+      data-test-id="info">
+      {message}
+    </div>
+  );
+};
+
 const hasDuplicate = (jsonObject, newName, oldName) => {
   return _.keys(jsonObject)
     .filter(key => key !== oldName)
@@ -27,5 +37,6 @@ const hasDuplicate = (jsonObject, newName, oldName) => {
 export {
   updateJson,
   getError,
-  hasDuplicate
+  hasDuplicate,
+  getInfo
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { TextInput } from '@contentful/forma-36-react-components';
-import { getSelect, getButton, updateJson, getError, hasDuplicate, getIconButton } from '../../shared/helpers';
+import { getSelect, getButton, updateJson, getError, hasDuplicate, getIconButton, getInfo } from '../../shared/helpers';
 
 export const blankOptionValue = 'blank';
 export const blankOptionName = 'Select Locale';
@@ -349,7 +349,7 @@ const LocaleZooms = ({ sdk }) => {
   return (
     <>
       <div>
-        {noLocale ? getError(true, 'No more locales available', 'no-locale') : getFieldFactory()}
+        {noLocale ? getInfo('All locales have been chosen. Please delete or edit an item to make changes.') : getFieldFactory()}
       </div>
       <div className="mt-4">
         {getFieldList()}
