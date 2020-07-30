@@ -61,7 +61,7 @@ const App = ({ sdk, locations }) => {
               locations={locations} />;
           }}/>
         <Route path="/bynder-image"
-               exact={}
+               exact
                component={() => (
                  <BynderImage
                    sdk={sdk || localizationLookupMockSdk}
