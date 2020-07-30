@@ -102,7 +102,6 @@ const LocaleZooms = ({ sdk }) => {
   const getListErrors = position => {
     let error = getError(zoomIdLengthError, zoomIdLengthErrorMessage, position);
     if (localeRequiredError) {
-      console.log('should work', position);
       error = getError(localeRequiredError, localeRequiredErrorMessage, position);
     }
     else if (localeUniqueError) {
@@ -260,8 +259,7 @@ const LocaleZooms = ({ sdk }) => {
 
         setLocaleRequiredError(blankLocale);
         setLocaleUniqueError(duplicateLocale);
-        console.log('blankZoomId', blankZoomId);
-        console.log('wrongLength', wrongLength);
+        
         if (!blankLocale && !duplicateLocale && !blankZoomId && !wrongLength) {
           const newObject = _.omit(jsonObject, [oldLocale]);
           const newValue = updateJson(newObject, keyValue, editZoomId);

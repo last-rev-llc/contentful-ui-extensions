@@ -26,11 +26,40 @@ afterEach(() => {
 
 describe('LocaleZooms helper methods', () => {
   describe('withBlankOption(options)', () => {
-  
+    test('Adds a new property to options for the default blank value', () => {
+      const optionsBefore = { 'en-US': 'English', 'fr': 'French' };
+      const optionsAfter = { 'en-US': 'English', 'fr': 'French', 'blank': 'Select Locale' };
+      const result = withBlankOption(optionsBefore);
+
+      expect(JSON.stringify(result)).toBe(JSON.stringify(optionsAfter));
+    });
   });
 
   describe('isToLength(id)', () => {
-  
+    describe('returns false if', () => {
+      test('id is not 10 or 11 characters long', () => {
+        const id = '1234567';
+        const result = isToLength(id);
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe('returns true if', () => {
+      test('id is 10 characters long', () => {
+        const id = '1234567890';
+        const result = isToLength(id);
+
+        expect(result).toBe(true);
+      });
+
+      test('id is 11 characters long', () => {
+        const id = '12345678901';
+        const result = isToLength(id);
+
+        expect(result).toBe(true);
+      });
+    });
   });
 });
 
@@ -59,26 +88,6 @@ describe('<LocaleZooms />', () => {
       const { getAllByTestId } = render(<LocaleZooms sdk={sdk} />);
       expect(getAllByTestId('field-item').length).toBe(_.keys(sdk.field.getValue()).length);
     });
-  });
-
-  describe('sortedOptions(options)', () => {
-    test.todo('test sortedOptions');
-  });
-
-  describe('prepareOptions(options)', () => {
-    test.todo('test prepareOptions');
-  });
-
-  describe('adjustLocales(locales)', () => {
-    test.todo('test adjustLocales');
-  });
-
-  describe('getListErrors(position)', () => {
-    test.todo('test getListErrors');
-  });
-
-  describe('getFactoryErrors(position)', () => {
-    test.todo('test getFactoryErrors');
   });
 
   describe('getFieldFactory()', () => {
