@@ -5,11 +5,19 @@ import {
   getOptions, 
   withLabel 
 } from './formControl';
+import {
+  updateJson,
+  getError,
+  hasDuplicate
+} from './utility';
 
 export { 
   getButton, 
   getIconButton, 
   getSelect, 
   getOptions, 
-  withLabel
+  withLabel,
+  updateJson,
+  getError,
+  hasDuplicate
 };

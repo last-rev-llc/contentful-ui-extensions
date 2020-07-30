@@ -1,6 +1,6 @@
-# Last Rev: LocalizationLookup
+# Last Rev: LocaleZooms
 
-The Last Rev LocalizationLookup extension can be used to create a simple JSON object to store different locales with zoom ids. You can add, edit, and/or delete as many JSON fields as you would like.
+The Last Rev LocaleZooms extension can be used to create a simple JSON object to store different locales with zoom ids. You can add, edit, and/or delete as many JSON fields as you would like.
 
 ## Setup Instructions
 
@@ -9,7 +9,7 @@ The Last Rev LocalizationLookup extension can be used to create a simple JSON ob
     - Name: LocaleZooms
     - Field Types: Object
     - Hosting: Self-hosted(src)
-    - Self-Hosted URL: [https://your-extension-domain.netlify.com/localeZooms](https://your-extension-domain.netlify.com/localeZooms)
+    - Self-Hosted URL: [https://your-extension-domain.netlify.com/locale-zooms](https://your-extension-domain.netlify.com/locale-zooms)
 3. Create an Object (JSON) field in your content model where you want to use the LocaleZooms field
 4. On the Content Model page, select "Settings" on the new JSON field you added
 5. Go to Appearance and select your new UI Extension
