@@ -251,15 +251,15 @@ const LocaleZooms = ({ sdk }) => {
       const blankZoomId = !editZoomId;
       const wrongLength = !isToLength(editZoomId);
 
+      const blankLocale = editLocale === blankOptionValue;
+      const duplicateLocale = hasDuplicate(jsonObject, keyValue, oldLocale);
+
+      setLocaleRequiredError(blankLocale);
+      setLocaleUniqueError(duplicateLocale);
       setZoomIdRequiredError(blankZoomId);
       setZoomIdLengthError(wrongLength);
+      
       if (keyValue !== oldLocale) {
-        const blankLocale = editLocale === blankOptionValue;
-        const duplicateLocale = hasDuplicate(jsonObject, keyValue, oldLocale);
-
-        setLocaleRequiredError(blankLocale);
-        setLocaleUniqueError(duplicateLocale);
-        
         if (!blankLocale && !duplicateLocale && !blankZoomId && !wrongLength) {
           const newObject = _.omit(jsonObject, [oldLocale]);
           const newValue = updateJson(newObject, keyValue, editZoomId);
