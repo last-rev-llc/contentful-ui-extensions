@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { TextInput, Button } from '@contentful/forma-36-react-components';
+import { updateJson, hasDuplicate } from '../../shared/helpers';
 
 const buttonStyle = {
   marginTop: '-3px'
@@ -9,13 +10,6 @@ const buttonStyle = {
 
 export const uniqueErrorMessage = 'This Name has already been added. Please change the Name to add field.';
 export const nameRequiredErrorMessage = 'At least one character is required for the Name field.';
-
-export const updateJson = (json, name, value) => {
-  return {
-    ...json,
-    [name]: value
-  };
-};
 
 export const renderError = (error, message, position) => {
   return error ? (
@@ -87,12 +81,6 @@ export const renderFieldProperty = (nameField, valueField, onNameChange, onValue
       </div>
     </div>
   );
-};
-
-export const hasDuplicate = (jsonObject, newName, oldName) => {
-  return _.keys(jsonObject)
-    .filter(key => key !== oldName)
-    .some(key => newName.toUpperCase() === key.toUpperCase());
 };
 
 const LocalizationLookup = ({ sdk }) => {
