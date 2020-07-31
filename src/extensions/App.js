@@ -21,6 +21,9 @@ import colorPickerMockSdk from './ColorPicker/mockSdk';
 import recipeStepsMockSdk from './RecipeSteps/mockSdk';
 import recipeIngredientsMockSdk from './RecipeIngredients/mockSdk';
 
+import BynderImage from "./BynderImage";
+import { createMockSDK } from "./BynderImage/mockSdk";
+
 const App = ({ sdk, locations }) => {
   return (
     <Router history={history}>
@@ -63,6 +66,15 @@ const App = ({ sdk, locations }) => {
             return <Seo sdk={sdk || usedSdk}
               locations={locations} />;
           }}/>
+        <Route path="/bynder-image"
+               exact
+               component={() => (
+                 <BynderImage
+                   sdk={createMockSDK()|| localizationLookupMockSdk}
+                   locations={locations}
+                 />
+               )}
+        />
       </Switch>
     </Router>
   );
