@@ -103,7 +103,7 @@ const getTextField = (
 export {
   getButton,
   getIconButton,
-  getTextField
+  getTextField,
   getOptions,
   getSelect,
   withLabel
