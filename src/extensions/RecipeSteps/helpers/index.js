@@ -4,7 +4,7 @@ import {
   getTextArea, 
   getTextAreaWithLabel, 
   getStepRows, 
-  getStepsTable 
+  getStepsTable
 } from './formControl';
 
 export {

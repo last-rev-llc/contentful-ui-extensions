@@ -4,7 +4,7 @@ import {
   getSelect,
   withLabel,
   getIngredientRows, 
-  getIngredientsTable 
+  getIngredientsTable
 } from './formControl';
 
 export {

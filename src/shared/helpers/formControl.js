@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, IconButton, Select, Option, FormLabel } from '@contentful/forma-36-react-components';
+import { Button, IconButton, TextField, Select, Option, FormLabel } from '@contentful/forma-36-react-components';
 
 const getButton = (label, buttonType, onClick, position) => {
   return <Button
@@ -63,9 +63,47 @@ const withLabel = (id, labelText, control) => {
   </>;
 };
 
+
+
+const getTextField = (
+  textValue, 
+  onChange, 
+  validationMessage, 
+  { 
+    id = 'input1', 
+    name = id, 
+    labelText = 'label1', 
+    helpText = '', 
+    required = false, 
+    requiredText = required ? 'required' : '', 
+    textInputProps = { 
+      disabled: false, 
+      placeholder: labelText, 
+      type: 'text' 
+    } 
+  }) => {
+  return <TextField
+    className=""
+    countCharacters={false}
+    formLabelProps={{requiredText}}
+    helpText={helpText}
+    id={id}
+    labelText={labelText}
+    name={name}
+    onChange={onChange}
+    required={required}
+    testId={`cf-ui-text-field-${id}`}
+    textInputProps={textInputProps}
+    textarea={false}
+    validationMessage={validationMessage}
+    value={textValue}
+    width="full" />;
+};
+
 export {
   getButton,
   getIconButton,
+  getTextField,
   getOptions,
   getSelect,
   withLabel

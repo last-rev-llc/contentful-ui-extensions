@@ -1,7 +1,8 @@
 import { 
   getButton, 
   getIconButton, 
-  getSelect, 
+  getSelect,
+  getTextField,
   getOptions, 
   withLabel 
 } from './formControl';
@@ -16,6 +17,7 @@ export {
   getButton, 
   getIconButton, 
   getSelect, 
+  getTextField,
   getOptions, 
   withLabel,
   updateJson,
