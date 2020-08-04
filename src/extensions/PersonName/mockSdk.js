@@ -2,9 +2,12 @@ const sdk = {
   field: {
     getValue: () => {
       return {
-        label: "Test Label",
-        phoneNumber: "5555555555",
-        extension: "1234",
+        salutation: "Test salutation",
+        firstName: "Test firstName",
+        middleName: "Test middleName",
+        lastName: "Test lastName",
+        suffix: "Test suffix",
+        nickname: "Test nickname",
       };
     },
     setValue: (value) => {
@@ -14,12 +17,8 @@ const sdk = {
 };
 
 class FakeField {
-  constructor(value) {
-    if(value) {
-      this._value = value;
-    } else {
-      this._value = "";
-    }
+  constructor() {
+    this._value = "";
   }
 
   setValue(v) {
@@ -47,9 +46,12 @@ export function createMockSDK() {
     field: new FakeField(),
     entry: {
       fields: {
-        label: new FakeField("Test Label"),
-        phoneNumber: new FakeField("Test PhoneNumber"),
-        extension: new FakeField("Test Extension"),
+        salutation: new FakeField(),
+        firstName: new FakeField(),
+        middleName: new FakeField(),
+        lastName: new FakeField(),
+        suffix: new FakeField(),
+        nickname: new FakeField(),
       },
     },
   };

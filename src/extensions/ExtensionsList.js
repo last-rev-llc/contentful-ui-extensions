@@ -11,6 +11,8 @@ export default function ExtensionsList() {
           className="">Seo</Link></li>
         <li><Link to="/localization-lookup"
           className="">Localization Lookup</Link></li>
+        <li><Link to="/person-name"
+          className="">Person Name</Link></li>
         <li><Link to="/phone-number"
           className="">Phone Number</Link></li>
       </ul>

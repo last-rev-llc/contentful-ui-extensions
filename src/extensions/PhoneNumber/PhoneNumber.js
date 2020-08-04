@@ -37,8 +37,7 @@ export default function PhoneNumber({ sdk }) {
         data-testid="phoneNumberLabel"
         textInputProps={{
           maxLength: 60,
-          onKeyPress: (e) => handleLabelChange(e.currentTarget),
-          onBlur: (e) => handleLabelChange(e.currentTarget),
+          onChange: (e) => handleLabelChange(e.currentTarget),
         }} />
       <TextField
         value={fieldValue.phoneNumber || ""}
@@ -49,8 +48,7 @@ export default function PhoneNumber({ sdk }) {
         data-testid="phoneNumber"
         textInputProps={{
           maxLength: 15,
-          onKeyPress: (e) => handlePhoneNumberChange(e.currentTarget),
-          onBlur: (e) => handlePhoneNumberChange(e.currentTarget),
+          onChange: (e) => handlePhoneNumberChange(e.currentTarget),
         }} />
       <TextField
         value={fieldValue.extension || ""}
@@ -60,8 +58,7 @@ export default function PhoneNumber({ sdk }) {
         data-testid="phoneNumberExtension"
         textInputProps={{
           maxLength: 10,
-          onKeyPress: (e) => handleExtensionChange(e.currentTarget),
-          onBlur: (e) => handleExtensionChange(e.currentTarget),
+          onChange: (e) => handleExtensionChange(e.currentTarget),
         }} />
     </div>
   );

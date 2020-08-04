@@ -5,6 +5,7 @@ import React from 'react';
 import {Router, Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
+import PersonName from './PersonName';
 import PhoneNumber from './PhoneNumber';
 import LocalizationLookup from './LocalizationLookup';
 import Seo from './Seo';
@@ -14,6 +15,7 @@ import history from '../history';
 import localizationLookupMockSdk from './LocalizationLookup/mockSdk';
 import colorPickerMockSdk from './ColorPicker/mockSdk';
 import PhoneNumberMockSdk from './PhoneNumber/mockSdk';
+import PersonNameMockSdk from './PersonName/mockSdk';
 
 const App = ({ sdk, locations }) => {
   return (
@@ -25,6 +27,10 @@ const App = ({ sdk, locations }) => {
         <Route path="/color-picker"
           exact
           component={() => <ColorPicker sdk={sdk || colorPickerMockSdk}
+            locations={locations} />} />
+        <Route path="/person-name"
+          exact
+          component={() => <PersonName sdk={sdk || PersonNameMockSdk}
             locations={locations} />} />
         <Route path="/phone-number"
           exact
