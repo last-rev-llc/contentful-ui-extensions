@@ -28,7 +28,8 @@ const getTextArea = (textValue, onChange) => {
 
 const getTextAreaWithLabel = (textValue, labelText, onChange) => {
   return <>
-    <FormLabel htmlFor="body">
+    <FormLabel htmlFor="body"
+      data-testid={`cf-ui-label-${labelText}`}>
       {labelText}
     </FormLabel>
     <Textarea
@@ -39,7 +40,7 @@ const getTextAreaWithLabel = (textValue, labelText, onChange) => {
       placeholder="Body"
       onChange={event => onChange(event)}
       rows={4}
-      testId="cf-ui-body-textarea"
+      data-testid={`cf-ui-body-${labelText}`}
       value={textValue}
       width="full" />
   </>;

@@ -39,8 +39,10 @@ const StepDialog = ({ sdk }) => {
   };
 
   return (
-    <div id='dialog-step-wrap'>
-      <Form spacing="default">
+    <div id='dialog-step-wrap'
+      data-testid="StepDialog">
+      <Form spacing="default"
+        data-testid="StepDialog-Form">
         <FieldGroup>
           {getTextField(step, (event) => setStep(event.currentTarget.value), stepErrorMessage, { id: 'stepNumber', type: 'number', labelText: 'Step Number', required: true })}
         </FieldGroup>

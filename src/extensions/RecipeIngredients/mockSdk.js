@@ -43,4 +43,11 @@ const mockSdk = {
   }
 };
 
+export const mockSdkList = {
+  ...mockSdk,
+  location: {
+    is: () => false,
+  }
+};
+
 export default mockSdk;

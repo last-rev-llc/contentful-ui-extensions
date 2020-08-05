@@ -7,7 +7,7 @@ const renderComponent = (sdk = defaultSdk) =>
   render(<RecipeIngredients sdk={sdk} />);
 
 configure({
-  testIdAttribute: "data-test-id",
+  testIdAttribute: "data-testid",
 });
 
 afterEach(() => {
@@ -28,19 +28,15 @@ describe("<RecipeIngredients />", () => {
     });
     test('Step Label renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('cf-ui-label-step')).toBeDefined();
+      expect(getByTestId('cf-ui-label-stepNumber')).toBeDefined();
     });
     test('Step Input renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('cf-ui-text-input-step')).toBeDefined();
-    });
-    test('Ingredient Label renders correctly', () => {
-      const { getByTestId } = renderComponent();
-      expect(getByTestId('cf-ui-label-ingredient')).toBeDefined();
+      expect(getByTestId('cf-ui-text-input-stepNumber')).toBeDefined();
     });
     test('Ingredient Input renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('cf-ui-text-input-ingredient')).toBeDefined();
+      expect(getByTestId('cf-ui-text-field-ingredient')).toBeDefined();
     });
     test('Imperial Quantity Label renders correctly', () => {
       const { getByTestId } = renderComponent();
@@ -74,6 +70,7 @@ describe("<RecipeIngredients />", () => {
       const { getByTestId } = renderComponent();
       expect(getByTestId('cf-ui-select-metricMeasure')).toBeDefined();
     });
+
     test('Button Save renders correctly', () => {
       const { getByTestId } = renderComponent();
       expect(getByTestId('cf-ui-button-Save')).toBeDefined();

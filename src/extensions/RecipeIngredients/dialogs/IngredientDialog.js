@@ -67,8 +67,10 @@ const IngredientDialog = ({ sdk }) => {
   const metricMeasureSelect = () => getSelect(metricUnits, (event) => setMetricMeasure(event.currentTarget.value), { id: 'metricMeasure' }, metricMeasure);
 
   return (
-    <div id='dialog-step-wrap'>
-      <Form spacing="default">
+    <div id='dialog-step-wrap'
+      data-testid="IngredientDialog">
+      <Form spacing="default"
+        data-testid="IngredientDialog-Form">
         <FieldGroup>
           {withLabel('stepNumber', 'Step Number', stepInput)}
         </FieldGroup>

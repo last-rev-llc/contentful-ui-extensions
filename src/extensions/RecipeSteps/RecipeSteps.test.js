@@ -8,7 +8,7 @@ const renderComponent = (sdk = defaultSdk) =>
   );
 
 configure({
-  testIdAttribute: 'data-test-id',
+  testIdAttribute: 'data-testid',
 });
 
 afterEach(() => {
@@ -29,21 +29,21 @@ describe('<RecipeSteps />', () => {
       const { getByTestId } = renderComponent();
       expect(getByTestId('StepDialog-Form')).toBeDefined();
     });
-    test('FormLabel Title renders correctly', () => {
+    test('Step Number Field renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('FormLabel-Title')).toBeDefined();
+      expect(getByTestId('cf-ui-text-field-stepNumber')).toBeDefined();
     });
-    test('TextInput Title renders correctly', () => {
+    test('Title Field renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('TextInput-Title')).toBeDefined();
+      expect(getByTestId('cf-ui-text-field-title')).toBeDefined();
     });
-    test('FormLabel Body renders correctly', () => {
+    test('Label Body renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('FormLabel-Body')).toBeDefined();
+      expect(getByTestId('cf-ui-label-Body')).toBeDefined();
     });
-    test('Textarea Body renders correctly', () => {
+    test.only('Textarea Body renders correctly', () => {
       const { getByTestId } = renderComponent();
-      expect(getByTestId('Textarea-Body')).toBeDefined();
+      expect(getByTestId('cf-ui-body-Body')).toBeDefined();
     });
     test('Button Save renders correctly', () => {
       const { getByTestId } = renderComponent();

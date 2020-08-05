@@ -8,6 +8,7 @@ const getButton = (label, buttonType, onClick, position) => {
     loading={false}
     onClick={onClick}
     testId={`cf-ui-button-${label}-${position}`}
+    data-testid={`cf-ui-button-${label}`}
     type="button">
     {label}
   </Button>;
@@ -92,7 +93,7 @@ const getTextField = (
     name={name}
     onChange={onChange}
     required={required}
-    testId={`cf-ui-text-field-${id}`}
+    data-testid={`cf-ui-text-field-${id}`}
     textInputProps={textInputProps}
     textarea={false}
     validationMessage={validationMessage}
