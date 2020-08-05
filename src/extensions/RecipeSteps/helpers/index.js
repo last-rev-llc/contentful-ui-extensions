@@ -1,16 +1,16 @@
-import { 
-  getTextInput, 
-  getTextInputWithLabel, 
-  getTextArea, 
-  getTextAreaWithLabel, 
-  getStepRows, 
-  getStepsTable 
+import {
+  getTextInput,
+  getTextInputWithLabel,
+  getTextArea,
+  getTextAreaWithLabel,
+  getStepRows,
+  getStepsTable
 } from './formControl';
 
 export {
-  getTextInput, 
+  getTextInput,
   getTextInputWithLabel,
-  getTextArea, 
+  getTextArea,
   getTextAreaWithLabel,
   getStepRows,
   getStepsTable

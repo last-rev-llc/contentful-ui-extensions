@@ -8,20 +8,20 @@ import {
   TableBody,
   TableCell,
   TableRow,
-  FormLabel,
+  FormLabel
 } from '@contentful/forma-36-react-components';
 import { getIconButton } from '../../../shared/helpers';
 
-const getTextInput = (textValue, onChange, { id = 'input1', name = id, type = 'text', placeholder = id }) => {
+const getTextInput = (textValue, onChange, { id = 'input1', name = id, type = 'text', placeholder = id, required = false }) => {
   return <TextInput
     className=""
     id={id}
     name={name}
     placeholder={placeholder}
     onChange={event => onChange(event)}
-    required
+    required={required}
     type={type}
-    testId={`cf-ui-text-input-${id}`}
+    testId='cf-ui-text-input-title'
     value={textValue}
     width="full" />;
 };
@@ -41,7 +41,7 @@ const getOptions = options => {
     : [<Option />];
 };
 
-const getSelect = (options, onChange, { id = 'select1', name = id }) => {
+const getSelect = (options, onChange, { id = 'select1', name = id }, value) => {
   return <Select
     className=""
     id={id}
@@ -49,16 +49,16 @@ const getSelect = (options, onChange, { id = 'select1', name = id }) => {
     onChange={onChange}
     testId={`cf-ui-select-${id}`}
     width="full"
-    willBlurOnEsc>
+    willBlurOnEsc
+    value={value}>
     {getOptions(options)}
   </Select>;
 };
 
-const withLabel = (id, labelText, control) => {
+const withLabel = (id, labelText, control, required = false) => {
   return <>
     <FormLabel htmlFor={id}
-      testId={`cf-ui-label-${id}`}
-      required>
+      required={required}>
       {labelText}
     </FormLabel>
     {control()}
@@ -70,12 +70,11 @@ const getIngredientRows = (ingredients, edit, remove) => {
     const keyId = index;
     return (
       <TableRow key={keyId}>
-        <TableCell data-test-id="Ingredients-Table-Cell-Step">{ingredient.step}</TableCell>
-        <TableCell data-test-id="Ingredients-Table-Cell-Ingredient">{ingredient.ingredient}</TableCell>
-        <TableCell data-test-id="Ingredients-Table-Cell-ImperialQuantity">{`${ingredient.imperialQuantity} ${ingredient.imperialMeasure}`}</TableCell>
-        <TableCell data-test-id="Ingredients-Table-Cell-MetricQuantity">{`${ingredient.metricQuantity} ${ingredient.metricMeasure}`}</TableCell>
-        <TableCell className='col-actions'
-          data-test-id="Ingredients-Table-Cell-Actions">
+        <TableCell>{ingredient.step}</TableCell>
+        <TableCell>{ingredient.ingredient}</TableCell>
+        <TableCell>{ingredient.imperialQuantity ? `${ingredient.imperialQuantity} ${ingredient.imperialMeasure}` : ''}</TableCell>
+        <TableCell>{ingredient.metricQuantity ? `${ingredient.metricQuantity} ${ingredient.metricMeasure}` : ''}</TableCell>
+        <TableCell className='col-actions'>
           {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
           {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
         </TableCell>
@@ -89,8 +88,7 @@ const getIngredientsTable = (ingredients, edit, remove) => {
     ? null
     : (
       <>
-        <Table className='steps-table'
-          data-test-id="Ingredients-Table">
+        <Table className='steps-table'>
           <TableHead isSticky>
             <TableRow>
               <TableCell>Step</TableCell>

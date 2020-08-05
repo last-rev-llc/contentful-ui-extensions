@@ -7,7 +7,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
-  FormLabel,
+  FormLabel
 } from '@contentful/forma-36-react-components';
 import { getIconButton } from '../../../shared/helpers';
 
@@ -28,20 +28,16 @@ const getTextArea = (textValue, onChange) => {
 
 const getTextAreaWithLabel = (textValue, labelText, onChange) => {
   return <>
-    <FormLabel htmlFor="body"
-      required
-      data-test-id="FormLabel-Body">
+    <FormLabel htmlFor="body">
       {labelText}
     </FormLabel>
     <Textarea
-      data-test-id="Textarea-Body"
       className=""
       id="body"
       maxLength={500}
       name="body"
       placeholder="Body"
       onChange={event => onChange(event)}
-      required
       rows={4}
       testId="cf-ui-body-textarea"
       value={textValue}
@@ -64,13 +60,11 @@ const getTextInput = (textValue, onChange) => {
 
 const getTextInputWithLabel = (textValue, labelText, onChange, options = { type: 'text', id: 'title', name: 'title', placeholder: 'Title' }) => {
   return <>
-    <FormLabel htmlFor="title"
-      data-test-id={`FormLabel-${labelText}`}
+    <FormLabel htmlFor={options.id}
       required>
       {labelText}
     </FormLabel>
     <TextInput
-      data-test-id={`TextInput-${labelText}`}
       className=""
       id={options.id}
       name={options.name}
@@ -89,11 +83,10 @@ const getStepRows = (steps, edit, remove) => {
     const keyId = index;
     return (
       <TableRow key={keyId}>
-        <TableCell data-test-id="Steps-Table-Cell-Step">{step.step}</TableCell>
-        <TableCell data-test-id="Steps-Table-Cell-Title">{step.title}</TableCell>
-        <TableCell data-test-id="Steps-Table-Cell-Body">{step.body}</TableCell>
-        <TableCell className='col-actions'
-          data-test-id="Steps-Table-Cell-Actions">
+        <TableCell>{step.step}</TableCell>
+        <TableCell>{step.title}</TableCell>
+        <TableCell>{step.body}</TableCell>
+        <TableCell className='col-actions'>
           {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
           {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
         </TableCell>
@@ -107,11 +100,10 @@ const getStepsTable = (steps, edit, remove) => {
     ? null
     : (
       <>
-        <Table className='steps-table'
-          data-test-id="Steps-Table">
+        <Table className='steps-table'>
           <TableHead isSticky>
             <TableRow>
-              <TableCell>Step</TableCell>
+              <TableCell>Step Number</TableCell>
               <TableCell>Title</TableCell>
               <TableCell>Body</TableCell>
               <TableCell className='col-actions' />

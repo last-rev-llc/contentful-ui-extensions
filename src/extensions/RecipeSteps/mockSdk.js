@@ -15,16 +15,6 @@ const mockSdk = {
       return value;
     }
   },
-  location: {
-    is: () => true
-  },
-  parameters: {
-    invocation: {
-      step: null
-    }
-  },
-  close: (value) => value
 };
 
-export const sdkList = { ...mockSdk, location: { is: () => false } };
 export default mockSdk;

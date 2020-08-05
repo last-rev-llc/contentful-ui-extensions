@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Form, FieldGroup } from '@contentful/forma-36-react-components';
 import { withLabel, getTextInput, getSelect } from '../helpers';
-import { getButton } from '../../../shared/helpers';
+import { getButton, getTextField } from '../../../shared/helpers';
 
 const imperialUnits = ['Teaspoon', 'Teaspoons', 'Tablespoon', 'Tablespoons', 'Cup', 'Cups', 'Ounce', 'Ounces', 'Pound', 'Pounds', 'Gram', 'Grams', 'Pinch', 'Each', 'As needed', 'To serve', 'To Taste', 'Bunch', 'Bunches', 'Can', 'Cans', 'Clove', 'Cloves', 'Leaf', 'Leaves', 'Package', 'Packages', 'Recipe', 'Recipes', 'Rib', 'Ribs', 'Slice', 'Slices', 'Wedge', 'Wedges'];
 const metricUnits = ['Milliliter', 'Milliliters', 'Liter', 'Liters', 'Ounce', 'Ounces', 'Gram', 'Grams', 'Pinch', 'Each', 'As needed', 'To serve', 'To Taste', 'Bunch', 'Bunches', 'Can', 'Cans', 'Clove', 'Cloves', 'Leaf', 'Leaves', 'Package', 'Packages', 'Recipe', 'Recipes', 'Rib', 'Ribs', 'Slice', 'Slices', 'Wedge', 'Wedges'];
@@ -10,14 +10,15 @@ const metricUnits = ['Milliliter', 'Milliliters', 'Liter', 'Liters', 'Ounce', 'O
 const IngredientDialog = ({ sdk }) => {
   const [step, setStep] = useState('');
   const [ingredient, setIngredient] = useState('');
-  const [imperialMeasure, setImperialMeasure] = useState('');
-  const [metricMeasure, setMetricMeasure] = useState('');
+  const [imperialMeasure, setImperialMeasure] = useState(imperialUnits[0]);
+  const [metricMeasure, setMetricMeasure] = useState(metricUnits[0]);
   const [imperialQuantity, setImperialQuantity] = useState('');
   const [metricQuantity, setMetricQuantity] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (sdk.parameters.invocation.ingredient) {
-      setStep(sdk.parameters.invocation.ingredient.step);
+      setStep(sdk.parameters.invocation.ingredient.step === '' ? null : sdk.parameters.invocation.ingredient.step);
       setIngredient(sdk.parameters.invocation.ingredient.ingredient);
       setImperialMeasure(sdk.parameters.invocation.ingredient.imperialMeasure);
       setImperialQuantity(sdk.parameters.invocation.ingredient.imperialQuantity);
@@ -31,31 +32,48 @@ const IngredientDialog = ({ sdk }) => {
   };
 
   const saveStep = () => {
-    sdk.close({ step: +step, ingredient, imperialMeasure, imperialQuantity: +imperialQuantity, metricMeasure, metricQuantity: +metricQuantity });
+    const returned = {
+      step: step ? +step : '',
+      imperialQuantity: imperialQuantity ? +imperialQuantity : '',
+      metricQuantity: metricQuantity ? +metricQuantity : '',
+      imperialMeasure: imperialQuantity ? imperialMeasure : '',
+      metricMeasure: metricQuantity ? metricMeasure : '',
+    };
+    if (ingredient) {
+      sdk.close({
+        step: returned.step,
+        ingredient,
+        imperialMeasure: returned.imperialMeasure,
+        imperialQuantity: returned.imperialQuantity,
+        metricMeasure: returned.metricMeasure,
+        metricQuantity: returned.metricQuantity
+      });
+    }
+    else {
+      setErrorMessage('The Ingredient field is required');
+    }
   };
 
-  const stepInput = () => getTextInput(step, (event) => setStep(event.currentTarget.value), { id: 'step', type: 'number', placeholder: 'Step' });
+  const stepInput = () => getTextInput(step, (event) => setStep(event.currentTarget.value), { id: 'stepNumber', type: 'number', placeholder: 'Step Number' });
 
-  const ingredientInput = () => getTextInput(ingredient, (event) => setIngredient(event.currentTarget.value), { id: 'ingredient', placeholder: 'Ingredient' });
+  const ingredientInput = () => getTextField(ingredient, (event) => setIngredient(event.currentTarget.value), errorMessage, { id: 'ingredient', labelText: 'Ingredient', required: true });
 
   const imperialQuantityInput = () => getTextInput(imperialQuantity, (event) => setImperialQuantity(event.currentTarget.value), { id: 'imperialQuantity', type: 'number', placeholder: 'Imperial Quantity' });
 
-  const imperialMeasureSelect = () => getSelect(imperialUnits, (event) => setImperialMeasure(event.currentTarget.value), { id: 'imperialMeasure' });
+  const imperialMeasureSelect = () => getSelect(imperialUnits, (event) => setImperialMeasure(event.currentTarget.value), { id: 'imperialMeasure' }, imperialMeasure);
 
   const metricQuantityInput = () => getTextInput(metricQuantity, (event) => setMetricQuantity(event.currentTarget.value), { id: 'metricQuantity', type: 'number', placeholder: 'Metric Quantity' });
 
-  const metricMeasureSelect = () => getSelect(metricUnits, (event) => setMetricMeasure(event.currentTarget.value), { id: 'metricMeasure' });
+  const metricMeasureSelect = () => getSelect(metricUnits, (event) => setMetricMeasure(event.currentTarget.value), { id: 'metricMeasure' }, metricMeasure);
 
   return (
-    <div id='dialog-step-wrap'
-      data-test-id="IngredientDialog">
-      <Form spacing="default"
-        data-test-id="IngredientDialog-Form">
+    <div id='dialog-step-wrap'>
+      <Form spacing="default">
         <FieldGroup>
-          {withLabel('step', 'Step', stepInput)}
+          {withLabel('stepNumber', 'Step Number', stepInput)}
         </FieldGroup>
         <FieldGroup>
-          {withLabel('ingredient', 'Ingredient', ingredientInput)}
+          {ingredientInput()}
         </FieldGroup>
         <FieldGroup row>
           {withLabel('imperialQuantity', 'Imperial Quantity', imperialQuantityInput)}

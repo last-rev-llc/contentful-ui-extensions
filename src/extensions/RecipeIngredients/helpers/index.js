@@ -1,14 +1,14 @@
-import { 
-  getTextInput, 
+import {
+  getTextInput,
   getOptions,
   getSelect,
   withLabel,
-  getIngredientRows, 
-  getIngredientsTable 
+  getIngredientRows,
+  getIngredientsTable
 } from './formControl';
 
 export {
-  getTextInput, 
+  getTextInput,
   getOptions,
   getSelect,
   withLabel,
