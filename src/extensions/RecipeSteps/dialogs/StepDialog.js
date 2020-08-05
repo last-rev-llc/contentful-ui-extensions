@@ -4,13 +4,15 @@ import {
   Form, 
   FieldGroup, 
 } from '@contentful/forma-36-react-components';
-import { getTextInputWithLabel, getTextAreaWithLabel } from '../helpers';
-import { getButton } from '../../../shared/helpers';
+import { getTextAreaWithLabel } from '../helpers';
+import { getButton, getTextField } from '../../../shared/helpers';
 
 const StepDialog = ({ sdk }) => {
   const [step, setStep] = useState('');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [stepErrorMessage, setStepErrorMessage] = useState('');
+  const [titleErrorMessage, setTitleErrorMessage] = useState('');
 
   useEffect(() => {
     if (sdk.parameters.invocation.step) {
@@ -25,17 +27,25 @@ const StepDialog = ({ sdk }) => {
   };
   
   const saveStep = () => {
-    sdk.close({ step: +step, title, body });
+    const errorMessage = 'This item is required';
+    if (step && title) {
+      sdk.close({ step: +step, title, body });
+    }
+    else {
+      setStepErrorMessage(!step ? errorMessage : '');
+      setTitleErrorMessage(!title ? errorMessage : '');
+    }
+    
   };
 
   return (
     <div id='dialog-step-wrap'>
       <Form spacing="default">
         <FieldGroup>
-          {getTextInputWithLabel(step, 'Step Number', (event) => setStep(event.currentTarget.value), { type: 'number', id: 'stepNumber', name: 'stepNumber', placeholder: 'Step Number' })}
+          {getTextField(step, (event) => setStep(event.currentTarget.value), stepErrorMessage, { id: 'stepNumber', type: 'number', labelText: 'Step Number', required: true })}
         </FieldGroup>
         <FieldGroup>
-          {getTextInputWithLabel(title, 'Title', (event) => setTitle(event.currentTarget.value))}
+          {getTextField(step, (event) => setTitle(event.currentTarget.value), titleErrorMessage, { id: 'title', labelText: 'Title', required: true })}
         </FieldGroup>
         <FieldGroup>
           {getTextAreaWithLabel(body, 'Body', (event) => setBody(event.currentTarget.value))}

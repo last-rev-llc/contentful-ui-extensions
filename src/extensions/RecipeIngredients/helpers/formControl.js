@@ -8,7 +8,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
-  FormLabel,
+  FormLabel
 } from '@contentful/forma-36-react-components';
 import { getIconButton } from '../../../shared/helpers';
 
@@ -41,7 +41,7 @@ const getOptions = options => {
     : [<Option />];
 };
 
-const getSelect = (options, onChange, { id = 'select1', name = id }) => {
+const getSelect = (options, onChange, { id = 'select1', name = id }, value) => {
   return <Select
     className=""
     id={id}
@@ -49,7 +49,8 @@ const getSelect = (options, onChange, { id = 'select1', name = id }) => {
     onChange={onChange}
     testId={`cf-ui-select-${id}`}
     width="full"
-    willBlurOnEsc>
+    willBlurOnEsc
+    value={value}>
     {getOptions(options)}
   </Select>;
 };
@@ -71,8 +72,8 @@ const getIngredientRows = (ingredients, edit, remove) => {
       <TableRow key={keyId}>
         <TableCell>{ingredient.step}</TableCell>
         <TableCell>{ingredient.ingredient}</TableCell>
-        <TableCell>{`${ingredient.imperialQuantity} ${ingredient.imperialMeasure}`}</TableCell>
-        <TableCell>{`${ingredient.metricQuantity} ${ingredient.metricMeasure}`}</TableCell>
+        <TableCell>{ingredient.imperialQuantity ? `${ingredient.imperialQuantity} ${ingredient.imperialMeasure}` : ''}</TableCell>
+        <TableCell>{ingredient.metricQuantity ? `${ingredient.metricQuantity} ${ingredient.metricMeasure}` : ''}</TableCell>
         <TableCell className='col-actions'>
           {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
           {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
