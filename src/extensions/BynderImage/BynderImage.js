@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import ReactDOM from "react-dom";
 import { get } from "lodash";
 
 import { TextInput } from "@contentful/forma-36-react-components";
-import { init } from "contentful-ui-extensions-sdk";
 import "@contentful/forma-36-react-components/dist/styles.css";
 import "./BynderImage.scss";
 
@@ -20,7 +18,7 @@ const BynderImage = ({ sdk }) => {
   const [value, setValue] = useState(sdk.field.getValue() || "");
   const {fields} = sdk.entry;
 
-  const onBynderImageChange = value => {
+  const onBynderImageChange = useEffect(value => {
     if (!Array.isArray(value)) return;
     if (value.length === 0) {
       fields.bynderId.setValue("");
@@ -35,15 +33,8 @@ const BynderImage = ({ sdk }) => {
       fields.altText.setValue(description);
       setIfEmpty(sdk, "internalTitle", title);
       setIfEmpty(sdk, "altTextOverride", description);
-    }
-  };
+    }}, [value, fields.altText, fields.bynderId, fields.imageName,sdk]);
 
-  const listenForBynderChanges = () => {
-    const bynderField = get(sdk, 'entry.fields["bynderData"]', null);
-    if (bynderField) {
-      bynderField.onValueChanged(onBynderImageChange);
-    }
-  };
 
   const onExternalChange = value => {
     setValue(value);
@@ -61,14 +52,12 @@ const BynderImage = ({ sdk }) => {
 
   useEffect(() => {
     sdk.window.startAutoResizer();
-    listenForBynderChanges();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    // Handler for external field value changes (e.g. when multiple authors are working on the same entry).
-    return sdk.field.onValueChanged(onExternalChange);
-  });
+    const bynderField = get(sdk, 'entry.fields["bynderData"]', null);
+    if (bynderField) {
+      bynderField.onValueChanged(onBynderImageChange);
+    }
+    sdk.field.onValueChanged(onExternalChange);
+  }, [sdk,onBynderImageChange]);
 
   return (
     <>
