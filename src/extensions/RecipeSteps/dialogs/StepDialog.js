@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { 
-  Form, 
-  FieldGroup, 
+import {
+  Form,
+  FieldGroup,
 } from '@contentful/forma-36-react-components';
 import { getTextAreaWithLabel } from '../helpers';
 import { getButton, getTextField } from '../../../shared/helpers';
@@ -21,11 +21,11 @@ const StepDialog = ({ sdk }) => {
       setBody(sdk.parameters.invocation.step.body);
     }
   }, [sdk]);
-  
+
   const closeDialog = () => {
     sdk.close();
   };
-  
+
   const saveStep = () => {
     const errorMessage = 'This item is required';
     if (step && title) {
@@ -35,12 +35,14 @@ const StepDialog = ({ sdk }) => {
       setStepErrorMessage(!step ? errorMessage : '');
       setTitleErrorMessage(!title ? errorMessage : '');
     }
-    
+
   };
 
   return (
-    <div id='dialog-step-wrap'>
-      <Form spacing="default">
+    <div id='dialog-step-wrap'
+      data-testid="StepDialog">
+      <Form spacing="default"
+        data-testid="StepDialog-Form">
         <FieldGroup>
           {getTextField(step, (event) => setStep(event.currentTarget.value), stepErrorMessage, { id: 'stepNumber', type: 'number', labelText: 'Step Number', required: true })}
         </FieldGroup>
@@ -57,7 +59,7 @@ const StepDialog = ({ sdk }) => {
       </Form>
     </div>
   );
-  
+
 };
 
 StepDialog.propTypes = {

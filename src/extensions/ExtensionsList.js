@@ -1,12 +1,12 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function ExtensionsList() {
   return (
     <div>
       <ul>
         <li><Link to="/bynder-image"
-                  className="">Bynder Image</Link></li>
+          className="">Bynder Image</Link></li>
         <li><Link to="/color-picker"
           className="">Color</Link></li>
         <li><Link to="/seo"

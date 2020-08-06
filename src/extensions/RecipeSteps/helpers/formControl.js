@@ -1,7 +1,7 @@
 import React from 'react';
-import { 
-  Textarea, 
-  TextInput, 
+import {
+  Textarea,
+  TextInput,
   Table,
   TableHead,
   TableBody,
@@ -27,8 +27,9 @@ const getTextArea = (textValue, onChange) => {
 };
 
 const getTextAreaWithLabel = (textValue, labelText, onChange) => {
-  return  <>
-    <FormLabel htmlFor="body">
+  return <>
+    <FormLabel htmlFor="body"
+      data-testid={`cf-ui-label-${labelText}`}>
       {labelText}
     </FormLabel>
     <Textarea
@@ -39,7 +40,7 @@ const getTextAreaWithLabel = (textValue, labelText, onChange) => {
       placeholder="Body"
       onChange={event => onChange(event)}
       rows={4}
-      testId="cf-ui-body-textarea"
+      data-testid={`cf-ui-body-${labelText}`}
       value={textValue}
       width="full" />
   </>;
@@ -97,7 +98,7 @@ const getStepRows = (steps, edit, remove) => {
 
 const getStepsTable = (steps, edit, remove) => {
   return steps.length === 0
-    ? null 
+    ? null
     : (
       <>
         <Table className='steps-table'>

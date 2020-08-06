@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  Select, 
+import {
+  Select,
   Option,
-  TextInput, 
+  TextInput,
   Table,
   TableHead,
   TableBody,
@@ -21,13 +21,13 @@ const getTextInput = (textValue, onChange, { id = 'input1', name = id, type = 't
     onChange={event => onChange(event)}
     required={required}
     type={type}
-    testId='cf-ui-text-input-title'
+    data-testid={`cf-ui-text-input-${id}`}
     value={textValue}
     width="full" />;
 };
 
 const getOptions = options => {
-  return options.length > 0 
+  return options.length > 0
     ? options.map(option => {
       return (
         <Option
@@ -47,7 +47,7 @@ const getSelect = (options, onChange, { id = 'select1', name = id }, value) => {
     id={id}
     name={name}
     onChange={onChange}
-    testId={`cf-ui-select-${id}`}
+    data-testid={`cf-ui-select-${id}`}
     width="full"
     willBlurOnEsc
     value={value}>
@@ -58,7 +58,8 @@ const getSelect = (options, onChange, { id = 'select1', name = id }, value) => {
 const withLabel = (id, labelText, control, required = false) => {
   return <>
     <FormLabel htmlFor={id}
-      required={required}>
+      required={required}
+      data-testid={`cf-ui-label-${id}`}>
       {labelText}
     </FormLabel>
     {control()}
@@ -70,11 +71,12 @@ const getIngredientRows = (ingredients, edit, remove) => {
     const keyId = index;
     return (
       <TableRow key={keyId}>
-        <TableCell>{ingredient.step}</TableCell>
-        <TableCell>{ingredient.ingredient}</TableCell>
-        <TableCell>{ingredient.imperialQuantity ? `${ingredient.imperialQuantity} ${ingredient.imperialMeasure}` : ''}</TableCell>
-        <TableCell>{ingredient.metricQuantity ? `${ingredient.metricQuantity} ${ingredient.metricMeasure}` : ''}</TableCell>
-        <TableCell className='col-actions'>
+        <TableCell data-testid="Ingredients-Table-Cell-Step">{ingredient.step}</TableCell>
+        <TableCell data-testid="Ingredients-Table-Cell-Ingredient">{ingredient.ingredient}</TableCell>
+        <TableCell data-testid="Ingredients-Table-Cell-ImperialQuantity">{ingredient.imperialQuantity ? `${ingredient.imperialQuantity} ${ingredient.imperialMeasure}` : ''}</TableCell>
+        <TableCell data-testid="Ingredients-Table-Cell-MetricQuantity">{ingredient.metricQuantity ? `${ingredient.metricQuantity} ${ingredient.metricMeasure}` : ''}</TableCell>
+        <TableCell className='col-actions'
+          data-testid="Ingredients-Table-Cell-Actions">
           {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
           {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
         </TableCell>
@@ -85,10 +87,11 @@ const getIngredientRows = (ingredients, edit, remove) => {
 
 const getIngredientsTable = (ingredients, edit, remove) => {
   return ingredients.length === 0
-    ? null 
+    ? null
     : (
       <>
-        <Table className='steps-table'>
+        <Table className='steps-table'
+          data-testid="Ingredients-Table">
           <TableHead isSticky>
             <TableRow>
               <TableCell>Step</TableCell>

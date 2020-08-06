@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Form, FieldGroup } from '@contentful/forma-36-react-components';
 import { withLabel, getTextInput, getSelect } from '../helpers';
-import { getButton, getTextField } from '../../../shared/helpers'; 
+import { getButton, getTextField } from '../../../shared/helpers';
 
-const imperialUnits = ['Teaspoon','Teaspoons','Tablespoon','Tablespoons','Cup','Cups','Ounce','Ounces','Pound','Pounds','Gram','Grams','Pinch','Each','As needed','To serve','To Taste','Bunch','Bunches','Can','Cans','Clove','Cloves','Leaf','Leaves','Package','Packages','Recipe','Recipes','Rib','Ribs','Slice','Slices','Wedge','Wedges'];
-const metricUnits = ['Milliliter','Milliliters','Liter','Liters','Ounce','Ounces','Gram','Grams','Pinch','Each','As needed','To serve','To Taste','Bunch','Bunches','Can','Cans','Clove','Cloves','Leaf','Leaves','Package','Packages','Recipe','Recipes','Rib','Ribs','Slice','Slices','Wedge','Wedges'];
+const imperialUnits = ['Teaspoon', 'Teaspoons', 'Tablespoon', 'Tablespoons', 'Cup', 'Cups', 'Ounce', 'Ounces', 'Pound', 'Pounds', 'Gram', 'Grams', 'Pinch', 'Each', 'As needed', 'To serve', 'To Taste', 'Bunch', 'Bunches', 'Can', 'Cans', 'Clove', 'Cloves', 'Leaf', 'Leaves', 'Package', 'Packages', 'Recipe', 'Recipes', 'Rib', 'Ribs', 'Slice', 'Slices', 'Wedge', 'Wedges'];
+const metricUnits = ['Milliliter', 'Milliliters', 'Liter', 'Liters', 'Ounce', 'Ounces', 'Gram', 'Grams', 'Pinch', 'Each', 'As needed', 'To serve', 'To Taste', 'Bunch', 'Bunches', 'Can', 'Cans', 'Clove', 'Cloves', 'Leaf', 'Leaves', 'Package', 'Packages', 'Recipe', 'Recipes', 'Rib', 'Ribs', 'Slice', 'Slices', 'Wedge', 'Wedges'];
 
 const IngredientDialog = ({ sdk }) => {
   const [step, setStep] = useState('');
@@ -26,11 +26,11 @@ const IngredientDialog = ({ sdk }) => {
       setMetricQuantity(sdk.parameters.invocation.ingredient.metricQuantity);
     }
   }, [sdk]);
-  
+
   const closeDialog = () => {
     sdk.close();
   };
-  
+
   const saveStep = () => {
     const returned = {
       step: step ? +step : '',
@@ -40,13 +40,13 @@ const IngredientDialog = ({ sdk }) => {
       metricMeasure: metricQuantity ? metricMeasure : '',
     };
     if (ingredient) {
-      sdk.close({ 
-        step: returned.step, 
-        ingredient, 
-        imperialMeasure: returned.imperialMeasure, 
-        imperialQuantity: returned.imperialQuantity, 
-        metricMeasure: returned.metricMeasure, 
-        metricQuantity: returned.metricQuantity 
+      sdk.close({
+        step: returned.step,
+        ingredient,
+        imperialMeasure: returned.imperialMeasure,
+        imperialQuantity: returned.imperialQuantity,
+        metricMeasure: returned.metricMeasure,
+        metricQuantity: returned.metricQuantity
       });
     }
     else {
@@ -56,7 +56,7 @@ const IngredientDialog = ({ sdk }) => {
 
   const stepInput = () => getTextInput(step, (event) => setStep(event.currentTarget.value), { id: 'stepNumber', type: 'number', placeholder: 'Step Number' });
 
-  const ingredientInput = () => getTextField(ingredient, (event) => setIngredient(event.currentTarget.value), errorMessage,{ id: 'ingredient', labelText: 'Ingredient', required: true });
+  const ingredientInput = () => getTextField(ingredient, (event) => setIngredient(event.currentTarget.value), errorMessage, { id: 'ingredient', labelText: 'Ingredient', required: true });
 
   const imperialQuantityInput = () => getTextInput(imperialQuantity, (event) => setImperialQuantity(event.currentTarget.value), { id: 'imperialQuantity', type: 'number', placeholder: 'Imperial Quantity' });
 
@@ -67,8 +67,10 @@ const IngredientDialog = ({ sdk }) => {
   const metricMeasureSelect = () => getSelect(metricUnits, (event) => setMetricMeasure(event.currentTarget.value), { id: 'metricMeasure' }, metricMeasure);
 
   return (
-    <div id='dialog-step-wrap'>
-      <Form spacing="default">
+    <div id='dialog-step-wrap'
+      data-testid="IngredientDialog">
+      <Form spacing="default"
+        data-testid="IngredientDialog-Form">
         <FieldGroup>
           {withLabel('stepNumber', 'Step Number', stepInput)}
         </FieldGroup>
@@ -90,7 +92,7 @@ const IngredientDialog = ({ sdk }) => {
       </Form>
     </div>
   );
-  
+
 };
 
 IngredientDialog.propTypes = {

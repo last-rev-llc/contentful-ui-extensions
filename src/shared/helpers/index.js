@@ -1,10 +1,10 @@
-import { 
-  getButton, 
-  getIconButton, 
+import {
+  getButton,
+  getIconButton,
   getSelect,
   getTextField,
-  getOptions, 
-  withLabel 
+  getOptions,
+  withLabel
 } from './formControl';
 import {
   updateJson,
@@ -13,12 +13,12 @@ import {
   getInfo
 } from './utility';
 
-export { 
-  getButton, 
-  getIconButton, 
-  getSelect, 
+export {
+  getButton,
+  getIconButton,
+  getSelect,
   getTextField,
-  getOptions, 
+  getOptions,
   withLabel,
   updateJson,
   getError,

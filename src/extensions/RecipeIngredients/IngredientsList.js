@@ -10,7 +10,7 @@ const IngredientsList = ({ sdk }) => {
   const [ingredientList, setIngredientList] = useState([]);
 
   useEffect(() => {
-    if(sdk.field.getValue()) {
+    if (sdk.field.getValue()) {
       let fieldValue = sdk.field.getValue();
       if (!Array.isArray(fieldValue)) {
         fieldValue = fieldValue.ingredients || [];
@@ -21,7 +21,7 @@ const IngredientsList = ({ sdk }) => {
 
   const addIngredient = (ingredient) => {
     if (ingredient) {
-      const ingredients = [ ...ingredientList ];
+      const ingredients = [...ingredientList];
       ingredients.push(ingredient);
       sdk.field.setValue(ingredients);
       setIngredientList(ingredients);
@@ -34,7 +34,7 @@ const IngredientsList = ({ sdk }) => {
   };
 
   const editIngredient = (ingredient, ingredientIndex) => {
-    const ingredients = [ ...ingredientList ];
+    const ingredients = [...ingredientList];
     if (ingredient && ingredients[ingredientIndex]) {
       ingredients[ingredientIndex] = ingredient;
       sdk.field.setValue(ingredients);
@@ -63,7 +63,7 @@ const IngredientsList = ({ sdk }) => {
       </div>
     </>
   );
-  
+
 };
 
 IngredientsList.propTypes = {

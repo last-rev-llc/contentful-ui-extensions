@@ -2,7 +2,7 @@
 /* eslint-disable react/require-default-props */
 /* eslint-disable import/no-named-default */
 import React from 'react';
-import {Router, Route, Switch} from 'react-router-dom';
+import { Router, Route, Switch } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ColorPicker from './ColorPicker';
 import LocalizationLookup from './LocalizationLookup';
@@ -59,22 +59,20 @@ const App = ({ sdk, locations }) => {
           exact
           component={() => {
             const usedSdk = sdk;
-            if(usedSdk.location.is(locations.LOCATION_APP_CONFIG)) {
+            if (usedSdk.location.is(locations.LOCATION_APP_CONFIG)) {
               return <SeoConfig sdk={usedSdk}
                 locations={locations} />;
             }
             return <Seo sdk={sdk || usedSdk}
               locations={locations} />;
-          }}/>
+          }} />
         <Route path="/bynder-image"
-               exact
-               component={() => (
-                 <BynderImage
-                   sdk={createMockSDK()|| localizationLookupMockSdk}
-                   locations={locations}
-                 />
-               )}
-        />
+          exact
+          component={() => (
+            <BynderImage
+              sdk={createMockSDK() || localizationLookupMockSdk}
+              locations={locations} />
+          )} />
       </Switch>
     </Router>
   );

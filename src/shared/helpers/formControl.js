@@ -8,6 +8,7 @@ const getButton = (label, buttonType, onClick, position) => {
     loading={false}
     onClick={onClick}
     testId={`cf-ui-button-${label}-${position}`}
+    data-testid={`cf-ui-button-${label}`}
     type="button">
     {label}
   </Button>;
@@ -16,16 +17,16 @@ const getButton = (label, buttonType, onClick, position) => {
 const getIconButton = (label, buttonType, iconType, iconSize, onClick, position) => {
   return <IconButton
     buttonType={buttonType}
-    iconProps={{ icon:iconType, size:iconSize }}
+    iconProps={{ icon: iconType, size: iconSize }}
     label={label}
     onClick={onClick}
-    testId={`cf-ui-button-${label}-${position}`}/>;
+    testId={`cf-ui-button-${label}-${position}`} />;
 };
 
 const getOptions = (options, optionObject, position) => {
-  return options.length > 0 
+  return options.length > 0
     ? options.map(option => {
-      
+
       return (
         <Option
           key={option}
@@ -48,7 +49,7 @@ const getSelect = (options, onChange, { id = 'select1', name = id, disabled = fa
     width={width}
     disabled={disabled}
     willBlurOnEsc
-    value={value || (optionObject ? optionObject[options[0]] : options[0]) }>
+    value={value || (optionObject ? optionObject[options[0]] : options[0])}>
     {getOptions(options, optionObject, position)}
   </Select>;
 };
@@ -66,33 +67,33 @@ const withLabel = (id, labelText, control) => {
 
 
 const getTextField = (
-  textValue, 
-  onChange, 
-  validationMessage, 
-  { 
-    id = 'input1', 
-    name = id, 
-    labelText = 'label1', 
-    helpText = '', 
-    required = false, 
-    requiredText = required ? 'required' : '', 
-    textInputProps = { 
-      disabled: false, 
-      placeholder: labelText, 
-      type: 'text' 
-    } 
+  textValue,
+  onChange,
+  validationMessage,
+  {
+    id = 'input1',
+    name = id,
+    labelText = 'label1',
+    helpText = '',
+    required = false,
+    requiredText = required ? 'required' : '',
+    textInputProps = {
+      disabled: false,
+      placeholder: labelText,
+      type: 'text'
+    }
   }) => {
   return <TextField
     className=""
     countCharacters={false}
-    formLabelProps={{requiredText}}
+    formLabelProps={{ requiredText }}
     helpText={helpText}
     id={id}
     labelText={labelText}
     name={name}
     onChange={onChange}
     required={required}
-    testId={`cf-ui-text-field-${id}`}
+    data-testid={`cf-ui-text-field-${id}`}
     textInputProps={textInputProps}
     textarea={false}
     validationMessage={validationMessage}
