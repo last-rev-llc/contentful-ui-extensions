@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { TextInput } from '@contentful/forma-36-react-components';
-import { getSelect, getButton, updateJson, getError, hasDuplicate, getIconButton, getInfo } from '../../shared/helpers';
+import { getSelect, getButton, updateJson, getError, hasDuplicate, getIconButton, getInfo, getTextField } from '../../shared/helpers';
 
 export const blankOptionValue = 'blank';
 export const blankOptionName = 'Select Locale';
@@ -37,6 +37,8 @@ const LocaleZooms = ({ sdk }) => {
   const [localeUniqueErrorInFactory, setLocaleUniqueErrorInFactory] = useState(false);
   const [zoomIdRequiredErrorInFactory, setZoomIdRequiredErrorInFactory] = useState(false);
   const [zoomIdLengthErrorInFactory, setZoomIdLengthErrorInFactory] = useState(false);
+  const [formatError, setFormatError] = useState(false);
+  const [jsonString, setJsonString] = useState('');
 
   const sortedOptions = (options) => {
     return options.sort((a, b) => {
@@ -45,6 +47,11 @@ const LocaleZooms = ({ sdk }) => {
       }
       if (b === blankOptionValue) {
         return 1;
+      }
+      if (!sdk.locales.names[a] || !sdk.locales.names[b]) {
+        setFormatError(true);
+        setJsonString(JSON.stringify(sdk.field.getValue(), undefined, 4));
+        return 0;
       }
       return sdk.locales.names[a].localeCompare(sdk.locales.names[b]);
     });
@@ -324,6 +331,27 @@ const LocaleZooms = ({ sdk }) => {
     );
   };
 
+  const onJsonStringChange = event => {
+    setJsonString(event.currentTarget.value);
+  };
+
+  const onJsonStringSave = () => {
+    try {
+      const newJson = JSON.parse(jsonString);
+      sdk.field.setValue(newJson);
+      setJsonObject(newJson);
+      setZoomId('');
+      const usedLocales = _.keys(newJson);
+      const options = sortedOptions(prepareOptions(_.keys(sdk.locales.names)));
+      const filteredLocales = options.filter(name => usedLocales.every(usedLocale => usedLocale !== name));
+      adjustLocales(filteredLocales);
+      setFormatError(false);
+    }
+    catch (e) {
+      setFormatError(true);
+    }
+  };
+
   const getFieldList = () => {
     const renderedList = sortedOptions(_.keys(jsonObject)).map((key, id) => {
       const divKey = id;
@@ -346,16 +374,28 @@ const LocaleZooms = ({ sdk }) => {
     );
   };
 
-  return (
-    <>
-      <div>
-        {noLocale ? getInfo('All locales have been chosen. Please delete or edit an item to make changes.') : getFieldFactory()}
-      </div>
-      <div className="mt-4">
-        {getFieldList()}
-      </div>
-    </>
-  );
+  return !formatError 
+    ? (
+      <>
+        <div>
+          {noLocale ? getInfo('All locales have been chosen. Please delete or edit an item to make changes.') : getFieldFactory()}
+        </div>
+        <div className="mt-4">
+          {getFieldList()}
+        </div>
+      </>
+    ) 
+    : (
+      <>
+        <div>
+          {getError(formatError, 'The JSON object appears to be in the wrong format. Please correct the format in order to proceed.', 'factory')}
+        </div>
+        <div>
+          {getTextField(jsonString, onJsonStringChange, '', { id: 'jsonString', labelText: 'JSON Object', textarea: true })}
+          {getButton('Save', 'positive', onJsonStringSave, 'factory')}
+        </div>
+      </>
+    );
 
 };
 

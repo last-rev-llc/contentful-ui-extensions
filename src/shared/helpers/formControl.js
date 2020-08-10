@@ -81,7 +81,8 @@ const getTextField = (
       disabled: false,
       placeholder: labelText,
       type: 'text'
-    }
+    },
+    textarea = false
   }) => {
   return <TextField
     className=""
@@ -95,7 +96,7 @@ const getTextField = (
     required={required}
     data-testid={`cf-ui-text-field-${id}`}
     textInputProps={textInputProps}
-    textarea={false}
+    textarea={textarea}
     validationMessage={validationMessage}
     value={textValue}
     width="full" />;
