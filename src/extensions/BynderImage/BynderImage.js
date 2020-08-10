@@ -29,14 +29,16 @@ const BynderImage = ({ sdk }) => {
         const bynderData = get(value, "[0]", {});
         const description = get(bynderData, "description", "");
         const title = get(bynderData, "name", "");
-        fields.bynderId.setValue(get(bynderData, "id", ""));
-        fields.imageName.setValue(title);
-        fields.altText.setValue(description);
+        const web = get(bynderData, "thumbnails.webimage");
+        if(fields.bynderId) fields.bynderId.setValue(get(bynderData, "id", ""));
+        if(fields.imageName) fields.imageName.setValue(title);
+        if(fields.altText) fields.altText.setValue(description);
+        if (fields.webImage) fields.webImage.setValue(web);
         setIfEmpty(sdk, "internalTitle", title);
         setIfEmpty(sdk, "altTextOverride", description);
       }
     },
-    [fields.altText, fields.bynderId, fields.imageName, sdk]
+    [fields.bynderImage, fields.altText, fields.bynderId, fields.webImage, sdk]
   );
 
   const onExternalChange = value => {
@@ -58,6 +60,8 @@ const BynderImage = ({ sdk }) => {
     const bynderField = get(sdk, 'entry.fields["bynderData"]', null);
     if (bynderField) {
       bynderField.onValueChanged(onBynderImageChange);
+      const value = bynderField.getValue();
+      onBynderImageChange(value);
     }
     sdk.field.onValueChanged(onExternalChange);
   }, [sdk, onBynderImageChange]);
