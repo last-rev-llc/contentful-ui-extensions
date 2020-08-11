@@ -15,7 +15,7 @@ const getTextArea = (textValue, onChange) => {
   return <Textarea
     className=""
     id="body"
-    maxLength={500}
+    maxLength={5000}
     name="body"
     placeholder="Body"
     onChange={event => onChange(event)}
@@ -35,7 +35,7 @@ const getTextAreaWithLabel = (textValue, labelText, onChange) => {
     <Textarea
       className=""
       id="body"
-      maxLength={500}
+      maxLength={5000}
       name="body"
       placeholder="Body"
       onChange={event => onChange(event)}
