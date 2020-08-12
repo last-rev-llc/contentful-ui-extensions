@@ -4,8 +4,81 @@ import { Form, FieldGroup } from '@contentful/forma-36-react-components';
 import { withLabel, getTextInput, getSelect } from '../helpers';
 import { getButton, getTextField } from '../../../shared/helpers';
 
-const imperialUnits = ['Teaspoon', 'Teaspoons', 'Tablespoon', 'Tablespoons', 'Cup', 'Cups', 'Ounce', 'Ounces', 'Pound', 'Pounds', 'Gram', 'Grams', 'Pinch', 'Each', 'As needed', 'To serve', 'To Taste', 'Bunch', 'Bunches', 'Can', 'Cans', 'Clove', 'Cloves', 'Leaf', 'Leaves', 'Package', 'Packages', 'Recipe', 'Recipes', 'Rib', 'Ribs', 'Slice', 'Slices', 'Wedge', 'Wedges'];
-const metricUnits = ['Milliliter', 'Milliliters', 'Liter', 'Liters', 'Ounce', 'Ounces', 'Gram', 'Grams', 'Pinch', 'Each', 'As needed', 'To serve', 'To Taste', 'Bunch', 'Bunches', 'Can', 'Cans', 'Clove', 'Cloves', 'Leaf', 'Leaves', 'Package', 'Packages', 'Recipe', 'Recipes', 'Rib', 'Ribs', 'Slice', 'Slices', 'Wedge', 'Wedges'];
+const imperialUnits = [
+  'Teaspoon', 
+  'Teaspoons', 
+  'Tablespoon', 
+  'Tablespoons', 
+  'Cup', 
+  'Cups', 
+  'Ounce', 
+  'Ounces', 
+  'Pound', 
+  'Pounds', 
+  'Gram', 
+  'Grams', 
+  'Pinch', 
+  'Each', 
+  'As needed', 
+  'To serve', 
+  'To Taste', 
+  'Bunch', 
+  'Bunches', 
+  'Can', 
+  'Cans', 
+  'Clove', 
+  'Cloves', 
+  'Leaf', 
+  'Leaves', 
+  'Package', 
+  'Packages', 
+  'Recipe', 
+  'Recipes', 
+  'Rib', 
+  'Ribs', 
+  'Slice', 
+  'Slices', 
+  'Wedge', 
+  'Wedges',
+  'Head',
+  'Heads'
+].sort();
+
+const metricUnits = [
+  'Milliliter', 
+  'Milliliters', 
+  'Liter', 
+  'Liters', 
+  'Ounce', 
+  'Ounces', 
+  'Gram', 
+  'Grams', 
+  'Pinch', 
+  'Each', 
+  'As needed', 
+  'To serve', 
+  'To Taste', 
+  'Bunch', 
+  'Bunches', 
+  'Can', 
+  'Cans', 
+  'Clove', 
+  'Cloves', 
+  'Leaf', 
+  'Leaves', 
+  'Package', 
+  'Packages', 
+  'Recipe', 
+  'Recipes', 
+  'Rib', 
+  'Ribs', 
+  'Slice', 
+  'Slices', 
+  'Wedge', 
+  'Wedges',
+  'Head',
+  'Heads'
+].sort();
 
 const IngredientDialog = ({ sdk }) => {
   const [step, setStep] = useState('');
