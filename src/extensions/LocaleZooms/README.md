@@ -18,8 +18,8 @@ The Last Rev LocaleZooms extension can be used to create a simple JSON object to
 
 ```json
 {
-  "English": "9876543210",
-  "Spanish": "1234567890"
+  "en-US": "9876543210",
+  "es": "1234567890"
 }
 ```
 
