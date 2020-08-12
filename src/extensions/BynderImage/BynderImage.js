@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
-import ReactDOM from "react-dom";
 import { get } from "lodash";
 
 import { TextInput } from "@contentful/forma-36-react-components";
-import { init } from "contentful-ui-extensions-sdk";
 import "@contentful/forma-36-react-components/dist/styles.css";
 import "./BynderImage.scss";
 
@@ -18,39 +16,37 @@ export function setIfEmpty(sdk, fieldId, value) {
 
 const BynderImage = ({ sdk }) => {
   const [value, setValue] = useState(sdk.field.getValue() || "");
-  const {fields} = sdk.entry;
+  const { fields } = sdk.entry;
 
-  const onBynderImageChange = value => {
-    if (!Array.isArray(value)) return;
-    if (value.length === 0) {
-      fields.bynderId.setValue("");
-      fields.imageName.setValue("");
-      fields.altText.setValue("");
-    } else {
-      const bynderData = get(value, "[0]", {});
-      const description = get(bynderData, "description", "");
-      const title = get(bynderData, "name", "");
-      fields.bynderId.setValue(get(bynderData, "id", ""));
-      fields.imageName.setValue(title);
-      fields.altText.setValue(description);
-      setIfEmpty(sdk, "internalTitle", title);
-      setIfEmpty(sdk, "altTextOverride", description);
-    }
-  };
-
-  const listenForBynderChanges = () => {
-    const bynderField = get(sdk, 'entry.fields["bynderData"]', null);
-    if (bynderField) {
-      bynderField.onValueChanged(onBynderImageChange);
-    }
-  };
+  const onBynderImageChange = useCallback(
+    value => {
+      if (!Array.isArray(value)) return;
+      if (value.length === 0) {
+        fields.bynderId.setValue("");
+        fields.imageName.setValue("");
+        fields.altText.setValue("");
+      } else {
+        const bynderData = get(value, "[0]", {});
+        const description = get(bynderData, "description", "");
+        const title = get(bynderData, "name", "");
+        const web = get(bynderData, "thumbnails.webimage");
+        if(fields.bynderId) fields.bynderId.setValue(get(bynderData, "id", ""));
+        if(fields.imageName) fields.imageName.setValue(title);
+        if(fields.altText) fields.altText.setValue(description);
+        if (fields.webImage) fields.webImage.setValue(web);
+        setIfEmpty(sdk, "internalTitle", title);
+        setIfEmpty(sdk, "altTextOverride", description);
+      }
+    },
+    [fields.bynderImage, fields.altText, fields.bynderId, fields.webImage, sdk]
+  );
 
   const onExternalChange = value => {
     setValue(value);
   };
 
   const onChange = e => {
-    const {value} = e.currentTarget;
+    const { value } = e.currentTarget;
     setValue(value);
     if (value) {
       sdk.field.setValue(value);
@@ -61,14 +57,14 @@ const BynderImage = ({ sdk }) => {
 
   useEffect(() => {
     sdk.window.startAutoResizer();
-    listenForBynderChanges();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    // Handler for external field value changes (e.g. when multiple authors are working on the same entry).
-    return sdk.field.onValueChanged(onExternalChange);
-  });
+    const bynderField = get(sdk, 'entry.fields["bynderData"]', null);
+    if (bynderField) {
+      bynderField.onValueChanged(onBynderImageChange);
+      const value = bynderField.getValue();
+      onBynderImageChange(value);
+    }
+    sdk.field.onValueChanged(onExternalChange);
+  }, [sdk, onBynderImageChange]);
 
   return (
     <>
@@ -78,7 +74,8 @@ const BynderImage = ({ sdk }) => {
         id="bynderImageId"
         data-testid="bynderImageTestId"
         value={value}
-        onChange={onChange}/>
+        onChange={onChange}
+      />
     </>
   );
 };
@@ -86,10 +83,6 @@ const BynderImage = ({ sdk }) => {
 BynderImage.propTypes = {
   sdk: PropTypes.object.isRequired
 };
-
-// init(sdk => {
-//   ReactDOM.render(<BynderImage sdk={sdk} />, document.getElementById("root"));
-// });
 
 /**
  * By default, iframe of the extension is fully reloaded on every save of a source file.
