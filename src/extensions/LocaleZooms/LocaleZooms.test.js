@@ -1,17 +1,17 @@
 import React from 'react';
 import _ from 'lodash';
 import { render, cleanup, configure, fireEvent, waitForElement } from '@testing-library/react';
-import LocaleZooms, { 
-  withBlankOption, 
-  isToLength,
+import LocaleZooms, {
+  withBlankOption,
+  isCorrectFormat,
   blankOptionValue,
   blankOptionName,
   uniqueErrorMessage,
   localeRequiredErrorMessage,
   zoomIdRequiredErrorMessage,
-  zoomIdLengthErrorMessage,
+  zoomIdFormatErrorMessage,
   zoomIdLengthMin,
-  zoomIdLengthMax 
+  zoomIdLengthMax,
 } from './LocaleZooms';
 
 import sdk from './mockSdk';
@@ -35,27 +35,40 @@ describe('LocaleZooms helper methods', () => {
     });
   });
 
-  describe('isToLength(id)', () => {
+  describe('isCorrectFormat(id)', () => {
     describe('returns false if', () => {
-      test('id is not 10 or 11 characters long', () => {
+      test('id is not 9, 10 or 11 characters long', () => {
         const id = '1234567';
-        const result = isToLength(id);
+        const result = isCorrectFormat(id);
+
+        expect(result).toBe(false);
+      });
+      test('id is not all number characters', () => {
+        const id = 'a234567';
+        const result = isCorrectFormat(id);
 
         expect(result).toBe(false);
       });
     });
 
     describe('returns true if', () => {
-      test('id is 10 characters long', () => {
-        const id = '1234567890';
-        const result = isToLength(id);
+      test('id is 9 number characters long', () => {
+        const id = '123456789';
+        const result = isCorrectFormat(id);
 
         expect(result).toBe(true);
       });
 
-      test('id is 11 characters long', () => {
+      test('id is 10 number characters long', () => {
+        const id = '1234567890';
+        const result = isCorrectFormat(id);
+
+        expect(result).toBe(true);
+      });
+
+      test('id is 11 number characters long', () => {
         const id = '12345678901';
-        const result = isToLength(id);
+        const result = isCorrectFormat(id);
 
         expect(result).toBe(true);
       });
@@ -76,7 +89,7 @@ describe('<LocaleZooms />', () => {
       const { getByTestId } = render(<LocaleZooms sdk={sdk} />);
       const localeField = getByTestId(factoryLocaleTestId);
       const zoomIdField = getByTestId(factoryZoomIdTestId);
-      
+
       expect(localeField).toBeTruthy();
       expect(zoomIdField).toBeTruthy();
       expect(getByTestId(addButtonTestId)).toBeTruthy();
@@ -156,7 +169,7 @@ describe('<LocaleZooms />', () => {
           fireEvent.click(getByTestId('cf-ui-select-option-fr-factory'));
           expect(localeField.value).toBe(changedLocale);
           expect(zoomIdField.value).toBe(zoomId);
-  
+
           fireEvent.click(getByTestId(addButtonTestId));
           expect(queryByTestId('error-factory')).toBeNull();
           expect(getAllByTestId('field-item').length).toBe(fieldListLength + 1);
@@ -223,15 +236,15 @@ describe('<LocaleZooms />', () => {
     describe('when edit button is pressed', () => {
       test('shows save button and cancel button', () => {
         const { getByTestId } = render(<LocaleZooms sdk={sdk} />);
-  
+
         fireEvent.click(getByTestId(editButton));
         expect(getByTestId(saveButton)).toBeTruthy();
         expect(getByTestId(cancelButton)).toBeTruthy();
       });
-  
+
       test('locale and zoom id are editable', () => {
         const { getByTestId } = render(<LocaleZooms sdk={sdk} />);
-  
+
         fireEvent.click(getByTestId(editButton));
         expect(getByTestId(localeTestIdFirst).disabled).toEqual(false);
         expect(getByTestId(zoomIdTestIdFirst).disabled).toEqual(false);
@@ -242,7 +255,7 @@ describe('<LocaleZooms />', () => {
           describe('locale is changed and', () => {
             test('zoom id is not changed', () => {
               const { getByTestId } = render(<LocaleZooms sdk={sdk} />);
-          
+
               fireEvent.click(getByTestId(editButton));
               fireEvent.change(getByTestId(localeTestIdFirst), { target: { value: newInput } });
               fireEvent.click(getByTestId(saveButton));
@@ -258,7 +271,7 @@ describe('<LocaleZooms />', () => {
 
             test('zoom id is changed', () => {
               const { getByTestId } = render(<LocaleZooms sdk={sdk} />);
-          
+
               fireEvent.click(getByTestId(editButton));
               fireEvent.change(getByTestId(localeTestIdFirst), { target: { value: newInput } });
               fireEvent.change(getByTestId(zoomIdTestIdFirst), { target: { value: newZoomIdInput } });
