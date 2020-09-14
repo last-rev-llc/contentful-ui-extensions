@@ -1,0 +1,60 @@
+.content {
+  margin: 1rem;
+}
+
+.title {
+  margin-bottom: 1rem;
+}
+
+.create-form-actions {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.setup-form {
+  .title {
+    margin-bottom: 1rem;
+  }
+  .actions {
+    width: 100%;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
+.sortable-list {
+  padding-inline-start: 0px;
+}
+
+.card-item-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.card-item-title {
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.card-item-button {
+  margin-right: 1rem;
+}
+
+.confirm-delete-dialog-form {
+  margin-top: 1rem;
+}
+
+.confirm-delete-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.confirm-delete-dialog-button {
+  margin-left: 1rem;
+}
