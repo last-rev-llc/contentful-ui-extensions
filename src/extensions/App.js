@@ -12,6 +12,7 @@ import Seo from "./Seo";
 import RecipeSteps from "./RecipeSteps";
 import RecipeIngredients from "./RecipeIngredients";
 import SeoConfig from "./Seo/SeoConfig";
+import TableBuilder from "./TableBuilder";
 import ExtensionsList from "./ExtensionsList";
 import history from "../history";
 import localizationLookupMockSdk from "./LocalizationLookup/mockSdk";
@@ -20,6 +21,7 @@ import contentDiffMockSdk from "./ContentDiff/mockSdk";
 import colorPickerMockSdk from "./ColorPicker/mockSdk";
 import recipeStepsMockSdk from "./RecipeSteps/mockSdk";
 import recipeIngredientsMockSdk from "./RecipeIngredients/mockSdk";
+import tableBuilderMockSdk from "./TableBuilder/mockSdk";
 
 import BynderImage from "./BynderImage";
 import { createMockSDK } from "./BynderImage/mockSdk";
@@ -107,6 +109,16 @@ const App = ({ sdk, locations }) => {
             <BynderImage sdk={sdk || createMockSDK()} locations={locations} />
           )}
         />
+        <Route
+          path="/table-builder"
+          exact
+          component={() => (
+            <TableBuilder
+              sdk={sdk || tableBuilderMockSdk}
+              locations={locations}
+            />
+          )}
+        />
       </Switch>
     </Router>
   );
@@ -121,8 +133,8 @@ App.propTypes = {
     LOCATION_DIALOG: PropTypes.string.isRequired,
     LOCATION_ENTRY_EDITOR: PropTypes.string.isRequired,
     LOCATION_PAGE: PropTypes.string.isRequired,
-    LOCATION_APP_CONFIG: PropTypes.string.isRequired
-  })
+    LOCATION_APP_CONFIG: PropTypes.string.isRequired,
+  }),
 };
 
 export default App;
