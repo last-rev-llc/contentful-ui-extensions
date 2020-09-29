@@ -55,7 +55,6 @@ export default function PersonName({ sdk }) {
         name="lastName"
         labelText="Last Name"
         required
-        data-testid="lastName"
         textInputProps={{
           onChange: handleFieldChange('lastName'),
         }} />
@@ -64,7 +63,6 @@ export default function PersonName({ sdk }) {
         id="suffix"
         name="suffix"
         labelText="Suffix"
-        data-testid="suffix"
         textInputProps={{
           onChange: handleFieldChange('suffix'),
         }} />
@@ -73,7 +71,6 @@ export default function PersonName({ sdk }) {
         id="nickname"
         name="nickname"
         labelText="Nickname"
-        data-testid="nickname"
         textInputProps={{
           onChange: handleFieldChange('nickname'),
         }} />
