@@ -9,6 +9,7 @@ import LocalizationLookup from "./LocalizationLookup";
 import LocaleZooms from "./LocaleZooms";
 import ContentDiff from "./ContentDiff";
 import Seo from "./Seo";
+import PersonName from './PersonName';
 import RecipeSteps from "./RecipeSteps";
 import RecipeIngredients from "./RecipeIngredients";
 import SeoConfig from "./Seo/SeoConfig";
@@ -18,6 +19,7 @@ import localizationLookupMockSdk from "./LocalizationLookup/mockSdk";
 import localeZoomsMockSdk from "./LocaleZooms/mockSdk";
 import contentDiffMockSdk from "./ContentDiff/mockSdk";
 import colorPickerMockSdk from "./ColorPicker/mockSdk";
+import personNameMockSdk from './PersonName/mockSdk';
 import recipeStepsMockSdk from "./RecipeSteps/mockSdk";
 import recipeIngredientsMockSdk from "./RecipeIngredients/mockSdk";
 
@@ -59,6 +61,10 @@ const App = ({ sdk, locations }) => {
             />
           )}
         />
+        <Route path="/person-name"
+          exact
+          component={() => <PersonName sdk={sdk || personNameMockSdk}
+            locations={locations} />} />
         <Route
           path="/recipe-ingredients"
           exact

@@ -17,6 +17,8 @@ export default function ExtensionsList() {
           className="">Locale Zooms</Link></li>
         <li><Link to="/recipe-ingredients"
           className="">Recipe Ingredients</Link></li>
+        <li><Link to="/person-name"
+          className="">Person Name</Link></li>
         <li><Link to="/recipe-steps"
           className="">Recipe Steps</Link></li>
         <li><Link to="/content-diff"
