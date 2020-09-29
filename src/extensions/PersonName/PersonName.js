@@ -3,50 +3,19 @@ import { TextField } from "@contentful/forma-36-react-components";
 import PropTypes from "prop-types";
 
 export default function PersonName({ sdk }) {
-  const [fieldValue, setFieldValue] = useState("");
+  const [fieldValue, setFieldValue] = useState({});
 
   useEffect(() => {
-    console.log(sdk);
-    if(sdk.field.getValue()){ 
+    if (sdk.field.getValue()) {
       setFieldValue(sdk.field.getValue());
-    } else{ 
+    } else {
       setFieldValue({});
     };
-    
+
   }, [sdk.field]);
 
-  const handleSalutationChange = (e) => {
-    fieldValue.salutation = e.value;
-    sdk.field.setValue(fieldValue);
-    setFieldValue(fieldValue);
-  };
-
-  const handleFirstNameChange = (e) => {
-    fieldValue.firstName = e.value;
-    sdk.field.setValue(fieldValue);
-    setFieldValue(fieldValue);
-  };
-
-  const handleMiddleNameChange = (e) => {
-    fieldValue.middleName = e.value;
-    sdk.field.setValue(fieldValue);
-    setFieldValue(fieldValue);
-  };
-
-  const handleLastNameChange = (e) => {
-    fieldValue.lastName = e.value;
-    sdk.field.setValue(fieldValue);
-    setFieldValue(fieldValue);
-  };
-
-  const handleSuffixChange = (e) => {
-    fieldValue.suffix = e.value;
-    sdk.field.setValue(fieldValue);
-    setFieldValue(fieldValue);
-  };
-
-  const handleNicknameChange = (e) => {
-    fieldValue.nickname = e.value;
+  const handleFieldChange = (fieldName) => (e) => {
+    fieldValue[fieldName] = e.currentTarget.value;
     sdk.field.setValue(fieldValue);
     setFieldValue(fieldValue);
   };
@@ -57,62 +26,56 @@ export default function PersonName({ sdk }) {
         value={fieldValue.salutation || ""}
         id="salutation"
         name="salutation"
-        labelText="salutation"
-        data-testid="salutation"
+        labelText="Salutation"
         textInputProps={{
-        //   maxLength: 60,
-          onChange: (e) => handleSalutationChange(e.currentTarget),
-        }} />
+          onChange: handleFieldChange('salutation'),
+        }}
+      />
       <TextField
         value={fieldValue.firstName || ""}
         id="firstName"
         name="firstName"
-        labelText="firstName"
+        labelText="First Name"
         required
-        data-testid="firstName"
         textInputProps={{
-        //   maxLength: 15,
-          onChange: (e) => handleFirstNameChange(e.currentTarget),
-        }} />
+          onChange: handleFieldChange('firstName'),
+        }}
+      />
       <TextField
         value={fieldValue.middleName || ""}
         id="middleName"
         name="middleName"
-        labelText="middleName"
-        data-testid="middleName"
+        labelText="Middle Name"
         textInputProps={{
-        //   maxLength: 10,
-          onChange: (e) => handleMiddleNameChange(e.currentTarget),
+          onChange: handleFieldChange('middleName'),
         }} />
       <TextField
         value={fieldValue.lastName || ""}
         id="lastName"
         name="lastName"
-        labelText="lastName"
+        labelText="Last Name"
+        required
         data-testid="lastName"
         textInputProps={{
-        //   maxLength: 10,
-          onChange: (e) => handleLastNameChange(e.currentTarget),
+          onChange: handleFieldChange('lastName'),
         }} />
       <TextField
         value={fieldValue.suffix || ""}
         id="suffix"
         name="suffix"
-        labelText="suffix"
+        labelText="Suffix"
         data-testid="suffix"
         textInputProps={{
-        //   maxLength: 10,
-          onChange: (e) => handleSuffixChange(e.currentTarget),
+          onChange: handleFieldChange('suffix'),
         }} />
       <TextField
         value={fieldValue.nickname || ""}
         id="nickname"
         name="nickname"
-        labelText="nickname"
+        labelText="Nickname"
         data-testid="nickname"
         textInputProps={{
-        //   maxLength: 10,
-          onChange: (e) => handleNicknameChange(e.currentTarget),
+          onChange: handleFieldChange('nickname'),
         }} />
     </div>
   );
