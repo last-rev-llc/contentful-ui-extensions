@@ -19,6 +19,8 @@ export default function ExtensionsList() {
           className="">Recipe Ingredients</Link></li>
         <li><Link to="/person-name"
           className="">Person Name</Link></li>
+        <li><Link to="/phone-number"
+          className="">Phone Number</Link></li>
         <li><Link to="/recipe-steps"
           className="">Recipe Steps</Link></li>
         <li><Link to="/content-diff"
