@@ -6,7 +6,12 @@ export default function PhoneNumber({ sdk }) {
   const [fieldValue, setFieldValue] = useState({});
 
   useEffect(() => {
-    setFieldValue(sdk.field.getValue());
+    if (sdk.field.getValue()) {
+      setFieldValue(sdk.field.getValue());
+    } else {
+      setFieldValue({});
+    };
+
   }, [sdk.field]);
 
   const handleFieldChange = (fieldName) => (e) => {
