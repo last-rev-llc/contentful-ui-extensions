@@ -16,15 +16,18 @@
     "@types/jest": "^25.2.3",
     "contentful": "^7.14.5",
     "contentful-ui-extensions-sdk": "^3.16.1",
+    "date-fns": "^2.16.1",
     "history": "^4.10.1",
     "lodash": "^4.17.19",
     "node-htmldiff": "^0.9.3",
     "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
+    "react-datepicker": "^3.2.2",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.3.0"
+    "react-scripts": "3.3.0",
+    "react-time-picker": "^4.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
