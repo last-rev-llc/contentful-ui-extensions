@@ -1,57 +1,63 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Checkbox,
-  Heading,
+  Switch,
   Table,
   TableHead,
   TableBody,
   TableRow,
   TableCell,
 } from '@contentful/forma-36-react-components';
-import TimeInput from '../../../shared/components/TimeInput';
+import TimeRange from '../../../shared/components/TimeRange';
+import TimezoneDropdown from '../../../shared/components/TimezoneDropdown';
 
 function DaysOfWeekTable({ daysOfWeek, onChange }) {
   return (
     <>
-      <Heading className="operatingHours__header">Regular Hours</Heading>
       <Table className="operatingHours__table">
         <TableHead>
           <TableRow>
             <TableCell>Day of Week</TableCell>
             <TableCell>Is Closed?</TableCell>
-            <TableCell>Opening Time</TableCell>
-            <TableCell>Closing Time</TableCell>
+            <TableCell>Timezone</TableCell>
+            <TableCell>Opening-Closing Times</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {
-            daysOfWeek.map((dayOfWeek, index) => (
-              <TableRow key={dayOfWeek.dayOfWeek}>
-                <TableCell>{ dayOfWeek.dayOfWeek }</TableCell>
-                <TableCell data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed`}>
-                  <Checkbox
-                    labelText=""
-                    checked={dayOfWeek.isClosed}
-                    onChange={(e) => onChange(index, { isClosed: e.target.checked, openingTime: null, closingTime: null })}
-                  />
-                </TableCell>
-                <TableCell data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-openingTime`}>
-                  <TimeInput
-                    value={dayOfWeek.openingTime}
-                    onChange={(value) => onChange(index, { openingTime: value })}
-                    disabled={dayOfWeek.isClosed}
-                  />
-                </TableCell>
-                <TableCell data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-closingTime`}>
-                  <TimeInput
-                    value={dayOfWeek.closingTime}
-                    onChange={(value) => onChange(index, { closingTime: value })}
-                    disabled={dayOfWeek.isClosed}
-                  />
-                </TableCell>
-              </TableRow>
-            ))
+            daysOfWeek.map((dayOfWeek, index) => {
+              return (
+                <TableRow key={dayOfWeek.dayOfWeek}>
+                  <TableCell>{ dayOfWeek.dayOfWeek }</TableCell>
+                  <TableCell data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed`}>
+                    <Switch
+                      id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed-switch`}
+                      labelText=""
+                      isChecked={dayOfWeek.isClosed}
+                      onToggle={(isChecked) => onChange(index, { isClosed: isChecked })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TimezoneDropdown
+                      value={dayOfWeek.timezone}
+                      onChange={(timezone) => onChange(index, { timezone })}
+                      disabled={dayOfWeek.isClosed}
+                    />
+                  </TableCell>
+                  <TableCell
+                    data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-openingTime`}
+                    className="operatingHours__timeRange"
+                  >
+                    <TimeRange
+                      value={dayOfWeek.timeRange}
+                      onChange={(value) => onChange(index, { timeRange: value })}
+                      step={{ minutes: 30 }}
+                      disabled={dayOfWeek.isClosed}
+                    />
+                  </TableCell>
+                </TableRow>
+              )
+            })
           }
         </TableBody>
       </Table>

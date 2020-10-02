@@ -32,9 +32,11 @@ import phoneNumberMockSdk from "./PhoneNumber/mockSdk";
 import operatingHoursMockSdk from "./OperatingHours/mockSdk";
 import recipeStepsMockSdk from "./RecipeSteps/mockSdk";
 import recipeIngredientsMockSdk from "./RecipeIngredients/mockSdk";
-
 import BynderImage from "./BynderImage";
 import { createMockSDK } from "./BynderImage/mockSdk";
+
+import '@contentful/forma-36-react-components/dist/styles.css';
+import '@contentful/forma-36-fcss/dist/styles.css';
 
 const App = ({ sdk, locations }) => {
   return (

@@ -10,4 +10,12 @@
   &__addRowButton {
     margin-bottom: .5rem;
   }
+
+  &__timeRange {
+    padding-right: 2rem;
+  }
+
+  input[type=checkbox] {
+    box-sizing: content-box;
+  }
 }

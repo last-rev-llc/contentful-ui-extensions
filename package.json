@@ -8,6 +8,7 @@
     "@contentful/forma-36-react-components": "^3.42.2",
     "@contentful/rich-text-html-renderer": "^14.1.1",
     "@contentful/rich-text-types": "^14.1.1",
+    "@material-ui/core": "^4.11.0",
     "@sentry/react": "^5.20.0",
     "@testing-library/dom": "^7.20.0",
     "@testing-library/jest-dom": "^4.2.4",
@@ -26,8 +27,7 @@
     "react-datepicker": "^3.2.2",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.3.0",
-    "react-time-picker": "^4.0.1"
+    "react-scripts": "3.3.0"
   },
   "scripts": {
     "start": "react-scripts start",

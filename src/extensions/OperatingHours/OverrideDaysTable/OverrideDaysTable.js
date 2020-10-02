@@ -12,7 +12,8 @@ import {
 } from '@contentful/forma-36-react-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import TimeInput from '../../../shared/components/TimeInput';
+import TimeRange from '../../../shared/components/TimeRange';
+import TimezoneDropdown from '../../../shared/components/TimezoneDropdown';
 
 const currentDate = new Date();
 
@@ -32,8 +33,8 @@ function OverrideDaysTable({ overrideDays, addOverrideDay, editOverrideDay }) {
           <TableRow>
             <TableCell>Date</TableCell>
             <TableCell>Is Closed?</TableCell>
-            <TableCell>Opening Time</TableCell>
-            <TableCell>Closing Time</TableCell>
+            <TableCell>Timezone</TableCell>
+            <TableCell>Opening-Closing Times</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -59,16 +60,17 @@ function OverrideDaysTable({ overrideDays, addOverrideDay, editOverrideDay }) {
                   />
                 </TableCell>
                 <TableCell>
-                  <TimeInput
-                    value={overrideDay.openingTime}
-                    onChange={(value) => editOverrideDay(index, { openingTime: value })}
+                  <TimezoneDropdown
+                    value={overrideDay.timezone}
+                    onChange={(value) => editOverrideDay(index, { timezone: value })}
                     disabled={overrideDay.isClosed}
                   />
                 </TableCell>
                 <TableCell>
-                  <TimeInput
-                    value={overrideDay.closingTime}
-                    onChange={(value) => editOverrideDay(index, { closingTime: value })}
+                  <TimeRange
+                    value={overrideDay.timeRange}
+                    onChange={(value) => editOverrideDay(index, { timeRange: value })}
+                    step={{ minutes: 30 }}
                     disabled={overrideDay.isClosed}
                   />
                 </TableCell>
