@@ -1,7 +1,7 @@
-import _ from 'lodash';
+import { get, isUndefined } from 'lodash';
 
-const createAssetHtml = (asset) => {
-  if (!asset || _.isUndefined(_.get(asset, 'fields'))) return '';
+export default (asset) => {
+  if (!asset || isUndefined(get(asset, 'fields'))) return '';
 
   return `<div class='entry-name' data-test-id="cdd-asset-title">${asset.fields.title['en-US']}</div>
       <ul class='field-list-wrap'>
@@ -9,5 +9,3 @@ const createAssetHtml = (asset) => {
       </ul>
   </div>`;
 };
-
-export default createAssetHtml;
