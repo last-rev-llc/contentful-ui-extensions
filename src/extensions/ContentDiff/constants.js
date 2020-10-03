@@ -4,6 +4,8 @@ export const entryValueTestId = 'cdd-entry-value';
 export const arrayWrapTestId = 'cdd-array-wrap';
 export const arrayLabelTestId = 'cdd-array-label';
 
+export const firstIndex = 0;
+
 export const fieldTypes = {
   richText: 'RichText',
   symbol: 'Symbol',
