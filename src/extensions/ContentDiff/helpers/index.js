@@ -4,5 +4,6 @@ import getArrayValue, { arrayListTestId, arrayListItemTestId } from './getArrayV
 
 export * from './lookups';
 export * from './createHtml';
+export * from './getters';
 
 export { getValue, createAssetHtml, getArrayValue, arrayListTestId, arrayListItemTestId };
