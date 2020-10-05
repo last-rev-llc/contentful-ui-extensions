@@ -371,22 +371,9 @@ export const ContentDiffDialog = ({ sdk }) => {
 
   if (loading) {
     return (
-      <EmptyState
-        className="loading-message"
-        headingProps={{
-          text: 'Last Rev - Content Diff',
-        }}
-        customImageElement={
-          <img
-            src="https://images.ctfassets.net/9o4l1mrd1tci/3ofhr7KXTuiqBhlwkm8h9h/a88289dcfa95fc23a9fcce8418aab94a/lastrev_logo_blk.png"
-            alt=""
-          />
-        }
-        descriptionProps={{
-          text: 'Loading content diffs...',
-        }}
-        testId="ContentDiffDialog-loading-message"
-      />
+      <div className="loading-message">
+        <p>Loading content diffs...</p>
+      </div>
     );
   }
 
