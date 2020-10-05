@@ -3,17 +3,8 @@ import PropTypes from 'prop-types';
 import { Button, Select, Option } from '@contentful/forma-36-react-components';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './ContentDiff.scss';
-import { get } from 'lodash';
-import {
-  addEditorInterface,
-  addEntry,
-  addEntrySnapshots,
-  getAsset,
-  getContentType,
-  getEntry,
-  resetLookups,
-} from './helpers/index';
-import { fieldTypes, firstIndex, linkTypes } from './constants';
+import { addEditorInterface, addEntry, addEntrySnapshots, createSimpleObjects, resetLookups } from './helpers';
+import { firstIndex } from './constants';
 
 const getLoading = () => {
   return (
@@ -29,53 +20,6 @@ const getError = (message) => {
       <p>{message}</p>
     </div>
   );
-};
-
-const createSimpleObject = async (control, space, fields, locale) => {
-  let asset;
-  let entryObject;
-  let entryContentType;
-  let textType;
-  let id = '';
-
-  switch (control.field.type) {
-    case fieldTypes.link:
-      id = locale
-        ? get(fields, `[${control.fieldId}]['en-US'].sys.id`)
-        : get(fields, `[${control.fieldId}]._fieldLocales['en-US']._value.sys.id`);
-      if (!id) break;
-      if (control.field.linkType === linkTypes.entry) {
-        entryObject = await getEntry(id, space);
-        entryContentType = await getContentType(get(entryObject, 'sys.contentType.sys.id'), space);
-      } else {
-        asset = await getAsset(id, space);
-      }
-      break;
-
-    case fieldTypes.text:
-      textType = control.widgetId;
-      break;
-
-    default:
-      break;
-  }
-  const value = fields[control.fieldId] && (fields[control.fieldId][locale] || fields[control.fieldId].getValue());
-  return {
-    id: control.fieldId,
-    type: control.field.type,
-    linkType: control.field.linkType,
-    textType,
-    value,
-    arrayType: fields[control.fieldId] && fields[control.fieldId].items && fields[control.fieldId].items.type,
-    label: control.field.name,
-    asset,
-    entry: entryObject,
-    entryContentType,
-  };
-};
-
-const createSimpleObjects = async (space, controls, fields, locale) => {
-  return Promise.all(controls.map((control) => createSimpleObject(control, space, fields, locale)));
 };
 
 export const ContentDiffSidebar = ({ sdk }) => {
@@ -114,7 +58,7 @@ export const ContentDiffSidebar = ({ sdk }) => {
 
     await sdk.dialogs.openExtension({
       width: 'fullWidth',
-      title: 'Last Rev Content Diff UIE',
+      title: 'Last Rev - Content Diff',
       allowHeightOverflow: true,
       parameters: {
         controls,

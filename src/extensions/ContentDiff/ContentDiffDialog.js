@@ -1,37 +1,30 @@
 /* eslint-disable react/no-danger */
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { compact, escape, get, head, isArray, isNil, join, startCase } from 'lodash';
+import { compact, get, head, isArray, isNil, join, startCase, escape } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import diff from 'node-htmldiff';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
 import './ContentDiff.scss';
+import { EmptyState } from '@contentful/forma-36-react-components';
 import {
+  addRemovedOldFields,
   createAssetHtml,
+  createContentSimpleObjects,
   createHtmlForArray,
   createHtmlForAsset,
   createHtmlForEntry,
   getArrayType,
   getArrayValue,
   getAsset,
-  getContentType,
-  getEditorInterface,
-  getEntry,
-  getEntrySnapshots,
+  getEntryByDate,
   getId,
   getLabel,
   getType,
   getValue,
-} from './helpers/index';
-import {
-  entryWrapTestId,
-  fieldTypes,
-  firstIndex,
-  linkTypes,
-  paragraphFieldTypes,
-  richTextFieldTypes,
-} from './constants';
+} from './helpers';
+import { entryWrapTestId, fieldTypes, linkTypes, paragraphFieldTypes, richTextFieldTypes } from './constants';
 
 const getTextDiff = ({ id, oldText, newText, fieldType }) => {
   const changedClass = newText === oldText ? 'no-change' : 'change';
@@ -81,8 +74,8 @@ const getFields = (field) => {
     case fieldTypes.symbol:
       result = getTextDiff({
         id: 0,
-        oldText: decodeURI(get(field, 'oldValue', '')),
-        newText: decodeURI(get(field, 'currentValue', '')),
+        oldText: escape(get(field, 'oldValue', '')),
+        newText: escape(get(field, 'currentValue', '')),
         fieldType: field.type,
       });
       break;
@@ -160,61 +153,7 @@ const getError = (message) => {
   );
 };
 
-const getEntryByDate = async (space, entryId, snapshotDate) => {
-  let entry;
-  if (snapshotDate) {
-    const snapshots = await getEntrySnapshots(entryId, space);
-    entry =
-      snapshots &&
-      snapshots.items &&
-      snapshots.items.filter((item) => new Date(item.sys.updatedAt) <= snapshotDate)[firstIndex];
-  } else {
-    entry = await getEntry(entryId, space);
-  }
-  return entry;
-};
-
-const createContentSimpleObjects = async (space, entry) => {
-  let objects;
-  let control;
-  if (!entry) return objects;
-  const contentType = await getContentType(entry.sys.contentType.sys.id, space);
-  const editorInterface = await getEditorInterface(entry.sys.contentType.sys.id, space);
-  if (!contentType) return objects;
-  const controls = (editorInterface && editorInterface.controls) || [];
-  const noValueEntered = {
-    nodeType: 'document',
-    marks: [],
-    content: [
-      {
-        nodeType: 'paragraph',
-        marks: [],
-        content: [
-          {
-            nodeType: 'text',
-            marks: [],
-            value: '<i>No value entered</i>',
-          },
-        ],
-      },
-    ],
-  };
-  objects = contentType.fields.map((field) => {
-    control = field.type === fieldTypes.text && controls.filter((c) => c.fieldId === field.id)[firstIndex];
-    return {
-      id: field.id,
-      contentId: entry.sys.id,
-      type: field.type,
-      textType: control && control.widgetId,
-      value: get(entry, `fields[${field.id}]['en-US']`, noValueEntered),
-      arrayType: field.items && field.items.type,
-      label: field.name,
-    };
-  });
-  return objects;
-};
-
-const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
+export const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
   // eslint-disable-next-line no-use-before-define
   const rtfLines = await getContentHtmlValue(field, space, snapshotDate, true);
 
@@ -227,7 +166,7 @@ const createEmbeddedRichTextLines = async (field, space, snapshotDate) => {
     </li>`;
 };
 
-const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => {
+export const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => {
   let value = '';
   let asset = '';
   switch (field.type) {
@@ -273,11 +212,11 @@ const getEmbeddedEntryValue = async (field, space, snapshotDate, isEmbedded) => 
   return value;
 };
 
-const createHtmlForEmbeddedEntryLines = async (lines, space, snapshotDate, isEmbedded) => {
+export const createHtmlForEmbeddedEntryLines = async (lines, space, snapshotDate, isEmbedded) => {
   return Promise.all(compact(lines).map(async (line) => getEmbeddedEntryValue(line, space, snapshotDate, isEmbedded)));
 };
 
-async function formatEntry(line, space, snapshotDate, isEmbedded) {
+export const formatEntry = async (line, space, snapshotDate, isEmbedded) => {
   let contentType;
   let result;
   if (isEmbedded) {
@@ -305,9 +244,9 @@ async function formatEntry(line, space, snapshotDate, isEmbedded) {
   result.unshift(embeddedEntryWrap);
   result.push('</ul></div>');
   return isArray(result) ? join(result, '') : result;
-}
+};
 
-const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
+export const createRichTextLines = async (lines, space, snapshotDate, isEmbedded) => {
   const rtfContentLines = await Promise.all(
     lines.map(async (line) => {
       let result;
@@ -376,7 +315,7 @@ const getContentHtmlValue = async (field, space, snapshotDate, isEmbedded) => {
   return parseRichTextToHtml(fieldValue);
 };
 
-const getContent = async (field, space, snapshotDate, snapshot) => {
+export const getContent = async (field, space, snapshotDate, snapshot) => {
   const currentRichTextHtml = await getContentHtmlValue(field, space);
   const oldRichTextHtml = await getContentHtmlValue(snapshot, space, snapshotDate);
   const result = {
@@ -402,25 +341,9 @@ const createDiffField = async (field, snapshots, space, snapshotDate) => {
   };
 };
 
-const createDiffFields = async (fields, snapshots, space, snapshotDate) => {
+export const createDiffFields = async (fields, snapshots, space, snapshotDate) => {
   const diffFields = await Promise.all(fields.map((field) => createDiffField(field, snapshots, space, snapshotDate)));
   return diffFields;
-};
-
-const addRemovedOldFields = (fields, snapshots) => {
-  snapshots.forEach((shot) => {
-    if (fields.every((field) => field.id !== shot.id)) {
-      fields.push({
-        id: getId(shot),
-        type: getType(shot),
-        label: getLabel(shot),
-        currentValue: false,
-        oldValue: getValue(shot),
-        arrayType: getArrayType(shot),
-      });
-    }
-  });
-  return fields;
 };
 
 export const ContentDiffDialog = ({ sdk }) => {
@@ -448,9 +371,22 @@ export const ContentDiffDialog = ({ sdk }) => {
 
   if (loading) {
     return (
-      <div className="loading-message">
-        <p>Loading content diffs...</p>
-      </div>
+      <EmptyState
+        className="loading-message"
+        headingProps={{
+          text: 'Last Rev - Content Diff',
+        }}
+        customImageElement={
+          <img
+            src="https://images.ctfassets.net/9o4l1mrd1tci/3ofhr7KXTuiqBhlwkm8h9h/a88289dcfa95fc23a9fcce8418aab94a/lastrev_logo_blk.png"
+            alt=""
+          />
+        }
+        descriptionProps={{
+          text: 'Loading content diffs...',
+        }}
+        testId="ContentDiffDialog-loading-message"
+      />
     );
   }
 

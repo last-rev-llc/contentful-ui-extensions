@@ -1,3 +1,5 @@
+import { firstIndex } from '../constants';
+
 let entryLookup = {};
 let assetLookup = {};
 let snapshotsLookup = {};
@@ -69,4 +71,18 @@ export const resetLookups = () => {
   snapshotsLookup = {};
   controlsLookup = {};
   contentTypeLookup = {};
+};
+
+export const getEntryByDate = async (space, entryId, snapshotDate) => {
+  let entry;
+  if (snapshotDate) {
+    const snapshots = await getEntrySnapshots(entryId, space);
+    entry =
+      snapshots &&
+      snapshots.items &&
+      snapshots.items.filter((item) => new Date(item.sys.updatedAt) <= snapshotDate)[firstIndex];
+  } else {
+    entry = await getEntry(entryId, space);
+  }
+  return entry;
 };

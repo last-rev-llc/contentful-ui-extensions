@@ -1,7 +1,6 @@
 import { get, isUndefined } from 'lodash';
 import { arrayLabelTestId, arrayWrapTestId, entryLabelTestId, entryValueTestId, entryWrapTestId } from '../constants';
-import getArrayValue from './getArrayValue';
-import getValue from './getValue';
+import { getArrayValue, getValue } from './getters';
 
 export const createHtmlForEntry = (entry) => {
   return `<li class="embedded-${entry.type} diff-field-wrap" key="${entry.id}" data-test-id="${entryWrapTestId}">
@@ -33,4 +32,14 @@ export const createHtmlForArray = (field) => {
       ${getArrayValue(field)}
     </li>
   `;
+};
+
+export const createAssetHtml = (asset) => {
+  if (!asset || isUndefined(get(asset, 'fields'))) return '';
+
+  return `<div class='entry-name' data-test-id="cdd-asset-title">${asset.fields.title['en-US']}</div>
+      <ul class='field-list-wrap'>
+        <li className="diff-field-wrap"><img src="${asset.fields.file['en-US'].url}" data-test-id="cdd-asset-image"/></li>
+      </ul>
+  </div>`;
 };
