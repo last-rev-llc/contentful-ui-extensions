@@ -1,35 +1,35 @@
 const entrySymbolFieldOne = {
-  'en-US': 'symbol field 1'
+  'en-US': 'symbol field 1',
 };
 
 const entrySymbolFieldTwo = {
-  'en-US': 'symbol field 2'
+  'en-US': 'symbol field 2',
 };
 
 const contentTypeSymbolFieldOne = {
-  id: 'contentTypeSymbolFieldOne',
-  type: 'Symbol',
-  name: 'Content Type Symbol Field One',
-  'en-US': 'symbol field 1'
+  'id': 'contentTypeSymbolFieldOne',
+  'type': 'Symbol',
+  'name': 'Content Type Symbol Field One',
+  'en-US': 'symbol field 1',
 };
 
 const contentTypeSymbolFieldTwo = {
-  id: 'contentTypeSymbolFieldTwo',
-  type: 'Symbol',
-  name: 'Content Type Symbol Field Two',
-  'en-US': 'symbol field 2'
+  'id': 'contentTypeSymbolFieldTwo',
+  'type': 'Symbol',
+  'name': 'Content Type Symbol Field Two',
+  'en-US': 'symbol field 2',
 };
 
 const assetFieldOne = {
   fields: {
     title: {
-      'en-US': 'Asset Field One'
+      'en-US': 'Asset Field One',
     },
     file: {
       'en-US': {
-        url: 'http://localhost/images/exampleone.jpeg'
-      }
-    }
+        url: 'http://localhost/images/exampleone.jpeg',
+      },
+    },
   },
 };
 
@@ -39,22 +39,22 @@ const snapshotOne = {
     id: '123456',
     contentType: {
       sys: {
-        id: 'entryOne'
-      }
-    }
+        id: 'entryOne',
+      },
+    },
   },
   snapshot: {
-    fields: {contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo},
+    fields: { contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo },
     sys: {
       updatedAt: '2020-06-29T23:04:28.809Z',
       id: '123456',
       contentType: {
         sys: {
-          id: 'entryOne'
-        }
-      }
-    }
-  }
+          id: 'entryOne',
+        },
+      },
+    },
+  },
 };
 
 const snapshotTwo = {
@@ -63,22 +63,22 @@ const snapshotTwo = {
     id: '123456',
     contentType: {
       sys: {
-        id: 'entryOne'
-      }
-    }
+        id: 'entryOne',
+      },
+    },
   },
   snapshot: {
-    fields: {entrySymbolFieldOne, entrySymbolFieldTwo},
+    fields: { entrySymbolFieldOne, entrySymbolFieldTwo },
     sys: {
       updatedAt: '2020-06-29T23:04:28.809Z',
       id: '123456',
       contentType: {
         sys: {
-          id: 'entryOne'
-        }
-      }
-    }
-  }
+          id: 'entryOne',
+        },
+      },
+    },
+  },
 };
 
 const entryOne = {
@@ -86,66 +86,68 @@ const entryOne = {
     id: '123456',
     contentType: {
       sys: {
-        id: 'entryOne'
-      }
-    }
+        id: 'entryOne',
+      },
+    },
   },
   snapshot: {
     sys: {
       id: '123456',
       contentType: {
         sys: {
-          id: 'entryOne'
-        }
-      }
-    }
+          id: 'entryOne',
+        },
+      },
+    },
   },
-  fields: { contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo }
+  fields: { contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo },
 };
 
 const arraySimpleObject = {
   id: 'arraySimpleObject',
-  type: 'Array', 
-  value: ['test', 'testing', 'tested'], 
+  type: 'Array',
+  value: ['test', 'testing', 'tested'],
   arrayType: 'Symbol',
   label: 'Array Simple Object',
   getValue: async () => arraySimpleObject.value,
   items: {
-    type: 'Symbol'
-  }
+    type: 'Symbol',
+  },
 };
 
 const mockSdk = {
   space: {
     getEntrySnapshots: async () => ({ items: [snapshotOne, snapshotTwo] }),
-    getEntry: async (entryId) => entryOne,
+    getEntry: async () => entryOne,
     getContentType: async (contentTypeId) => ({
       sys: {
-        id: contentTypeId
+        id: contentTypeId,
       },
-      fields: [contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo]
+      fields: [contentTypeSymbolFieldOne, contentTypeSymbolFieldTwo],
     }),
-    getEditorInterface: async (contentTypeId) => ({
-      controls: [{
-        fieldId: 'textFieldOne',
-        widgetId: 'multipleLine'
-      }]
+    getEditorInterface: async () => ({
+      controls: [
+        {
+          fieldId: 'textFieldOne',
+          widgetId: 'multipleLine',
+        },
+      ],
     }),
-    getAsset: async (assetId) => assetFieldOne
+    getAsset: async () => assetFieldOne,
   },
   ids: {
     space: 'space',
-    environment: 'master'
+    environment: 'master',
   },
   location: {
-    is: () => false
+    is: () => false,
   },
   window: {
-    startAutoResizer: () => true
+    startAutoResizer: () => true,
   },
   entry: {
-    fields: {}
-  }
+    fields: {},
+  },
 };
 
 export {
@@ -157,7 +159,7 @@ export {
   contentTypeSymbolFieldTwo,
   entryOne,
   snapshotOne,
-  snapshotTwo
+  snapshotTwo,
 };
 
 export default mockSdk;

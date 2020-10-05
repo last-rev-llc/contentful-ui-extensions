@@ -3,6 +3,8 @@ export const entryLabelTestId = 'cdd-entry-label';
 export const entryValueTestId = 'cdd-entry-value';
 export const arrayWrapTestId = 'cdd-array-wrap';
 export const arrayLabelTestId = 'cdd-array-label';
+export const arrayListTestId = 'cdd-array-list';
+export const arrayListItemTestId = 'cdd-array-list-item';
 
 export const firstIndex = 0;
 
