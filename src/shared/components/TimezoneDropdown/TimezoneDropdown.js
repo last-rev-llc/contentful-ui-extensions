@@ -1,66 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Dropdown, DropdownList, DropdownListItem } from '@contentful/forma-36-react-components';
+import { getSelect } from '../../helpers';
 
-const TIMEZONES = [
-  'America/New_York',
-  'America/Chicago',
-  'America/Denver',
-  'America/Phoenix',
-  'America/Los_Angeles',
-  'America/Anchorage'
-];
+const TIMEZONES = {
+  'America/New_York': 'ET',
+  'America/Chicago': 'CT',
+  'America/Denver': 'MT',
+  'America/Los_Angeles': 'PT'
+};
 
-function TimezoneDropdown({ value, onChange, disabled }) {
-  const [isOpen, setIsOpen] = useState(false);
-
+function TimezoneDropdown({ value, onChange, disabled, position, name, className }) {
   return (
-    <Dropdown
-      isOpen={isOpen}
-      onClose={() => setIsOpen(false)}
-      toggleElement={
-        <Button
-          size="small"
-          buttonType="muted"
-          indicateDropdown
-          onClick={() => setIsOpen(!isOpen)}
-          disabled={disabled}
-        >
-          { value }
-        </Button>
+    <>
+      {
+        getSelect(
+          Object.keys(TIMEZONES),
+          onChange,
+          { name, disabled, optionObject: TIMEZONES },
+          value,
+          position,
+          className
+        )
       }
-    >
-      <DropdownList>
-        {
-          TIMEZONES.map((tz) => (
-            <DropdownListItem
-              key={tz}
-              onClick={() => {
-                onChange(tz);
-                setIsOpen(false);
-              }}
-            >
-              { tz }
-            </DropdownListItem>
-          ))
-        }
-      </DropdownList>
-    </Dropdown>
+    </>
   );
 }
 
 TimezoneDropdown.propTypes = {
-  value: PropTypes.arrayOf(PropTypes.string),
-  onChange: PropTypes.func.isRequired,
-  increment: PropTypes.shape({
-    minutes: PropTypes.number,
-  }).isRequired,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
   disabled: PropTypes.bool,
+  position: PropTypes.string.isRequired,
+  name: PropTypes.string,
+  className: PropTypes.string,
 };
 
 TimezoneDropdown.defaultProps = {
-  value: '',
+  className: '',
   disabled: false,
+  name: '',
+  onChange: () => {},
+  value: '',
 };
 
 export default TimezoneDropdown;

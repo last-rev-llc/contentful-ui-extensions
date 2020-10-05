@@ -1,21 +1,85 @@
 .operatingHours {
-  &__header {
-    margin-bottom: .5rem;
-  }
-
   &__table {
-    margin-bottom: 1rem;
-  }
-
-  &__addRowButton {
-    margin-bottom: .5rem;
+    margin-top: 1rem;
   }
 
   &__timeRange {
     padding-right: 2rem;
+    padding-top: 2rem;
+    padding-bottom: 0;
+  }
+
+  &__table-actions {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  &__datepicker {
+    max-width: 120px;
+  }
+
+  &__isClosed {
+    max-width: 50px;
+  }
+
+  &__timezone {
+    max-width: 75px;
+  }
+
+  &__emptyTableRow {
+    padding: .9375rem 1.25rem;
+    text-align: center;
+  }
+
+  &__newRowError {
+    margin-top: 2rem;
+  }
+
+  &__newRowCard {
+    margin-top: 2rem;
+  }
+
+  &__cancelButton {
+    margin-left: 1rem;
+  }
+
+  &__newRowForm > div:last-child {
+    margin-bottom: 0;
+  }
+
+  &__newRowFormFields {
+    display: flex;
+
+    > div {
+      margin-bottom: 0;
+      margin-right: 2rem;
+
+      &:last-child {
+        flex: 1 0 auto;
+        margin-right: 1rem;
+      }
+    }
+
+    &__isClosed {
+      display: flex;
+      flex-direction: column-reverse;
+      justify-content: space-between;
+
+      > input {
+        margin-bottom: 1rem;
+      }
+    }
+
+    &__timeRange > label {
+      margin-bottom: 1.5rem;
+    }
   }
 
   input[type=checkbox] {
     box-sizing: content-box;
+  }
+
+  tr > td {
+    vertical-align: middle;
   }
 }

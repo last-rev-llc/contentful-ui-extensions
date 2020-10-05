@@ -5,17 +5,17 @@ import DaysOfWeekTable from './DaysOfWeekTable';
 import OverrideDaysTable from './OverrideDaysTable';
 import './OperatingHours.scss';
 
-const INITIAL_TIME_RANGE = ['12:00 AM', '11:30 PM'];
+const INITIAL_TIME_RANGE = ['12:00 AM', '12:00 AM'];
 
 const INITIAL_STATE = {
   daysOfWeek: [
-    { dayOfWeek: 'Monday', isClosed: false, timezone: 'America/New_York', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Tuesday', isClosed: false, timezone: 'America/New_York', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Wednesday', isClosed: false, timezone: 'America/New_York', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Thursday', isClosed: false, timezone: 'America/New_York', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Friday', isClosed: false, timezone: 'America/New_York', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Saturday', isClosed: false, timezone: 'America/New_York', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Sunday', isClosed: false, timezone: 'America/New_York', timeRange: INITIAL_TIME_RANGE },
+    { dayOfWeek: 'Monday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
+    { dayOfWeek: 'Tuesday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
+    { dayOfWeek: 'Wednesday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
+    { dayOfWeek: 'Thursday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
+    { dayOfWeek: 'Friday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
+    { dayOfWeek: 'Saturday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
+    { dayOfWeek: 'Sunday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
   ],
   overrideDays: []
 };
@@ -52,11 +52,8 @@ export default function OperatingHours({ sdk }) {
     setDaysOfWeek(daysOfWeekCopy);
   }
 
-  function addOverrideDay() {
-    setOverrideDays([
-      { isClosed: true, timezone: 'America/New_York', timeRange: INITIAL_TIME_RANGE },
-      ...overrideDays]
-    );
+  function addOverrideDay(overrideDay) {
+    setOverrideDays([...overrideDays, overrideDay]);
   }
 
   function editOverrideDay(index, value) {
@@ -70,24 +67,26 @@ export default function OperatingHours({ sdk }) {
     setOverrideDays(overrideDaysCopy);
   }
 
+  function deleteOverrideDay(index) {
+    const newOverrideDays = overrideDays.filter((od, i) => i !== index);
+    setOverrideDays(newOverrideDays);
+  }
+
   return (
     <div className="operatingHours">
       <Tabs
         role="tablist"
-        withDivider
-      >
+        withDivider>
         <Tab
           id="regularHours"
           selected={selectedTab === 'regularHours'}
-          onSelect={() => setSelectedTab('regularHours')}
-        >
+          onSelect={() => setSelectedTab('regularHours')}>
           Regular Hours
         </Tab>
         <Tab
           id="overrideDays"
           selected={selectedTab === 'overrideDays'}
-          onSelect={() => setSelectedTab('overrideDays')}
-        >
+          onSelect={() => setSelectedTab('overrideDays')}>
           Special Dates
         </Tab>
       </Tabs>
@@ -96,8 +95,7 @@ export default function OperatingHours({ sdk }) {
           <TabPanel id="regularHours-tabPanel">
             <DaysOfWeekTable
               daysOfWeek={daysOfWeek}
-              onChange={changeDaysOfWeek}
-            />
+              onChange={changeDaysOfWeek} />
           </TabPanel>
         )
       }
@@ -108,7 +106,7 @@ export default function OperatingHours({ sdk }) {
               overrideDays={overrideDays}
               addOverrideDay={addOverrideDay}
               editOverrideDay={editOverrideDay}
-            />
+              deleteOverrideDay={deleteOverrideDay} />
           </TabPanel>
         )
       }

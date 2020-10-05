@@ -18,46 +18,43 @@ function DaysOfWeekTable({ daysOfWeek, onChange }) {
         <TableHead>
           <TableRow>
             <TableCell>Day of Week</TableCell>
-            <TableCell>Is Closed?</TableCell>
+            <TableCell>Closed?</TableCell>
             <TableCell>Timezone</TableCell>
-            <TableCell>Opening-Closing Times</TableCell>
+            <TableCell>Open/Close Times</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {
-            daysOfWeek.map((dayOfWeek, index) => {
-              return (
-                <TableRow key={dayOfWeek.dayOfWeek}>
-                  <TableCell>{ dayOfWeek.dayOfWeek }</TableCell>
-                  <TableCell data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed`}>
-                    <Switch
-                      id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed-switch`}
-                      labelText=""
-                      isChecked={dayOfWeek.isClosed}
-                      onToggle={(isChecked) => onChange(index, { isClosed: isChecked })}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <TimezoneDropdown
-                      value={dayOfWeek.timezone}
-                      onChange={(timezone) => onChange(index, { timezone })}
-                      disabled={dayOfWeek.isClosed}
-                    />
-                  </TableCell>
-                  <TableCell
-                    data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-openingTime`}
-                    className="operatingHours__timeRange"
-                  >
-                    <TimeRange
-                      value={dayOfWeek.timeRange}
-                      onChange={(value) => onChange(index, { timeRange: value })}
-                      step={{ minutes: 30 }}
-                      disabled={dayOfWeek.isClosed}
-                    />
-                  </TableCell>
-                </TableRow>
-              )
-            })
+            daysOfWeek.map((dayOfWeek, index) => (
+              <TableRow key={dayOfWeek.dayOfWeek}>
+                <TableCell>{ dayOfWeek.dayOfWeek }</TableCell>
+                <TableCell data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed`}>
+                  <Switch
+                    id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed-switch`}
+                    labelText=""
+                    isChecked={dayOfWeek.isClosed}
+                    onToggle={(isChecked) => onChange(index, { isClosed: isChecked })}
+                  />
+                </TableCell>
+                <TableCell>
+                  <TimezoneDropdown
+                    value={dayOfWeek.timezone}
+                    onChange={(e) => onChange(index, { timezone: e.currentTarget.value })}
+                    disabled={dayOfWeek.isClosed}
+                    position={`line-${index}`}
+                    className="operatingHours__timezone" />
+                </TableCell>
+                <TableCell
+                  data-test-id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-timeRange`}
+                  className="operatingHours__timeRange">
+                  <TimeRange
+                    value={dayOfWeek.timeRange}
+                    onChange={(value) => onChange(index, { timeRange: value })}
+                    step={{ minutes: 30 }}
+                    disabled={dayOfWeek.isClosed} />
+                </TableCell>
+              </TableRow>
+            ))
           }
         </TableBody>
       </Table>

@@ -9,7 +9,7 @@ const TIME_FORMAT = 'h:mm a';
 const useStyles = makeStyles({
   marked: {
     marginBottom: 0,
-    marginTop: '0.5rem',
+    marginTop: '1rem',
   },
   valueLabel: {
     textAlign: 'center',
@@ -22,7 +22,6 @@ const useStyles = makeStyles({
 });
 
 function TimeRange({ value, onChange, step, disabled }) {
-  const [marks, setMarks] = useState([]);
   const [dayTimes, setDayTimes] = useState([]);
   const [selectedValue, setSelectedValue] = useState([]);
 
@@ -31,13 +30,16 @@ function TimeRange({ value, onChange, step, disabled }) {
   useEffect(() => {
     const [start, end] = value;
 
-    const val = [dayTimes.indexOf(start), dayTimes.indexOf(end)];
+    const startIndex = dayTimes.indexOf(start);
+    const endIndex = dayTimes.indexOf(end);
+
+    const val = [startIndex, endIndex === startIndex && endIndex === 0 ? dayTimes.length - 1 : endIndex];
     setSelectedValue(val);
-  }, [dayTimes]);
+  }, [value, dayTimes]);
 
   useEffect(() => {
     const start = startOfDay(new Date());
-    const end = endOfDay(new Date());
+    const end = startOfDay(add(start, { days: 1 }));
 
     const newDayTimes = [];
     
@@ -47,19 +49,11 @@ function TimeRange({ value, onChange, step, disabled }) {
       newDayTimes.push(formattedDate);
     }
 
-    // First and last times on slider are always visible
-    const newMarks = [
-      { label: newDayTimes[0], value: 0 },
-      { label: newDayTimes[newDayTimes.length - 1], value: newDayTimes.length - 1 },
-    ];
-
-    setMarks(newMarks);
     setDayTimes(newDayTimes);
   }, [step.minutes]);
 
   function handleChange(e, val) {
     const [start, end] = val;
-    setSelectedValue(val);
     onChange([dayTimes[start], dayTimes[end]]);
   }
 
@@ -71,7 +65,6 @@ function TimeRange({ value, onChange, step, disabled }) {
     <Slider
       value={selectedValue}
       onChange={handleChange}
-      marks={marks}
       min={0}
       max={dayTimes.length - 1}
       valueLabelDisplay="on"
@@ -87,7 +80,7 @@ function TimeRange({ value, onChange, step, disabled }) {
 
 TimeRange.propTypes = {
   value: PropTypes.arrayOf(PropTypes.string),
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   step: PropTypes.shape({
     minutes: PropTypes.number,
   }).isRequired,
@@ -95,8 +88,9 @@ TimeRange.propTypes = {
 };
 
 TimeRange.defaultProps = {
-  value: '',
   disabled: false,
+  onChange: () => {},
+  value: '',
 };
 
 export default TimeRange;

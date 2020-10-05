@@ -1,84 +1,86 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button,
-  Checkbox,
-  Heading,
+  Paragraph,
   Table,
   TableHead,
   TableBody,
   TableRow,
   TableCell,
 } from '@contentful/forma-36-react-components';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import TimeRange from '../../../shared/components/TimeRange';
-import TimezoneDropdown from '../../../shared/components/TimezoneDropdown';
+import RowEditForm from './RowEditForm';
+import OverrideDaysTableRow from './OverrideDaysTableRow';
 
-const currentDate = new Date();
+function OverrideDaysTable({ overrideDays, addOverrideDay, editOverrideDay, deleteOverrideDay }) {
+  const [editRowIndex, setEditRowIndex] = useState(-1);
 
-function OverrideDaysTable({ overrideDays, addOverrideDay, editOverrideDay }) {
+  function submitRowEdit(row) {
+    if (!row.date) {
+      throw Error('The Date field is required. Please fill it before submit.');
+    }
+
+    if (editRowIndex === -1) {
+      addOverrideDay(row);
+      return;
+    }
+
+    editOverrideDay(editRowIndex, row);
+    setEditRowIndex(-1);
+  }
+
+  function enterRowEditMode(rowIndex) {
+    setEditRowIndex(rowIndex);
+  }
+
+  function cancelEditRow() {
+    setEditRowIndex(-1);
+  }
+
   return (
     <>
-      <Heading className="operatingHours__header">Special Dates</Heading>
-      <Button
-        buttonType="primary"
-        onClick={addOverrideDay}
-        className="operatingHours__addRowButton"
-      >
-        Add Special Date
-      </Button>
       <Table className="operatingHours__table">
         <TableHead>
           <TableRow>
             <TableCell>Date</TableCell>
-            <TableCell>Is Closed?</TableCell>
+            <TableCell>Closed?</TableCell>
             <TableCell>Timezone</TableCell>
-            <TableCell>Opening-Closing Times</TableCell>
+            <TableCell>Open/Close Times</TableCell>
+            <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>
           {
-            overrideDays.map((overrideDay, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <DatePicker
-                    selected={overrideDay.date}
-                    onChange={(date) => editOverrideDay(index, { date })}
-                    minDate={currentDate}
-                    excludeDates={overrideDays
-                      .filter((od, odIndex) => od.date && odIndex !== index)
-                      .map(od => od.date)
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Checkbox
-                    labelText=""
-                    checked={overrideDay.isClosed}
-                    onChange={(e) => editOverrideDay(index, { isClosed: e.target.checked, openingTime: null, closingTime: null })}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TimezoneDropdown
-                    value={overrideDay.timezone}
-                    onChange={(value) => editOverrideDay(index, { timezone: value })}
-                    disabled={overrideDay.isClosed}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TimeRange
-                    value={overrideDay.timeRange}
-                    onChange={(value) => editOverrideDay(index, { timeRange: value })}
-                    step={{ minutes: 30 }}
-                    disabled={overrideDay.isClosed}
-                  />
-                </TableCell>
+            (!overrideDays || overrideDays.length === 0) && (
+              <TableRow>
+                <td
+                  className="operatingHours__emptyTableRow"
+                  colSpan="5">
+                  <Paragraph>
+                    There are no special dates registered yet. Fill the form below to add one.
+                  </Paragraph>
+                </td>
               </TableRow>
+            )
+          }
+          {
+            overrideDays.map((overrideDay, index) => (
+              <OverrideDaysTableRow
+                key={overrideDay.date.toString()}
+                id={`OperatingHours-OverrideDays-${index}`}
+                position={index.toString()}
+                disabled
+                value={overrideDay}
+                clickEdit={() => enterRowEditMode(index)}
+                clickRemove={() => deleteOverrideDay(index)} />
             ))
           }
         </TableBody>
       </Table>
+      <RowEditForm
+        value={editRowIndex > -1 ? overrideDays[editRowIndex] : null}
+        onSubmit={submitRowEdit}
+        onCancel={cancelEditRow}
+        alreadySelectedDates={overrideDays.map(od => od.date).filter((od, i) => editRowIndex !== i)} />
     </>
   );
 }
@@ -89,6 +91,7 @@ OverrideDaysTable.propTypes = {
   })).isRequired,
   addOverrideDay: PropTypes.func.isRequired,
   editOverrideDay: PropTypes.func.isRequired,
+  deleteOverrideDay: PropTypes.func.isRequired,
 };
 
 export default OverrideDaysTable;
