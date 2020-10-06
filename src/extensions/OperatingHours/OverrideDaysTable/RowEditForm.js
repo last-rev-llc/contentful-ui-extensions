@@ -6,7 +6,7 @@ import TimeRange from '../../../shared/components/TimeRange';
 import TimezoneDropdown from '../../../shared/components/TimezoneDropdown';
 
 const INITIAL_TIME_RANGE = ['12:00 AM', '12:00 AM'];
-const INITIAL_NEW_ROW_STATE = { timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE };
+const INITIAL_NEW_ROW_STATE = { isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE };
 const currentDate = new Date();
 
 function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
@@ -56,12 +56,21 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
               <DatePicker
                 name="date"
                 placeholderText="Select a date"
-                selected={row.date}
-                onChange={(date) => onValueChanged('date', date)}
+                selected={row.date ? new Date(row.date) : null}
+                onChange={(date) => onValueChanged('date', date.toString())}
                 minDate={currentDate}
-                excludeDates={alreadySelectedDates}
+                excludeDates={alreadySelectedDates.map(date => new Date(date))}
                 popperPlacement="bottom-start"
                 className="operatingHours__datepicker" />
+            </FieldGroup>
+            <FieldGroup>
+              <FormLabel htmlFor="timezone">Timezone</FormLabel>
+              <TimezoneDropdown
+                value={row.timezone}
+                onChange={(e) => onValueChanged('timezone', e.currentTarget.value)}
+                position="factory"
+                className="operatingHours__timezone"
+                name="timezone" />
             </FieldGroup>
             <Switch
               id="OperatingHours-OverrideDays-factory-isClosed-switch"
@@ -69,16 +78,6 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
               isChecked={row.isClosed}
               onToggle={isClosed => onValueChanged('isClosed', isClosed)}
               className="operatingHours__newRowFormFields__isClosed" />
-            <FieldGroup>
-              <FormLabel htmlFor="timezone">Timezone</FormLabel>
-              <TimezoneDropdown
-                value={row.timezone}
-                onChange={(e) => onValueChanged('timezone', e.currentTarget.value)}
-                disabled={row.isClosed}
-                position="factory"
-                className="operatingHours__timezone"
-                name="timezone" />
-            </FieldGroup>
             <div className="operatingHours__newRowFormFields__timeRange">
               <FormLabel htmlFor="">Open/Close Times</FormLabel>
               <TimeRange
@@ -119,9 +118,9 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
 }
 
 RowEditForm.propTypes = {
-  alreadySelectedDates: PropTypes.arrayOf(PropTypes.object),
+  alreadySelectedDates: PropTypes.arrayOf(PropTypes.string),
   value: PropTypes.shape({
-    date: PropTypes.object,
+    date: PropTypes.string,
     isClosed: PropTypes.bool.isRequired,
     timezone: PropTypes.string,
     timeRange: PropTypes.arrayOf(PropTypes.string)

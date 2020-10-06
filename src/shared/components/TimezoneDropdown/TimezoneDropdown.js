@@ -9,14 +9,14 @@ const TIMEZONES = {
   'America/Los_Angeles': 'PT'
 };
 
-function TimezoneDropdown({ value, onChange, disabled, position, name, className }) {
+function TimezoneDropdown({ id, value, onChange, disabled, position, name, className }) {
   return (
     <>
       {
         getSelect(
           Object.keys(TIMEZONES),
           onChange,
-          { name, disabled, optionObject: TIMEZONES },
+          { id, name, disabled, optionObject: TIMEZONES },
           value,
           position,
           className
@@ -27,6 +27,7 @@ function TimezoneDropdown({ value, onChange, disabled, position, name, className
 }
 
 TimezoneDropdown.propTypes = {
+  id: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
   disabled: PropTypes.bool,
@@ -36,6 +37,7 @@ TimezoneDropdown.propTypes = {
 };
 
 TimezoneDropdown.defaultProps = {
+  id: '',
   className: '',
   disabled: false,
   name: '',

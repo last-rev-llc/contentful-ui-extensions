@@ -16,28 +16,28 @@ import TimezoneDropdown from '../../../shared/components/TimezoneDropdown';
 function OverrideDaysTableRow({ id, position, value, clickEdit, clickRemove }) {
   return (
     <TableRow>
-      <TableCell>
+      <TableCell style={{ width: '130px' }}>
         <TextInput
           width="small"
-          value={format(value.date, 'MM/d/y')}
+          value={format(new Date(value.date), 'MM/d/y')}
           disabled
         />
       </TableCell>
-      <TableCell>
+      <TableCell style={{ width: '120px' }}>
+        <TimezoneDropdown
+          value={value.timezone}
+          disabled
+          position={position}
+          className="operatingHours__timezone"
+        />
+      </TableCell>
+      <TableCell style={{ width: '90px' }}>
         <Switch
           id={`${id}-isClosed-switch`}
           labelText=""
           isChecked={value.isClosed}
           isDisabled
           className="operatingHours__isClosed"
-        />
-      </TableCell>
-      <TableCell>
-        <TimezoneDropdown
-          value={value.timezone}
-          disabled
-          position={position}
-          className="operatingHours__timezone"
         />
       </TableCell>
       <TableCell className="operatingHours__timeRange">
@@ -47,7 +47,7 @@ function OverrideDaysTableRow({ id, position, value, clickEdit, clickRemove }) {
           disabled
         />
       </TableCell>
-      <TableCell>
+      <TableCell style={{ width: '40px' }}>
         <CardActions>
           <DropdownList>
             <DropdownListItem onClick={clickEdit}>
@@ -66,7 +66,12 @@ function OverrideDaysTableRow({ id, position, value, clickEdit, clickRemove }) {
 OverrideDaysTableRow.propTypes = {
   id: PropTypes.string.isRequired,
   position: PropTypes.string.isRequired,
-  value: PropTypes.shape().isRequired,
+  value: PropTypes.shape({
+    date: PropTypes.string,
+    isClosed: PropTypes.bool,
+    timezone: PropTypes.string,
+    timeRange: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired,
   clickEdit: PropTypes.func.isRequired,
   clickRemove: PropTypes.func.isRequired,
 };

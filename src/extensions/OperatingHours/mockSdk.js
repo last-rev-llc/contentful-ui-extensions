@@ -12,7 +12,8 @@ const sdk = {
         { dayOfWeek: 'Saturday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
         { dayOfWeek: 'Sunday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
       ],
-      overrideDays: []
+      overrideDays: [],
+      friendlyLabels: [],
     }),
     setValue: val => val,
   },

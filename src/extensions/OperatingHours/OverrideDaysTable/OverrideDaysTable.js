@@ -38,12 +38,12 @@ function OverrideDaysTable({ overrideDays, addOverrideDay, editOverrideDay, dele
 
   return (
     <>
-      <Table className="operatingHours__table">
+      <Table className="operatingHours__table" testId="TESTAO-123">
         <TableHead>
           <TableRow>
             <TableCell>Date</TableCell>
-            <TableCell>Closed?</TableCell>
             <TableCell>Timezone</TableCell>
+            <TableCell>Closed?</TableCell>
             <TableCell>Open/Close Times</TableCell>
             <TableCell />
           </TableRow>
@@ -87,7 +87,7 @@ function OverrideDaysTable({ overrideDays, addOverrideDay, editOverrideDay, dele
 
 OverrideDaysTable.propTypes = {
   overrideDays: PropTypes.arrayOf(PropTypes.shape({
-    date: PropTypes.shape(),
+    date: PropTypes.string,
   })).isRequired,
   addOverrideDay: PropTypes.func.isRequired,
   editOverrideDay: PropTypes.func.isRequired,
