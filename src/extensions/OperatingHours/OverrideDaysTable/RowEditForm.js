@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, FieldGroup, Form, FormLabel, Note, Switch } from '@contentful/forma-36-react-components';
+import { format, parse } from 'date-fns';
 import DatePicker from '../../../shared/components/DatePicker';
 import TimeRange from '../../../shared/components/TimeRange';
 import TimezoneDropdown from '../../../shared/components/TimezoneDropdown';
@@ -57,10 +58,10 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
               <DatePicker
                 name="date"
                 placeholderText="Select a date"
-                selected={row.date ? new Date(row.date) : null}
-                onChange={(date) => onValueChanged('date', date.toString())}
+                selected={row.date ? parse(row.date, 'M/d/y', new Date()) : null}
+                onChange={(date) => onValueChanged('date', format(date, 'M/d/y'))}
                 minDate={currentDate}
-                excludeDates={alreadySelectedDates.map(date => new Date(date))}
+                excludeDates={alreadySelectedDates.map(date => parse(date, 'M/d/y', new Date()))}
                 popperPlacement="bottom-start"
                 className="operatingHours__datepicker" />
             </FieldGroup>
