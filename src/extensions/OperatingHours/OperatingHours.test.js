@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-onchange */
 import React from 'react';
 import { render, configure, cleanup, fireEvent } from '@testing-library/react';
+import { format } from 'date-fns';
 import OperatingHours from './OperatingHours';
 import mockedSdk from './mockSdk';
 
@@ -12,7 +13,7 @@ jest.mock('../../shared/components/DatePicker', () => ({ selected, onChange }) =
       data-test-id="overrideDaysForm-datepicker"
       type="text"
       value={selected ? selected.toString() : ''}
-      onChange={(e) => onChange(e.target.value)} />
+      onChange={(e) => onChange(new Date(e.target.value))} />
   );
 });
 
@@ -180,9 +181,111 @@ describe('<OperatingHours />', () => {
 
       expect(getByTestId('overrideDaysTableBody').childNodes.length).toBe(1);
       expect(sdk.field.setValue).toHaveBeenCalledTimes(1);
-      expect(sdk.field.setValue.mock.results[0].value.overrideDays[0].date).toBe(date.toString());
+      expect(sdk.field.setValue.mock.results[0].value.overrideDays.length).toBe(1);
+      expect(sdk.field.setValue.mock.results[0].value.overrideDays[0].date).toBe(format(date, 'M/d/y'));
       expect(sdk.field.setValue.mock.results[0].value.overrideDays[0].timezone).toBe(timezone);
       expect(sdk.field.setValue.mock.results[0].value.overrideDays[0].timeRange).toEqual(timeRange);
+    });
+
+    test('edit a special date', async () => {
+      // Arrange
+      const overrideSdk = {
+        ...sdk,
+        field: {
+          ...sdk.field,
+          getValue: () => {
+            const value = sdk.field.getValue();
+            return {
+              ...value,
+              overrideDays: [
+                { date: '12/25/2020', isClosed: false, timezone: 'America/Chicago', timeRange: ['08:00AM', '06:00PM'] },
+              ]
+            };
+          }
+        }
+      };
+
+      const { getByText, getByTestId } = render(<OperatingHours sdk={overrideSdk} />);
+
+      const specialDatesTab = getByText('Special Dates');
+      fireEvent.click(specialDatesTab);
+
+      const actionsMenu = getByTestId('OperatingHours-OverrideDays-0-actions').childNodes[0];
+      fireEvent.click(actionsMenu);
+
+      const editButton = getByTestId('OperatingHours-OverrideDays-0-edit').childNodes[0];
+      fireEvent.click(editButton);
+
+      // Act
+      const date = new Date(2020, 12, 26);
+      const timezone = 'PT';
+      const timeRange = ['07:00AM', '07:00PM'];
+
+      fireEvent.change(getByTestId('overrideDaysForm-datepicker'), {
+        target: { value: date }
+      });
+
+      fireEvent.change(getByTestId('overrideDaysForm-timezone'), {
+        target: { value: timezone }
+      });
+
+      fireEvent.change(getByTestId('overrideDaysForm-timeRange'), {
+        target: { value: timeRange.join('-') }
+      });
+
+      overrideSdk.field.setValue = jest.fn(val => val);
+
+      fireEvent.click(getByTestId('overrideDaysForm-editButton'));
+
+      // Assert
+      expect(getByTestId('overrideDaysTableBody').childNodes.length).toBe(1);
+      expect(overrideSdk.field.setValue).toHaveBeenCalledTimes(1);
+      expect(overrideSdk.field.setValue.mock.results[0].value.overrideDays.length).toBe(1);
+      expect(overrideSdk.field.setValue.mock.results[0].value.overrideDays[0].date).toBe(format(date, 'M/d/y'));
+      expect(overrideSdk.field.setValue.mock.results[0].value.overrideDays[0].timezone).toBe(timezone);
+      expect(overrideSdk.field.setValue.mock.results[0].value.overrideDays[0].timeRange).toEqual(timeRange);
+    });
+
+    test('remove a special date', async () => {
+      // Arrange
+      const overrideSdk = {
+        ...sdk,
+        field: {
+          ...sdk.field,
+          getValue: () => {
+            const value = sdk.field.getValue();
+            return {
+              ...value,
+              overrideDays: [
+                { date: '12/25/2020', isClosed: false, timezone: 'America/Chicago', timeRange: ['08:00AM', '06:00PM'] },
+                { date: '12/26/2020', isClosed: false, timezone: 'America/Chicago', timeRange: ['08:00AM', '06:00PM'] },
+                { date: '12/27/2020', isClosed: false, timezone: 'America/Chicago', timeRange: ['08:00AM', '06:00PM'] },
+              ]
+            };
+          }
+        }
+      };
+
+      const { getByText, getByTestId } = render(<OperatingHours sdk={overrideSdk} />);
+
+      const specialDatesTab = getByText('Special Dates');
+      fireEvent.click(specialDatesTab);
+
+      const actionsMenu = getByTestId('OperatingHours-OverrideDays-1-actions').childNodes[0];
+      fireEvent.click(actionsMenu);
+
+      overrideSdk.field.setValue = jest.fn(val => val);
+
+      // Act
+      const removeButton = getByTestId('OperatingHours-OverrideDays-1-remove').childNodes[0];
+      fireEvent.click(removeButton);
+
+
+      // Assert
+      expect(getByTestId('overrideDaysTableBody').childNodes.length).toBe(2);
+      expect(overrideSdk.field.setValue).toHaveBeenCalledTimes(1);
+      expect(overrideSdk.field.setValue.mock.results[0].value.overrideDays.length).toBe(2);
+      expect(overrideSdk.field.setValue.mock.results[0].value.overrideDays.map(od => od.date)).not.toContain('12/26/2020');
     });
   });
 });

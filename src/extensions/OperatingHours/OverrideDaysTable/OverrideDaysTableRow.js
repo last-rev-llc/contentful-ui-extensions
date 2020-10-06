@@ -49,12 +49,16 @@ function OverrideDaysTableRow({ id, position, value, clickEdit, clickRemove }) {
         />
       </TableCell>
       <TableCell style={{ width: '40px' }}>
-        <CardActions>
+        <CardActions testId={`${id}-actions`}>
           <DropdownList>
-            <DropdownListItem onClick={clickEdit}>
+            <DropdownListItem
+              onClick={clickEdit}
+              testId={`${id}-edit`}>
               Edit
             </DropdownListItem>
-            <DropdownListItem onClick={clickRemove}>
+            <DropdownListItem
+              onClick={clickRemove}
+              testId={`${id}-remove`}>
               Remove
             </DropdownListItem>
           </DropdownList>

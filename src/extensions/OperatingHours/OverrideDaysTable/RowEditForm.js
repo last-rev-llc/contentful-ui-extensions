@@ -95,6 +95,7 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
             value ? (
               <>
                 <Button
+                  testId="overrideDaysForm-editButton"
                   buttonType="primary"
                   type="submit">
                   Save Edit
