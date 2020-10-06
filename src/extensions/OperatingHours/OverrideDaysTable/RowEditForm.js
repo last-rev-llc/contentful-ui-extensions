@@ -49,7 +49,8 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
       <Card className="operatingHours__newRowCard">
         <Form
           onSubmit={submit}
-          className="operatingHours__newRowForm">
+          className="operatingHours__newRowForm"
+          testId="overrideDaysForm">
           <div className="operatingHours__newRowFormFields">
             <FieldGroup>
               <FormLabel htmlFor="date">Date</FormLabel>
@@ -66,6 +67,7 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
             <FieldGroup>
               <FormLabel htmlFor="timezone">Timezone</FormLabel>
               <TimezoneDropdown
+                id="overrideDaysForm-timezone"
                 value={row.timezone}
                 onChange={(e) => onValueChanged('timezone', e.currentTarget.value)}
                 position="factory"
@@ -81,6 +83,7 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
             <div className="operatingHours__newRowFormFields__timeRange">
               <FormLabel htmlFor="">Open/Close Times</FormLabel>
               <TimeRange
+                testId="overrideDaysForm-timeRange"
                 value={row.timeRange}
                 onChange={timeRange => onValueChanged('timeRange', timeRange)}
                 step={{ minutes: 30 }}
@@ -105,6 +108,7 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
               </>
             ) : (
               <Button
+                testId="overrideDaysForm-addButton"
                 buttonType="primary"
                 type="submit">
                 Add Special Date

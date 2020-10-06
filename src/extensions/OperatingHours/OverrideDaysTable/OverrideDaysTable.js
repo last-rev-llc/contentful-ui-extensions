@@ -38,7 +38,9 @@ function OverrideDaysTable({ overrideDays, addOverrideDay, editOverrideDay, dele
 
   return (
     <>
-      <Table className="operatingHours__table" testId="TESTAO-123">
+      <Table
+        className="operatingHours__table"
+        testId="overrideDaysTable">
         <TableHead>
           <TableRow>
             <TableCell>Date</TableCell>
@@ -48,7 +50,7 @@ function OverrideDaysTable({ overrideDays, addOverrideDay, editOverrideDay, dele
             <TableCell />
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody testId="overrideDaysTableBody">
           {
             (!overrideDays || overrideDays.length === 0) && (
               <TableRow>

@@ -6,6 +6,16 @@ import mockedSdk from './mockSdk';
 
 let sdk = null;
 
+jest.mock('../../shared/components/DatePicker', () => ({ selected, onChange }) => {
+  return (
+    <input
+      data-test-id="overrideDaysForm-datepicker"
+      type="text"
+      value={selected ? selected.toString() : ''}
+      onChange={(e) => onChange(e.target.value)} />
+  );
+});
+
 jest.mock('../../shared/components/TimezoneDropdown', () => ({ id, value, onChange }) => {
   return (
     <select
@@ -26,7 +36,7 @@ jest.mock('../../shared/components/TimeRange', () => ({ testId, value, onChange,
       data-test-id={testId}
       type="text"
       value={value.join('-')}
-      onChange={(val) => onChange(val.split('-'))}
+      onChange={(e) => onChange(e.target.value.split('-'))}
       disabled={disabled} />
   );
 });
@@ -93,7 +103,7 @@ describe('<OperatingHours />', () => {
 
       const isClosedCheckbox = getByTestId('OperatingHours-RegularHours-Monday-isClosed').firstChild;
 
-      fireEvent(isClosedCheckbox, new Event('click'));
+      fireEvent.click(isClosedCheckbox);
 
       const timeRangeField = getByTestId('OperatingHours-RegularHours-Monday-timeRange');
 
@@ -115,24 +125,64 @@ describe('<OperatingHours />', () => {
       expect(sdk.field.setValue.mock.results[0].value.daysOfWeek[0].timezone).toBe('MT');
     });
 
-    // test('time range change triggers sdk setValue', () => {
-    //   const { getByTestId } = render(<OperatingHours sdk={sdk} />);
+    test('time range change triggers sdk setValue', () => {
+      const { getByTestId } = render(<OperatingHours sdk={sdk} />);
 
-    //   const timeRange = getByTestId('OperatingHours-RegularHours-Monday-timeRange');
+      const timeRange = getByTestId('OperatingHours-RegularHours-Monday-timeRange');
 
-    //   sdk.field.setValue = jest.fn(val => val);
+      sdk.field.setValue = jest.fn(val => val);
 
-    //   const value = '08:00AM-08:00PM';
+      fireEvent.change(timeRange, {
+        target: { value: '08:00AM-08:00PM' }
+      });
 
-    //   fireEvent.change(timeRange, {
-    //     target: { value }
-    //   });
-
-    //   expect(sdk.field.setValue).toHaveBeenCalledTimes(1);
-    //   expect(sdk.field.setValue.mock.results[0].value.daysOfWeek[0].timeRange).toBe(value);
-    // });
+      expect(sdk.field.setValue).toHaveBeenCalledTimes(1);
+      expect(sdk.field.setValue.mock.results[0].value.daysOfWeek[0].timeRange).toEqual(['08:00AM', '08:00PM']);
+    });
   });
 
   describe('Special Dates tab', () => {
+    test('renders the special date tab when switch tabs', () => {
+      const { getByText, getByTestId } = render(<OperatingHours sdk={sdk} />);
+
+      const specialDatesTab = getByText('Special Dates');
+      fireEvent.click(specialDatesTab);
+
+      expect(getByTestId('overrideDaysTable')).toBeDefined();
+      expect(getByTestId('overrideDaysForm')).toBeDefined();
+    });
+
+    test('add a special date', () => {
+      const { getByText, getByTestId } = render(<OperatingHours sdk={sdk} />);
+
+      const specialDatesTab = getByText('Special Dates');
+      fireEvent.click(specialDatesTab);
+
+      const date = new Date();
+      const timezone = 'MT';
+      const timeRange = ['06:00AM', '06:00PM'];
+
+      fireEvent.change(getByTestId('overrideDaysForm-datepicker'), {
+        target: { value: date }
+      });
+
+      fireEvent.change(getByTestId('overrideDaysForm-timezone'), {
+        target: { value: timezone }
+      });
+
+      fireEvent.change(getByTestId('overrideDaysForm-timeRange'), {
+        target: { value: timeRange.join('-') }
+      });
+
+      sdk.field.setValue = jest.fn(val => val);
+
+      fireEvent.click(getByTestId('overrideDaysForm-addButton'));
+
+      expect(getByTestId('overrideDaysTableBody').childNodes.length).toBe(1);
+      expect(sdk.field.setValue).toHaveBeenCalledTimes(1);
+      expect(sdk.field.setValue.mock.results[0].value.overrideDays[0].date).toBe(date.toString());
+      expect(sdk.field.setValue.mock.results[0].value.overrideDays[0].timezone).toBe(timezone);
+      expect(sdk.field.setValue.mock.results[0].value.overrideDays[0].timeRange).toEqual(timeRange);
+    });
   });
 });

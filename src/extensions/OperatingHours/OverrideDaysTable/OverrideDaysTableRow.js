@@ -26,6 +26,7 @@ function OverrideDaysTableRow({ id, position, value, clickEdit, clickRemove }) {
       <TableCell style={{ width: '120px' }}>
         <TimezoneDropdown
           value={value.timezone}
+          onChange={() => {}}
           disabled
           position={position}
           className="operatingHours__timezone"
