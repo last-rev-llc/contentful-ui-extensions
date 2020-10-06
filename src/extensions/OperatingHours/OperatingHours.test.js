@@ -288,4 +288,137 @@ describe('<OperatingHours />', () => {
       expect(overrideSdk.field.setValue.mock.results[0].value.overrideDays.map(od => od.date)).not.toContain('12/26/2020');
     });
   });
+
+  describe('Friendly Labels tab', () => {
+    test('renders the friendly labels tab when switch tabs', () => {
+      const { getByText, getByTestId } = render(<OperatingHours sdk={sdk} />);
+
+      const friendlyLabelsTab = getByText('Friendly Labels');
+      fireEvent.click(friendlyLabelsTab);
+
+      expect(getByTestId('friendlyLabelsTable')).toBeDefined();
+      expect(getByTestId('friendlyLabelsForm')).toBeDefined();
+    });
+
+    test('add a friendly label', () => {
+      const { getByText, getByTestId, getByLabelText } = render(<OperatingHours sdk={sdk} />);
+
+      const friendlyLabelsTab = getByText('Friendly Labels');
+      fireEvent.click(friendlyLabelsTab);
+
+      const period = 'Mon-Fri';
+      const description = 'All day';
+
+      fireEvent.change(getByLabelText('Period', { exact: false }), {
+        target: { value: period }
+      });
+
+      fireEvent.change(getByLabelText('Description', { exact: false }), {
+        target: { value: description }
+      });
+
+      sdk.field.setValue = jest.fn(val => val);
+
+      fireEvent.click(getByTestId('friendlyLabelsForm-addButton'));
+
+      expect(getByTestId('friendlyLabelsTableBody').childNodes.length).toBe(1);
+      expect(sdk.field.setValue).toHaveBeenCalledTimes(1);
+      expect(sdk.field.setValue.mock.results[0].value.friendlyLabels.length).toBe(1);
+      expect(sdk.field.setValue.mock.results[0].value.friendlyLabels[0].period).toBe(period);
+      expect(sdk.field.setValue.mock.results[0].value.friendlyLabels[0].description).toBe(description);
+    });
+
+    test('edit a friendly label', async () => {
+      // Arrange
+      const overrideSdk = {
+        ...sdk,
+        field: {
+          ...sdk.field,
+          getValue: () => {
+            const value = sdk.field.getValue();
+            return {
+              ...value,
+              friendlyLabels: [
+                { period: 'Mon-Fri', description: 'All day' },
+              ]
+            };
+          }
+        }
+      };
+
+      const { getByText, getByTestId, getByLabelText } = render(<OperatingHours sdk={overrideSdk} />);
+
+      const friendlyLabelsTab = getByText('Friendly Labels');
+      fireEvent.click(friendlyLabelsTab);
+
+      const actionsMenu = getByTestId('friendlyLabel-0-actions').childNodes[0];
+      fireEvent.click(actionsMenu);
+
+      const editButton = getByTestId('friendlyLabel-0-edit').childNodes[0];
+      fireEvent.click(editButton);
+
+      // Act
+      const period = 'Weekdays';
+      const description = '24h';
+
+      fireEvent.change(getByLabelText('Period', { exact: false }), {
+        target: { value: period }
+      });
+
+      fireEvent.change(getByLabelText('Description', { exact: false }), {
+        target: { value: description }
+      });
+
+      overrideSdk.field.setValue = jest.fn(val => val);
+
+      fireEvent.click(getByTestId('friendlyLabelsForm-editButton'));
+
+      // Assert
+      expect(getByTestId('friendlyLabelsTableBody').childNodes.length).toBe(1);
+      expect(overrideSdk.field.setValue).toHaveBeenCalledTimes(1);
+      expect(overrideSdk.field.setValue.mock.results[0].value.friendlyLabels.length).toBe(1);
+      expect(overrideSdk.field.setValue.mock.results[0].value.friendlyLabels[0].period).toBe(period);
+      expect(overrideSdk.field.setValue.mock.results[0].value.friendlyLabels[0].description).toBe(description);
+    });
+
+    test('remove a friendly label', async () => {
+      // Arrange
+      const overrideSdk = {
+        ...sdk,
+        field: {
+          ...sdk.field,
+          getValue: () => {
+            const value = sdk.field.getValue();
+            return {
+              ...value,
+              friendlyLabels: [
+                { period: 'Mon/Wed/Frid', description: '8am-8pm' },
+                { period: 'Tue/Thu', description: '9am-6pm' },
+                { period: 'Weekends and Holidays', description: 'Closed' },
+              ]
+            };
+          }
+        }
+      };
+
+      const { getByText, getByTestId } = render(<OperatingHours sdk={overrideSdk} />);
+
+      const friendlyLabelsTab = getByText('Friendly Labels');
+      fireEvent.click(friendlyLabelsTab);
+
+      const actionsMenu = getByTestId('friendlyLabel-1-actions').childNodes[0];
+      fireEvent.click(actionsMenu);
+
+      overrideSdk.field.setValue = jest.fn(val => val);
+
+      // Act
+      const removeButton = getByTestId('friendlyLabel-1-remove').childNodes[0];
+      fireEvent.click(removeButton);
+
+      // Assert
+      expect(getByTestId('friendlyLabelsTableBody').childNodes.length).toBe(2);
+      expect(overrideSdk.field.setValue).toHaveBeenCalledTimes(1);
+      expect(overrideSdk.field.setValue.mock.results[0].value.friendlyLabels.map(l => l.period)).not.toContain('Tue/Thu');
+    });
+  });
 });

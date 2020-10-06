@@ -29,7 +29,8 @@ function EditForm({ value, onSubmit, onCancel }) {
       <Card className="operatingHours__newRowCard">
         <Form
           onSubmit={submit}
-          className="operatingHours__newRowForm">
+          className="operatingHours__newRowForm"
+          testId="friendlyLabelsForm">
           <div className="operatingHours__newRowFormFields">
             <FieldGroup>
               <TextField
@@ -38,7 +39,8 @@ function EditForm({ value, onSubmit, onCancel }) {
                 labelText="Period"
                 value={period}
                 onChange={e => setPeriod(e.target.value)}
-                required />
+                required
+                testId="friendlyLabelsForm-period" />
             </FieldGroup>
             <FieldGroup>
               <TextField
@@ -47,7 +49,8 @@ function EditForm({ value, onSubmit, onCancel }) {
                 labelText="Description"
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                required />
+                required
+                testId="friendlyLabelsForm-description" />
             </FieldGroup>
           </div>
           {
@@ -55,21 +58,24 @@ function EditForm({ value, onSubmit, onCancel }) {
               <>
                 <Button
                   buttonType="primary"
-                  type="submit">
+                  type="submit"
+                  testId="friendlyLabelsForm-editButton">
                   Save Edit
                 </Button>
                 <Button
                   buttonType="muted"
                   type="button"
                   onClick={onCancel}
-                  className="operatingHours__cancelButton">
+                  className="operatingHours__cancelButton"
+                  testId="friendlyLabelsForm-cancelButton">
                   Cancel
                 </Button>
               </>
             ) : (
               <Button
                 buttonType="primary"
-                type="submit">
+                type="submit"
+                testId="friendlyLabelsForm-addButton">
                 Add Friendly Label
               </Button>
             )

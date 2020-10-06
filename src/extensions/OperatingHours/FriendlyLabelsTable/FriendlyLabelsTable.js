@@ -43,7 +43,9 @@ function FriendlyLabelsTable({ friendlyLabels, addRow, editRow, deleteRow }) {
         Here you can add custom messages for the operating hours (Ex: Mon-Fri: All day). If you add a row here
         all the other filled data will be ignored.
       </Note>
-      <Table className="operatingHours__table">
+      <Table
+        className="operatingHours__table"
+        testId="friendlyLabelsTable">
         <TableHead>
           <TableRow>
             <TableCell>Period</TableCell>
@@ -51,7 +53,7 @@ function FriendlyLabelsTable({ friendlyLabels, addRow, editRow, deleteRow }) {
             <TableCell />
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody testId="friendlyLabelsTableBody">
           {
             (!friendlyLabels || friendlyLabels.length === 0) && (
               <TableRow>
@@ -71,12 +73,16 @@ function FriendlyLabelsTable({ friendlyLabels, addRow, editRow, deleteRow }) {
                 <TableCell>{ friendlyLabel.period }</TableCell>
                 <TableCell>{ friendlyLabel.description }</TableCell>
                 <TableCell>
-                  <CardActions>
+                  <CardActions testId={`friendlyLabel-${index}-actions`}>
                     <DropdownList>
-                      <DropdownListItem onClick={() => enterRowEditMode(index)}>
+                      <DropdownListItem
+                        onClick={() => enterRowEditMode(index)}
+                        testId={`friendlyLabel-${index}-edit`}>
                         Edit
                       </DropdownListItem>
-                      <DropdownListItem onClick={() => deleteRow(index)}>
+                      <DropdownListItem
+                        onClick={() => deleteRow(index)}
+                        testId={`friendlyLabel-${index}-remove`}>
                         Remove
                       </DropdownListItem>
                     </DropdownList>
@@ -96,7 +102,13 @@ function FriendlyLabelsTable({ friendlyLabels, addRow, editRow, deleteRow }) {
 }
 
 FriendlyLabelsTable.propTypes = {
-
+  friendlyLabels: PropTypes.arrayOf(PropTypes.shape({
+    period: PropTypes.string,
+    description: PropTypes.string
+  })).isRequired,
+  addRow: PropTypes.func.isRequired,
+  editRow: PropTypes.func.isRequired,
+  deleteRow: PropTypes.func.isRequired
 };
 
 export default FriendlyLabelsTable;
