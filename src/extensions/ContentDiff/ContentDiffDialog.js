@@ -7,7 +7,6 @@ import diff from 'node-htmldiff';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
 import './ContentDiff.scss';
-import { EmptyState } from '@contentful/forma-36-react-components';
 import {
   addRemovedOldFields,
   createAssetHtml,
@@ -26,11 +25,11 @@ import {
 } from './helpers';
 import { entryWrapTestId, fieldTypes, linkTypes, paragraphFieldTypes, richTextFieldTypes } from './constants';
 
-const getTextDiff = ({ id, oldText, newText, fieldType }) => {
+const getTextDiff = ({ oldText, newText, fieldType }) => {
   const changedClass = newText === oldText ? 'no-change' : 'change';
 
   return (
-    <div className="diff-field-line-wrap" key={id} data-field-type={fieldType} data-test-id="cdd-diff-fields">
+    <div className="diff-field-line-wrap" data-field-type={fieldType} data-test-id="cdd-diff-fields">
       <div
         className={`diff-text diff-text_snapshot ${changedClass}`}
         data-test-id="cdd-old-text"
@@ -57,76 +56,56 @@ getTextDiff.propTypes = PropTypes.shape({
   fieldType: PropTypes.string.isRequired,
 }).isRequired;
 
-const getFields = (field) => {
-  if (isNil(field) || isNil(get(field, 'type'))) return '';
-  let result;
+const renderFieldDiff = (field) => {
+  const fieldType = get(field, 'type');
 
-  switch (field.type) {
+  if (isNil(fieldType)) return '';
+  let getter;
+
+  switch (fieldType) {
     case fieldTypes.richText:
-      result = getTextDiff({
-        id: 0,
-        oldText: get(field, 'content.oldValue', ''),
-        newText: get(field, 'content.currentValue', ''),
-        fieldType: field.type,
-      });
+      getter = (key) => get(field, `content['${key}']`, '');
       break;
 
     case fieldTypes.symbol:
-      result = getTextDiff({
-        id: 0,
-        oldText: escape(get(field, 'oldValue', '')),
-        newText: escape(get(field, 'currentValue', '')),
-        fieldType: field.type,
-      });
+      getter = (key) => escape(get(field, key, ''));
       break;
 
     case fieldTypes.text:
-      result = getTextDiff({
-        id: 0,
-        oldText: get(field, 'oldValue', ''),
-        newText: get(field, 'currentValue', ''),
-        fieldType: field.type,
-      });
+    case fieldTypes.boolean:
+      getter = (key) => get(field, key, '');
       break;
-
     case fieldTypes.object:
-      // TODO: need to add an object diff tool
+      // This seems to work, but needs further testing on complex JSON content
+      getter = (key) => `<pre>${JSON.stringify(get(field, key, ''), null, 2)}</pre>`;
       break;
 
     case fieldTypes.array:
       if (field.arrayType === fieldTypes.symbol) {
-        result = getTextDiff({
-          id: 0,
-          oldText: getArrayValue(get(field, 'oldValue', [])),
-          newText: getArrayValue(get(field, 'currentValue', [])),
-          fieldType: field.type,
-        });
+        getter = (key) => getArrayValue(get(field, key, []));
       }
+      // TODO: handle other array types?
       break;
 
     case fieldTypes.link:
       if (field.linkType === linkTypes.asset) {
-        result = getTextDiff({
-          id: 0,
-          oldText: createAssetHtml(get(field, 'oldValue')),
-          newText: createAssetHtml(get(field, 'currentValue')),
-          fieldType: field.type,
-        });
+        getter = (key) => createAssetHtml(get(field, key));
       } else {
-        result = getTextDiff({
-          id: 0,
-          oldText: get(field, 'oldValue', ''),
-          newText: get(field, 'currentValue', ''),
-          fieldType: field.type,
-        });
+        getter = (key) => get(field, key, '');
       }
-
       break;
 
     default:
       break;
   }
-  return result;
+
+  return getter
+    ? getTextDiff({
+        fieldType,
+        oldText: getter('oldValue'),
+        newText: getter('currentValue'),
+      })
+    : '';
 };
 
 const getFieldInfo = (id, field) => {
@@ -135,7 +114,7 @@ const getFieldInfo = (id, field) => {
       <label htmlFor="fieldLabel" data-test-id="cdd-field-label">
         {field.label}
       </label>
-      {getFields(field)}
+      {renderFieldDiff(field)}
     </li>
   );
 };
@@ -400,6 +379,6 @@ ContentDiffDialog.propTypes = {
   }).isRequired,
 };
 
-export { getTextDiff, getFields, getFieldInfo, getFieldTables, getArrayValue };
+export { getTextDiff, renderFieldDiff, getFieldInfo, getFieldTables, getArrayValue };
 
 export default ContentDiffDialog;

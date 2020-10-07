@@ -15,6 +15,7 @@ export const fieldTypes = {
   array: 'Array',
   link: 'Link',
   text: 'Text',
+  boolean: 'Boolean',
 };
 
 export const linkTypes = {

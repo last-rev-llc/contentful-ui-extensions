@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, has } from 'lodash';
 import { fieldTypes, firstIndex, linkTypes } from '../constants';
 import { getArrayType, getId, getLabel, getType, getValue } from './getters';
 import { getAsset, getContentType, getEditorInterface, getEntry } from './lookups';
@@ -43,7 +43,7 @@ export const createContentSimpleObjects = async (space, entry) => {
   return objects;
 };
 
-export const createSimpleObject = async (control, space, fields, locale) => {
+export const createSimpleObject = async (field, control, space, locale) => {
   let asset;
   let entryObject;
   let entryContentType;
@@ -52,9 +52,7 @@ export const createSimpleObject = async (control, space, fields, locale) => {
 
   switch (control.field.type) {
     case fieldTypes.link:
-      id = locale
-        ? get(fields, `[${control.fieldId}]['en-US'].sys.id`)
-        : get(fields, `[${control.fieldId}]._fieldLocales['en-US']._value.sys.id`);
+      id = locale ? get(field, `['${locale}'].sys.id`) : get(field, `_fieldLocales['en-US']._value.sys.id`);
       if (!id) break;
       if (control.field.linkType === linkTypes.entry) {
         entryObject = await getEntry(id, space);
@@ -71,13 +69,19 @@ export const createSimpleObject = async (control, space, fields, locale) => {
     default:
       break;
   }
-  const value = fields[control.fieldId] && (fields[control.fieldId][locale] || fields[control.fieldId].getValue());
+
+  let value = '';
+
+  if (field) {
+    value = has(field, locale) ? get(field, locale) : field.getValue();
+  }
+
   return {
     id: control.fieldId,
     type: control.field.type,
     textType,
     value,
-    arrayType: fields[control.fieldId] && fields[control.fieldId].items && fields[control.fieldId].items.type,
+    arrayType: get(field, 'items.type'),
     label: control.field.name,
     linkType: control.field.linkType,
     asset,
@@ -87,7 +91,9 @@ export const createSimpleObject = async (control, space, fields, locale) => {
 };
 
 export const createSimpleObjects = async (space, controls, fields, locale) => {
-  return Promise.all(controls.map((control) => createSimpleObject(control, space, fields, locale)));
+  return Promise.all(
+    controls.map((control) => createSimpleObject(get(fields, control.fieldId), control, space, locale))
+  );
 };
 
 export const addRemovedOldFields = (fields, snapshots) => {
