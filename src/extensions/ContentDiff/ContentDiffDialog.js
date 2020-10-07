@@ -379,6 +379,6 @@ ContentDiffDialog.propTypes = {
   }).isRequired,
 };
 
-export { getTextDiff, renderFieldDiff as getFields, getFieldInfo, getFieldTables, getArrayValue };
+export { getTextDiff, renderFieldDiff, getFieldInfo, getFieldTables, getArrayValue };
 
 export default ContentDiffDialog;

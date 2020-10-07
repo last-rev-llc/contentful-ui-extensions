@@ -5,7 +5,7 @@ import { waitFor } from '@testing-library/dom';
 import diff from 'node-htmldiff';
 import {
   getTextDiff,
-  getFields,
+  renderFieldDiff,
   getFieldInfo,
   getFieldTables,
   getEmbeddedEntryValue,
@@ -149,7 +149,7 @@ describe('<ContentDiffDialog sdk={sdk}', () => {
 
   describe('getFields(field = { id, type, label, content: { currentValue, oldValue }, currentValue, oldValue, arrayType })', () => {
     test('shows rich text field info', () => {
-      const { getByTestId } = render(getFields(richTextFieldInfo));
+      const { getByTestId } = render(renderFieldDiff(richTextFieldInfo));
       expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(richTextFieldInfo.type);
       expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
       expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
@@ -157,7 +157,7 @@ describe('<ContentDiffDialog sdk={sdk}', () => {
     });
 
     test('shows symbol field info', () => {
-      const { getByTestId } = render(getFields(symbolFieldInfo));
+      const { getByTestId } = render(renderFieldDiff(symbolFieldInfo));
       expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(symbolFieldInfo.type);
       expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
       expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
@@ -165,14 +165,14 @@ describe('<ContentDiffDialog sdk={sdk}', () => {
     });
 
     test('shows array field info', () => {
-      const { getByTestId, getAllByTestId } = render(getFields(arrayFieldInfo));
+      const { getByTestId, getAllByTestId } = render(renderFieldDiff(arrayFieldInfo));
       expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(arrayFieldInfo.type);
       expect(getAllByTestId(arrayListTestId).length).toBe(arrayFieldLength);
       expect(getAllByTestId(arrayListItemTestId).length).toBe(arrayFieldLength * 3);
     });
 
     test('shows link field info', () => {
-      const { getByTestId } = render(getFields(linkFieldInfo));
+      const { getByTestId } = render(renderFieldDiff(linkFieldInfo));
       expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(linkFieldInfo.type);
       expect(getByTestId(oldTextTestId).textContent).not.toBeNull();
       expect(getByTestId(diffTextTestId).textContent).not.toBeNull();
