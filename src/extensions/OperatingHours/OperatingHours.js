@@ -6,17 +6,15 @@ import OverrideDaysTable from './OverrideDaysTable';
 import FriendlyLabelsTable from './FriendlyLabelsTable/FriendlyLabelsTable';
 import './OperatingHours.scss';
 
-const INITIAL_TIME_RANGE = ['12:00 AM', '12:00 AM'];
-
 const INITIAL_STATE = {
   daysOfWeek: [
-    { dayOfWeek: 'Monday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Tuesday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Wednesday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Thursday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Friday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Saturday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
-    { dayOfWeek: 'Sunday', isClosed: false, timezone: 'America/Chicago', timeRange: INITIAL_TIME_RANGE },
+    { dayOfWeek: 'Monday', isClosed: false, timezone: 'America/Chicago' },
+    { dayOfWeek: 'Tuesday', isClosed: false, timezone: 'America/Chicago' },
+    { dayOfWeek: 'Wednesday', isClosed: false, timezone: 'America/Chicago' },
+    { dayOfWeek: 'Thursday', isClosed: false, timezone: 'America/Chicago' },
+    { dayOfWeek: 'Friday', isClosed: false, timezone: 'America/Chicago' },
+    { dayOfWeek: 'Saturday', isClosed: false, timezone: 'America/Chicago' },
+    { dayOfWeek: 'Sunday', isClosed: false, timezone: 'America/Chicago' },
   ],
   overrideDays: [],
   friendlyLabels: []

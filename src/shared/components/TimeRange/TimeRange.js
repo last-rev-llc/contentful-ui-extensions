@@ -28,6 +28,11 @@ function TimeRange({ value, onChange, step, disabled }) {
   const classes = useStyles();
 
   useEffect(() => {
+    if (!value || value.length === 0) {
+      onChange([dayTimes[0], dayTimes[dayTimes.length - 1]]);
+      return;
+    }
+
     const [start, end] = value;
 
     const startIndex = dayTimes.indexOf(start);

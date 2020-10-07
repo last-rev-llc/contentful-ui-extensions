@@ -16,7 +16,13 @@ function RowEditForm({ value, onSubmit, onCancel, alreadySelectedDates }) {
 
   useEffect(() => {
     if (value) {
-      setRow({ ...value });
+      const val = { ...value };
+
+      if (!val.timeRange) {
+        val.timeRange = INITIAL_TIME_RANGE;
+      }
+
+      setRow(val);
     } else {
       setRow(INITIAL_NEW_ROW_STATE);
     }

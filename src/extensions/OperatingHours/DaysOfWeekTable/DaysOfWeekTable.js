@@ -49,7 +49,7 @@ function DaysOfWeekTable({ daysOfWeek, onChange }) {
                   className="operatingHours__timeRange">
                   <TimeRange
                     testId={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-timeRange`}
-                    value={dayOfWeek.timeRange}
+                    value={dayOfWeek.timeRange || []}
                     onChange={(value) => onChange(index, { timeRange: value })}
                     step={{ minutes: 30 }}
                     disabled={dayOfWeek.isClosed} />
