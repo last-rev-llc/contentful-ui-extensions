@@ -147,7 +147,7 @@ describe('<ContentDiffDialog sdk={sdk}', () => {
     });
   });
 
-  describe('getFields(field = { id, type, label, content: { currentValue, oldValue }, currentValue, oldValue, arrayType })', () => {
+  describe('renderFieldDiff(field = { type, label, content: { currentValue, oldValue }, currentValue, oldValue, arrayType })', () => {
     test('shows rich text field info', () => {
       const { getByTestId } = render(renderFieldDiff(richTextFieldInfo));
       expect(getByTestId(diffFieldsTestId).getAttribute('data-field-type')).toBe(richTextFieldInfo.type);
