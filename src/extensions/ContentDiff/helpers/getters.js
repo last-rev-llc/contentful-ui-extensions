@@ -37,6 +37,8 @@ export const getValue = (field) => {
     } else if (field.type === fieldTypes.link && field.linkType === linkTypes.entry) {
       const displayField = get(field, 'entryContentType.displayField');
       value = get(field, `entry.fields['${displayField}']['en-US']`);
+    } else if (field.type === fieldTypes.boolean) {
+      value = get(field, 'value') ? 'True' : 'False';
     } else {
       value = get(field, 'value');
     }
