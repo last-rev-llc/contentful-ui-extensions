@@ -10,20 +10,19 @@ import {
   TextInput,
 } from '@contentful/forma-36-react-components';
 import { format } from 'date-fns';
-import TimeRange from '../../../shared/components/TimeRange';
 import TimezoneDropdown from '../../../shared/components/TimezoneDropdown';
 
 function OverrideDaysTableRow({ id, position, value, clickEdit, clickRemove }) {
   return (
     <TableRow>
-      <TableCell style={{ width: '130px' }}>
+      <TableCell className="operatingHours__dateTableCell">
         <TextInput
           width="small"
           value={format(new Date(value.date), 'MM/d/y')}
           disabled
         />
       </TableCell>
-      <TableCell style={{ width: '120px' }}>
+      <TableCell className="operatingHours__timezoneTableCell">
         <TimezoneDropdown
           value={value.timezone}
           onChange={() => {}}
@@ -32,7 +31,7 @@ function OverrideDaysTableRow({ id, position, value, clickEdit, clickRemove }) {
           className="operatingHours__timezone"
         />
       </TableCell>
-      <TableCell style={{ width: '90px' }}>
+      <TableCell className="operatingHours__switchTableCell">
         <Switch
           id={`${id}-isClosed-switch`}
           labelText=""
@@ -41,14 +40,10 @@ function OverrideDaysTableRow({ id, position, value, clickEdit, clickRemove }) {
           className="operatingHours__isClosed"
         />
       </TableCell>
-      <TableCell className="operatingHours__timeRange">
-        <TimeRange
-          value={value.timeRange}
-          step={{ minutes: 30 }}
-          disabled
-        />
+      <TableCell>
+        { value.timeRange.join(' - ') }
       </TableCell>
-      <TableCell style={{ width: '40px' }}>
+      <TableCell className="operatingHours__actionsTableCell">
         <CardActions testId={`${id}-actions`}>
           <DropdownList>
             <DropdownListItem

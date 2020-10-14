@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { getSelect } from '../../helpers';
 
 const TIMEZONES = {
-  'America/New_York': 'ET',
-  'America/Chicago': 'CT',
-  'America/Denver': 'MT',
-  'America/Los_Angeles': 'PT'
+  'America/New_York': 'New York',
+  'America/Chicago': 'Chicago',
+  'America/Denver': 'Denver',
+  'America/Phoenix': 'Phoenix',
+  'America/Los_Angeles': 'Los Angeles'
 };
 
 function TimezoneDropdown({ id, value, onChange, disabled, position, name, className }) {

@@ -4,7 +4,6 @@ import {
   CardActions,
   DropdownList,
   DropdownListItem,
-  Note,
   Paragraph,
   Table,
   TableHead,
@@ -37,19 +36,13 @@ function FriendlyLabelsTable({ friendlyLabels, addRow, editRow, deleteRow }) {
 
   return (
     <>
-      <Note
-        className="operatingHours__newRowError"
-        noteType="primary">
-        Here you can add custom messages for the operating hours (Ex: Mon-Fri: All day). If you add a row here
-        all the other filled data will be ignored.
-      </Note>
       <Table
         className="operatingHours__table"
         testId="friendlyLabelsTable">
         <TableHead>
           <TableRow>
-            <TableCell>Period</TableCell>
-            <TableCell>Description</TableCell>
+            <TableCell>Label</TableCell>
+            <TableCell>Value</TableCell>
             <TableCell />
           </TableRow>
         </TableHead>
@@ -72,7 +65,7 @@ function FriendlyLabelsTable({ friendlyLabels, addRow, editRow, deleteRow }) {
               <TableRow key={friendlyLabel.description}>
                 <TableCell>{ friendlyLabel.period }</TableCell>
                 <TableCell>{ friendlyLabel.description }</TableCell>
-                <TableCell>
+                <TableCell className="operatingHours__actionsTableCell">
                   <CardActions testId={`friendlyLabel-${index}-actions`}>
                     <DropdownList>
                       <DropdownListItem

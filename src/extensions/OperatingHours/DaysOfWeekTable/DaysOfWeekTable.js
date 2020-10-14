@@ -27,8 +27,8 @@ function DaysOfWeekTable({ daysOfWeek, onChange }) {
           {
             daysOfWeek.map((dayOfWeek, index) => (
               <TableRow key={dayOfWeek.dayOfWeek}>
-                <TableCell style={{ width: '130px' }}>{ dayOfWeek.dayOfWeek }</TableCell>
-                <TableCell style={{ width: '120px' }}>
+                <TableCell className="operatingHours__dateTableCell">{ dayOfWeek.dayOfWeek }</TableCell>
+                <TableCell className="operatingHours__timezoneTableCell">
                   <TimezoneDropdown
                     id={`${dayOfWeek.dayOfWeek}-timezone`}
                     value={dayOfWeek.timezone}
@@ -37,7 +37,7 @@ function DaysOfWeekTable({ daysOfWeek, onChange }) {
                     className="operatingHours__timezone" />
                 </TableCell>
                 <TableCell
-                  style={{ width: '90px' }}
+                  className="operatingHours__switchTableCell"
                   testId={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed`}>
                   <Switch
                     id={`OperatingHours-RegularHours-${dayOfWeek.dayOfWeek}-isClosed-switch`}

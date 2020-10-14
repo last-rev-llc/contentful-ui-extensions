@@ -22,6 +22,7 @@ function EditForm({ value, onSubmit, onCancel }) {
 
   function submit() {
     onSubmit({ period, description });
+    clearData();
   }
 
   return (
@@ -36,7 +37,7 @@ function EditForm({ value, onSubmit, onCancel }) {
               <TextField
                 id="period"
                 name="period"
-                labelText="Period"
+                labelText="Label"
                 value={period}
                 onChange={e => setPeriod(e.target.value)}
                 required
@@ -46,10 +47,9 @@ function EditForm({ value, onSubmit, onCancel }) {
               <TextField
                 id="description"
                 name="description"
-                labelText="Description"
+                labelText="Value"
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                required
                 testId="friendlyLabelsForm-description" />
             </FieldGroup>
           </div>

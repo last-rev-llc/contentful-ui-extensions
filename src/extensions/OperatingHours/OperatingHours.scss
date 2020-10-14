@@ -24,7 +24,7 @@
   }
 
   &__timezone {
-    max-width: 75px;
+    max-width: 130px;
   }
 
   &__emptyTableRow {
@@ -74,6 +74,22 @@
     &__timeRange > label {
       margin-bottom: 1.5rem;
     }
+  }
+
+  &__dateTableCell {
+    width: 130px;
+  }
+
+  &__timezoneTableCell {
+    width: 120px;
+  }
+
+  &__switchTableCell {
+    width: 90px;
+  }
+
+  &__actionsTableCell {
+    width: 40px;
   }
 
   input[type=checkbox] {
