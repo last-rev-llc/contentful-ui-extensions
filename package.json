@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@bynder/compact-view": "^2.2.0",
     "@contentful/field-editor-reference": "^1.11.0",
     "@contentful/forma-36-fcss": "0.0.34",
     "@contentful/forma-36-react-components": "^3.42.2",
