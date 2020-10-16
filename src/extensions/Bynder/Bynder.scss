@@ -1,0 +1,16 @@
+.Bynder {
+  &__card {
+    margin: 10px;
+    position: relative;
+    width: 150px;
+    height: 100px;
+  
+    > img {
+      display: block;
+      max-width: 150px;
+      max-height: 100px;
+      margin: auto;
+      user-select: none;
+    }
+  }
+}
