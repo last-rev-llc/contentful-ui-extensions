@@ -45,6 +45,7 @@ To see the extension in your Contentful instance follow the directions below for
 
 #### Individual Extension Documentation
 
+- [Address](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Address)
 - [Color Picker](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/ColorPicker)
 - [SEO](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Seo)
 - [PersonName](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/PersonName)

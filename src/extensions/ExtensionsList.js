@@ -6,6 +6,11 @@ export default function ExtensionsList() {
     <div>
       <ul>
         <li>
+          <Link to="/address" className="">
+            Address
+          </Link>
+        </li>
+        <li>
           <Link to="/bynder-image" className="">
             Bynder Image
           </Link>
