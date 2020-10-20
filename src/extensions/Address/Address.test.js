@@ -30,7 +30,7 @@ describe('<Address />', () => {
         streetAddress: 'street address',
         streetAddress2: 'street address 2',
         city: 'Denver',
-        state: 'Colorado',
+        state: 'CO',
         postalCode: '00000',
         latitude: '00000',
         longitude: '00000',
@@ -129,7 +129,7 @@ describe('<Address />', () => {
       const { getByLabelText } = render(<Address sdk={sdk} />);
 
       const element = getByLabelText('State', { exact: false });
-      const value = 'Alabama';
+      const value = 'NY';
 
       fireEvent.change(element, {
         target: { value }
