@@ -23,7 +23,7 @@ function CoveoReferenceSearchDialog({ sdk }) {
         cq: existingCq = null
       }
     },
-    notifier: { error }
+    notifier
   } = sdk;
 
   // TODO: figure out how to attach a click handler to search results.
@@ -72,11 +72,11 @@ function CoveoReferenceSearchDialog({ sdk }) {
         setSearchCss(css);
         setFieldMapping(fm);
       } catch (err) {
-        error(`Unable to load search data: ${err.message}`);
+        notifier.error(`Unable to load search data: ${err.message}`);
       }
     }
     fetchIt();
-  }, [endpoint, searchPageName, error]);
+  }, [endpoint, searchPageName, notifier]);
 
   const searchContainer = useRef(null);
 
@@ -118,17 +118,21 @@ function CoveoReferenceSearchDialog({ sdk }) {
   );
 
   const scriptsLoaded = useCallback(async () => {
-    const coveoSearch = await CoveoSearchService.getInstance({ sdk });
-    if (searchContainer.current) {
-      coveoSearch.initCoveo(
-        searchContainer.current.firstChild,
-        {
-          querySuccess: querySuccessHandler
-        },
-        existingState
-      );
+    try {
+      const coveoSearch = await CoveoSearchService.getInstance({ sdk });
+      if (searchContainer.current) {
+        coveoSearch.initCoveo(
+          searchContainer.current.firstChild,
+          {
+            querySuccess: querySuccessHandler
+          },
+          existingState
+        );
+      }
+    } catch (err) {
+      notifier.error(err);
     }
-  }, [sdk, querySuccessHandler, existingState]);
+  }, [sdk, querySuccessHandler, existingState, notifier]);
 
   useScripts(searchJs, scriptsLoaded);
   useCss(searchCss);
