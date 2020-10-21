@@ -8,7 +8,7 @@ import { get, filter, has } from "lodash";
 import { TYPE_REF_SEARCH } from "../constants";
 import CoveoReferenceSearchEntry from "./CoveoReferenceSearchEntry";
 
-function CoveoReferenceSearchList({ sdk }) {
+function CoveoReferenceSearchFieldDisplay({ sdk }) {
   const {
     field,
     space,
@@ -94,4 +94,4 @@ function CoveoReferenceSearchList({ sdk }) {
   );
 }
 
-export default CoveoReferenceSearchList;
+export default CoveoReferenceSearchFieldDisplay;

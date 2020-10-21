@@ -7,7 +7,7 @@ import { locations } from "contentful-ui-extensions-sdk";
 import CoveoSearchFieldDisplay from "./CoveoSearchFieldDisplay";
 import CoveoSearchDialog from "./CoveoSearchDialog";
 
-function CoveoReferenceSearch({ sdk }) {
+function CoveoSearch({ sdk }) {
   const { location } = sdk;
 
   if (location.is(locations.LOCATION_DIALOG)) {
@@ -17,7 +17,7 @@ function CoveoReferenceSearch({ sdk }) {
   return <CoveoSearchFieldDisplay sdk={sdk} />;
 }
 
-CoveoReferenceSearch.propTypes = {
+CoveoSearch.propTypes = {
   sdk: PropTypes.shape({
     location: PropTypes.string.isRequired
   }).isRequired,
@@ -32,4 +32,4 @@ CoveoReferenceSearch.propTypes = {
   }).isRequired
 };
 
-export default CoveoReferenceSearch;
+export default CoveoSearch;
