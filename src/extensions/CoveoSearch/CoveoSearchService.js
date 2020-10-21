@@ -41,7 +41,7 @@ class CoveoSearchService {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async initCoveo(searchContainer, listeners = [], existingState) {
+  async initCoveo({ searchContainer, listeners = [], existingState }) {
     let counter = 0;
     while (counter < 5 && typeof Coveo === "undefined") {
       // eslint-disable-next-line no-await-in-loop

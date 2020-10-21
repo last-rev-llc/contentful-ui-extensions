@@ -12,7 +12,7 @@ import CoveoSearchService from "./CoveoSearchService";
 import CoveosSearchResultList from "./CoveoSearchResultList";
 import { TYPE_SAVED_SEARCH } from "./constants";
 
-function CoveoReferenceSearchDialog({ sdk }) {
+function CoveoSearchDialog({ sdk }) {
   const {
     parameters: {
       installation: { endpoint },
@@ -121,13 +121,13 @@ function CoveoReferenceSearchDialog({ sdk }) {
     try {
       const coveoSearch = await CoveoSearchService.getInstance({ sdk });
       if (searchContainer.current) {
-        coveoSearch.initCoveo(
-          searchContainer.current.firstChild,
-          {
+        coveoSearch.initCoveo({
+          searchContainer: searchContainer.current.firstChild,
+          listeners: {
             querySuccess: querySuccessHandler
           },
           existingState
-        );
+        });
       }
     } catch (err) {
       notifier.error(err);
@@ -174,7 +174,7 @@ function CoveoReferenceSearchDialog({ sdk }) {
   );
 }
 
-// CoveoReferenceSearchDialog.propTypes = {
+// CoveoSearchDialog.propTypes = {
 //   sdk: PropTypes.shape({
 //     parameters: PropTypes.shape({
 //       installation: PropTypes.shqape({
@@ -197,4 +197,4 @@ function CoveoReferenceSearchDialog({ sdk }) {
 //   }).isRequired,
 // };
 
-export default CoveoReferenceSearchDialog;
+export default CoveoSearchDialog;
