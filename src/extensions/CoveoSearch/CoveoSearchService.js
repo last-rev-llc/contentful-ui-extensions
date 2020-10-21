@@ -15,9 +15,15 @@ class CoveoSearchService {
   }
 
   async init() {
-    while (typeof Coveo === "undefined") {
+    let counter = 0;
+    while (counter < 5 && typeof Coveo === "undefined") {
       // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, 1000));
+      counter += 1;
+    }
+
+    if (typeof Coveo === "undefined") {
+      throw Error("Unable to initialize Coveo library!");
     }
 
     const response = await fetch(this.endpoint, {
@@ -36,9 +42,15 @@ class CoveoSearchService {
 
   // eslint-disable-next-line class-methods-use-this
   async initCoveo(searchContainer, listeners = [], existingState) {
-    while (typeof Coveo === "undefined") {
+    let counter = 0;
+    while (counter < 5 && typeof Coveo === "undefined") {
       // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, 1000));
+      counter += 1;
+    }
+
+    if (typeof Coveo === "undefined") {
+      throw Error("Unable to initialize Coveo library!");
     }
 
     Coveo.init(searchContainer);
