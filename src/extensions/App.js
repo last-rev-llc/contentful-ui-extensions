@@ -8,9 +8,10 @@ import ColorPicker from "./ColorPicker";
 import LocalizationLookup from "./LocalizationLookup";
 import LocaleZooms from "./LocaleZooms";
 import ContentDiff from "./ContentDiff";
+import CoveoSearch from "./CoveoSearch";
 import Seo from "./Seo";
-import PersonName from './PersonName';
-import PhoneNumber from './PhoneNumber';
+import PersonName from "./PersonName";
+import PhoneNumber from "./PhoneNumber";
 import RecipeSteps from "./RecipeSteps";
 import RecipeIngredients from "./RecipeIngredients";
 import SeoConfig from "./Seo/SeoConfig";
@@ -20,8 +21,9 @@ import localizationLookupMockSdk from "./LocalizationLookup/mockSdk";
 import localeZoomsMockSdk from "./LocaleZooms/mockSdk";
 import contentDiffMockSdk from "./ContentDiff/mockSdk";
 import colorPickerMockSdk from "./ColorPicker/mockSdk";
-import personNameMockSdk from './PersonName/mockSdk';
-import phoneNumberMockSdk from './PhoneNumber/mockSdk';
+import coveoSearchMock from "./CoveoSearch/mockSdk";
+import personNameMockSdk from "./PersonName/mockSdk";
+import phoneNumberMockSdk from "./PhoneNumber/mockSdk";
 import recipeStepsMockSdk from "./RecipeSteps/mockSdk";
 import recipeIngredientsMockSdk from "./RecipeIngredients/mockSdk";
 
@@ -44,6 +46,11 @@ const App = ({ sdk, locations }) => {
           )}
         />
         <Route
+          path="/coveo-search"
+          exact
+          component={() => <CoveoSearch sdk={sdk || coveoSearchMock} />}
+        />
+        <Route
           path="/localization-lookup"
           exact
           component={() => (
@@ -63,16 +70,15 @@ const App = ({ sdk, locations }) => {
             />
           )}
         />
-        <Route path="/person-name"
+        <Route
+          path="/person-name"
           exact
           component={() => (
-            <PersonName
-              sdk={sdk || personNameMockSdk}
-              locations={locations}
-            />
+            <PersonName sdk={sdk || personNameMockSdk} locations={locations} />
           )}
         />
-        <Route path="/phone-number"
+        <Route
+          path="/phone-number"
           exact
           component={() => (
             <PhoneNumber

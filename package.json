@@ -55,5 +55,16 @@
     "lint-staged": "^9.5.0",
     "prettier": "^1.19.1",
     "react-test-renderer": "^16.13.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,json,css}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

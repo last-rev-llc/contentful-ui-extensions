@@ -1,0 +1,41 @@
+PUT https://api.contentful.com/spaces/4yx69hifndy8/environments/jaime-test-coveo-uie/extensions/coveo-search
+Authorization: Bearer <removed>
+Content-Type: application/vnd.contentful.management.v1+json
+
+{
+  "extension": {
+    "src": "http://localhost:3000/coveo-search",
+    "name": "Coveo Search",
+    "fieldTypes": [
+      {
+        "type": "Array",
+        "items": {
+          "type": "Link",
+          "linkType": "Entry"
+        }
+      },
+      {
+        "type": "Object"
+      }
+    ],
+    "sidebar": false,
+    "parameters": {
+      "installation": [
+        {
+          "id": "endpoint",
+          "name": "Endpoint URL",
+          "type": "Symbol",
+          "required": true
+        }
+      ],
+      "instance": [
+        {
+          "id": "searchPageName",
+          "name": "Name of the Coveo Seach Page to use",
+          "type": "Symbol",
+          "required": true
+        }
+      ]
+    }
+  }
+}
