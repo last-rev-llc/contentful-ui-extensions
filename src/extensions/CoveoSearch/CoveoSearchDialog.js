@@ -51,26 +51,18 @@ function CoveoSearchDialog({ sdk }) {
         const {
           // TODO: must return field mapping from endpoint... need to change these fields to be content type agnostic
           // ideally something like uwh_content_id and uwh_content_type is preferred.
-          data: {
-            html,
-            css,
-            javascript,
-            // TODO: must return field mapping from endpoint... need to change these fields to be content type agnostic
-            // ideally something like uwh_content_id and uwh_content_type is preferred.
-
-            // hartd coding these for now...
-            fieldMapping: fm = {
-              contentId: "uwh_provider_content_id",
-              contentType: "uwh_provider_content_type"
-            }
-          }
+          data: { searchPage, fieldMappings }
         } = await response.json();
 
-        setLoading(false);
-        setSearchHtml(html);
-        setSearchJs(javascript);
-        setSearchCss(css);
-        setFieldMapping(fm);
+        if (searchPage) {
+          setLoading(false);
+          setSearchHtml(searchPage.html);
+          setSearchJs(searchPage.javascript);
+          setSearchCss(searchPage.css);
+          setFieldMapping(fieldMappings);
+        } else {
+          notifier.error(`No serach page found with name: ${searchPageName}`);
+        }
       } catch (err) {
         notifier.error(`Unable to load search data: ${err.message}`);
       }
