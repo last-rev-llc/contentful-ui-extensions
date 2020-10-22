@@ -4,7 +4,13 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import ReactDom from "react-dom";
 // import PropTypes from 'prop-types';
-import { Button, EmptyState } from "@contentful/forma-36-react-components";
+import {
+  Button,
+  Dropdown,
+  DropdownList,
+  DropdownListItem,
+  EmptyState
+} from "@contentful/forma-36-react-components";
 import "@contentful/forma-36-react-components/dist/styles.css";
 import { get } from "lodash";
 import { useCss, useScripts } from "./CoveoSearchHooks";
@@ -20,7 +26,8 @@ function CoveoSearchDialog({ sdk }) {
         searchPageName,
         type,
         query: existingState = null,
-        cq: existingCq = null
+        cq: existingCq = null,
+        numberOfItems: existingNumberOfItems = 3
       }
     },
     notifier
@@ -36,6 +43,8 @@ function CoveoSearchDialog({ sdk }) {
   const [results, setResults] = useState([]);
   const [cq, setCq] = useState(existingCq);
   const [fieldMapping, setFieldMapping] = useState(null);
+  const [isDropdownIOpen, setDropdownOpen] = useState(false);
+  const [numberOfItems, setNumberOfItems] = useState(existingNumberOfItems);
 
   useEffect(() => {
     async function fetchIt() {
@@ -154,9 +163,49 @@ function CoveoSearchDialog({ sdk }) {
   return (
     <>
       {type === TYPE_SAVED_SEARCH ? (
-        <Button icon="Code" onClick={() => sdk.close({ query, cq })}>
-          Save this search
-        </Button>
+        <>
+          <Button
+            icon="Code"
+            onClick={() => sdk.close({ query, cq, numberOfItems })}
+          >
+            Save this search
+          </Button>
+          <Dropdown
+            isOpen={isDropdownIOpen}
+            onClose={() => setDropdownOpen(false)}
+            toggleElement={
+              <Button
+                size="small"
+                buttonType="muted"
+                indicateDropdown
+                onClick={() => setDropdownOpen(!isDropdownIOpen)}
+              >
+                Number of Items
+              </Button>
+            }
+          >
+            <DropdownList maxHeight={200}>
+              {[...new Array(10)].map((_entry, i) => {
+                const index = i + 1;
+                return (
+                  <DropdownListItem
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={`key-${index}`}
+                    onClick={e => {
+                      setNumberOfItems(
+                        parseInt(e.currentTarget.textContent, 10)
+                      );
+                      setDropdownOpen(false);
+                    }}
+                    isActive={index === numberOfItems}
+                  >
+                    {index}
+                  </DropdownListItem>
+                );
+              })}
+            </DropdownList>
+          </Dropdown>
+        </>
       ) : null}
       <div
         ref={searchContainer}
