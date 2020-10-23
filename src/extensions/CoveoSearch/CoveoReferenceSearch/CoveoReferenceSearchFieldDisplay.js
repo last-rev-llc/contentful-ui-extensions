@@ -1,61 +1,36 @@
 /* eslint-disable react/prop-types */
 // TODO: enable proptypes
-import React, { useCallback, useEffect, useState } from "react";
-import { EntityList, Button } from "@contentful/forma-36-react-components";
+import React, { useCallback } from "react";
+import { TextLink } from "@contentful/forma-36-react-components";
+import { MultipleEntryReferenceEditor } from "@contentful/field-editor-reference";
 import "@contentful/forma-36-react-components/dist/styles.css";
-import { get, filter, has } from "lodash";
+import { get, has } from "lodash";
 
 import { TYPE_REF_SEARCH } from "../constants";
-import CoveoReferenceSearchEntry from "./CoveoReferenceSearchEntry";
 
 function CoveoReferenceSearchFieldDisplay({ sdk }) {
   const {
     field,
-    space,
     dialogs: { openExtension: openDialogExtension },
     parameters: {
       instance: { searchPageName }
     }
   } = sdk;
 
-  const [entries, setEntries] = useState([]);
-
-  useEffect(() => {
-    const detachValueChangeHandler = field.onValueChanged(setEntries);
-
-    setEntries(field.getValue() || []);
-
-    return () => {
-      detachValueChangeHandler(setEntries);
-    };
-  }, [field]);
-
-  const removeItem = useCallback(
-    async id => {
-      const newItems = filter(entries, ref => {
-        return get(ref, "sys.id") !== id;
-      });
-
-      await field.setValue(newItems);
-    },
-    [entries, field]
-  );
-
   const addItem = useCallback(
-    async contentId => {
-      const newItems = entries || [];
-
-      newItems.push({
+    contentId => {
+      const items = field.getValue() || [];
+      const newItems = Array.from(items);
+      newItems.splice(items.length, 0, {
         sys: {
           type: "Link",
           linkType: "Entry",
           id: contentId
         }
       });
-
-      await field.setValue(newItems);
+      field.setValue(newItems);
     },
-    [entries, field]
+    [field]
   );
 
   const openDialog = async () => {
@@ -73,23 +48,23 @@ function CoveoReferenceSearchFieldDisplay({ sdk }) {
     }
   };
 
-  // TODO: handle drag and drop
   return (
     <div className="coveoReferenceSearchList">
-      {entries && entries.length ? (
-        <EntityList>
-          {entries.map(entry => (
-            <CoveoReferenceSearchEntry
-              space={space}
-              contentId={get(entry, "sys.id")}
-              removeHandler={removeItem}
-            />
-          ))}
-        </EntityList>
-      ) : null}
-      <Button buttonType="primary" onClick={openDialog}>
-        Search for content
-      </Button>
+      <MultipleEntryReferenceEditor
+        viewType="link"
+        sdk={sdk}
+        parameters={{
+          instance: {
+            canCreateEntity: true,
+            canLinkEntity: true
+          }
+        }}
+        renderCustomActions={() => (
+          <TextLink icon="Search" onClick={openDialog}>
+            Search for content
+          </TextLink>
+        )}
+      />
     </div>
   );
 }
