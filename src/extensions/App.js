@@ -11,6 +11,7 @@ import LocalizationLookup from "./LocalizationLookup";
 import LocaleZooms from "./LocaleZooms";
 import ContentDiff from "./ContentDiff";
 import CoveoSearch from "./CoveoSearch";
+import OperatingHours from "./OperatingHours";
 import Seo from "./Seo";
 import PersonName from "./PersonName";
 import PhoneNumber from "./PhoneNumber";
@@ -28,11 +29,14 @@ import colorPickerMockSdk from "./ColorPicker/mockSdk";
 import coveoSearchMock from "./CoveoSearch/mockSdk";
 import personNameMockSdk from "./PersonName/mockSdk";
 import phoneNumberMockSdk from "./PhoneNumber/mockSdk";
+import operatingHoursMockSdk from "./OperatingHours/mockSdk";
 import recipeStepsMockSdk from "./RecipeSteps/mockSdk";
 import recipeIngredientsMockSdk from "./RecipeIngredients/mockSdk";
-
 import BynderImage from "./BynderImage";
 import { createMockSDK } from "./BynderImage/mockSdk";
+
+import '@contentful/forma-36-react-components/dist/styles.css';
+import '@contentful/forma-36-fcss/dist/styles.css';
 
 const App = ({ sdk, locations }) => {
   return (
@@ -81,6 +85,15 @@ const App = ({ sdk, locations }) => {
             <LocaleZooms
               sdk={sdk || localeZoomsMockSdk}
               locations={locations}
+            />
+          )}
+        />
+        <Route
+          path="/operating-hours"
+          exact
+          component={() => (
+            <OperatingHours
+              sdk={sdk || operatingHoursMockSdk}
             />
           )}
         />

@@ -39,9 +39,9 @@ const getOptions = (options, optionObject, position) => {
     : [<Option />];
 };
 
-const getSelect = (options, onChange, { id = 'select1', name = id, disabled = false, optionObject, width = 'medium' }, value, position) => {
+const getSelect = (options, onChange, { id = 'select1', name = id, disabled = false, optionObject, width = 'medium' }, value, position, className) => {
   return <Select
-    className=""
+    className={className}
     id={id}
     name={name}
     onChange={onChange}

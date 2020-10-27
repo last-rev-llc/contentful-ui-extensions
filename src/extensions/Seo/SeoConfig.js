@@ -1,8 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {Component} from 'react';
 import { get, set, filter, keys, indexOf, isEmpty, find, head, omit } from 'lodash';
-import '@contentful/forma-36-react-components/dist/styles.css';
-import '@contentful/forma-36-fcss/dist/styles.css';
 import { 
   EmptyState,
   IconButton,
