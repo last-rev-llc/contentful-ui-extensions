@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 import "@contentful/forma-36-react-components/dist/styles.css";
-import "./CoveoSearch.scss";
 import PropTypes from "prop-types";
 import { locations } from "contentful-ui-extensions-sdk";
 import CoveoSearchFieldDisplay from "./CoveoSearchFieldDisplay";
