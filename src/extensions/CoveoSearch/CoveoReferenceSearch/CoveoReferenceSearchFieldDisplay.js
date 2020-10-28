@@ -30,8 +30,6 @@ function CoveoReferenceSearchFieldDisplay({ sdk }) {
           }
         }))
       ];
-
-      console.log("newItems", newItems);
       field.setValue(newItems);
     },
     [field]
