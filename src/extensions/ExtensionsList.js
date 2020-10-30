@@ -26,13 +26,13 @@ export default function ExtensionsList() {
           </Link>
         </li>
         <li>
-          <Link to="/coveo-search" className="">
-            Coveo Search
+          <Link to="/content-diff" className="">
+            Content Diff
           </Link>
         </li>
         <li>
-          <Link to="/seo" className="">
-            Seo
+          <Link to="/coveo-search" className="">
+            Coveo Search
           </Link>
         </li>
         <li>
@@ -46,13 +46,8 @@ export default function ExtensionsList() {
           </Link>
         </li>
         <li>
-          <Link to="/recipe-ingredients" className="">
-            Recipe Ingredients
-          </Link>
-        </li>
-        <li>
-          <Link to="/recipe-steps" className="">
-            Recipe Steps
+          <Link to="/operating-hours" className="">
+            Operating Hours
           </Link>
         </li>
         <li>
@@ -66,8 +61,18 @@ export default function ExtensionsList() {
           </Link>
         </li>
         <li>
-          <Link to="/content-diff" className="">
-            Content Diff
+          <Link to="/recipe-ingredients" className="">
+            Recipe Ingredients
+          </Link>
+        </li>
+        <li>
+          <Link to="/recipe-steps" className="">
+            Recipe Steps
+          </Link>
+        </li>
+        <li>
+          <Link to="/seo" className="">
+            Seo
           </Link>
         </li>
       </ul>
