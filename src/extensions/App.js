@@ -6,6 +6,7 @@ import { Router, Route, Switch } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import Address from "./Address";
+import Bynder from './Bynder';
 import ColorPicker from "./ColorPicker";
 import LocalizationLookup from "./LocalizationLookup";
 import LocaleZooms from "./LocaleZooms";
@@ -22,6 +23,7 @@ import ExtensionsList from "./ExtensionsList";
 import history from "../history";
 
 import addressMockSdk from "./Address/mockSdk";
+import bynderMockSdk from "./Bynder/mockSdk";
 import localizationLookupMockSdk from "./LocalizationLookup/mockSdk";
 import localeZoomsMockSdk from "./LocaleZooms/mockSdk";
 import contentDiffMockSdk from "./ContentDiff/mockSdk";
@@ -49,6 +51,16 @@ const App = ({ sdk, locations }) => {
           component={() => (
             <Address
               sdk={sdk || addressMockSdk}
+              locations={locations}
+            />
+          )}
+        />
+        <Route
+          path="/bynder"
+          exact
+          component={() => (
+            <Bynder
+              sdk={sdk || bynderMockSdk}
               locations={locations}
             />
           )}

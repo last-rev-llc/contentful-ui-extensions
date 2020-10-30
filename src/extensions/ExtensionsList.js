@@ -11,6 +11,11 @@ export default function ExtensionsList() {
           </Link>
         </li>
         <li>
+          <Link to="/bynder" className="">
+            Bynder
+          </Link>
+        </li>
+        <li>
           <Link to="/bynder-image" className="">
             Bynder Image
           </Link>
