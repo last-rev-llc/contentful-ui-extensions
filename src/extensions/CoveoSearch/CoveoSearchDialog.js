@@ -12,7 +12,8 @@ import {
   EmptyState
 } from "@contentful/forma-36-react-components";
 import "@contentful/forma-36-react-components/dist/styles.css";
-import { get } from "lodash";
+import { get, reject, some } from "lodash";
+import "./CoveoSearchDialog.scss";
 import { useCss, useScripts } from "./CoveoSearchHooks";
 import CoveoSearchService from "./CoveoSearchService";
 import CoveosSearchResultList from "./CoveoSearchResultList";
@@ -45,6 +46,7 @@ function CoveoSearchDialog({ sdk }) {
   const [fieldMapping, setFieldMapping] = useState(null);
   const [isDropdownIOpen, setDropdownOpen] = useState(false);
   const [numberOfItems, setNumberOfItems] = useState(existingNumberOfItems);
+  const [selectedContentIds, setSelectedContentIds] = useState([]);
 
   useEffect(() => {
     async function fetchIt() {
@@ -82,13 +84,14 @@ function CoveoSearchDialog({ sdk }) {
   const searchContainer = useRef(null);
 
   const selectReferenceHandler = useCallback(
-    (contentId, contentType) => {
-      sdk.close({
-        contentId,
-        contentType
-      });
+    contentId => {
+      const predicate = id => id === contentId;
+      const newSelectedContent = some(selectedContentIds, predicate)
+        ? reject(selectedContentIds, predicate)
+        : [...selectedContentIds, contentId];
+      setSelectedContentIds(newSelectedContent);
     },
-    [sdk]
+    [selectedContentIds]
   );
 
   useEffect(() => {
@@ -100,23 +103,12 @@ function CoveoSearchDialog({ sdk }) {
           type={type}
           fieldMapping={fieldMapping}
           selectReferenceHandler={selectReferenceHandler}
+          selectedContent={selectedContentIds}
         />,
         el
       );
     }
-  }, [fieldMapping, results, selectReferenceHandler, type]);
-
-  const querySuccessHandler = useCallback(
-    (args, state) => {
-      if (type === TYPE_SAVED_SEARCH) {
-        setQuery(state);
-        setCq(get(args, "query.cq"));
-      }
-
-      setResults(get(args, "results.results"));
-    },
-    [type]
-  );
+  }, [fieldMapping, results, selectReferenceHandler, selectedContentIds, type]);
 
   const scriptsLoaded = useCallback(async () => {
     try {
@@ -125,7 +117,13 @@ function CoveoSearchDialog({ sdk }) {
         coveoSearch.initCoveo({
           searchContainer: searchContainer.current.firstChild,
           listeners: {
-            querySuccess: querySuccessHandler
+            deferredQuerySuccess: (args, state) => {
+              if (type === TYPE_SAVED_SEARCH) {
+                setQuery(state);
+                setCq(get(args, "query.cq"));
+              }
+              setResults(get(args, "results.results"));
+            }
           },
           existingState
         });
@@ -133,7 +131,7 @@ function CoveoSearchDialog({ sdk }) {
     } catch (err) {
       notifier.error(err);
     }
-  }, [sdk, querySuccessHandler, existingState, notifier]);
+  }, [sdk, existingState, type, notifier]);
 
   useScripts(searchJs, scriptsLoaded);
   useCss(searchCss);
@@ -165,7 +163,7 @@ function CoveoSearchDialog({ sdk }) {
       {type === TYPE_SAVED_SEARCH ? (
         <>
           <Button
-            icon="Code"
+            icon="Download"
             onClick={() => sdk.close({ query, cq, numberOfItems })}
           >
             Save this search
@@ -206,7 +204,15 @@ function CoveoSearchDialog({ sdk }) {
             </DropdownList>
           </Dropdown>
         </>
-      ) : null}
+      ) : (
+        <Button
+          icon="PlusCircle"
+          onClick={() => sdk.close({ selectedContentIds })}
+        >
+          Save references
+        </Button>
+      )}
+
       <div
         ref={searchContainer}
         dangerouslySetInnerHTML={{ __html: searchHtml }}

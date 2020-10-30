@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { TextLink } from "@contentful/forma-36-react-components";
 import { MultipleEntryReferenceEditor } from "@contentful/field-editor-reference";
 import "@contentful/forma-36-react-components/dist/styles.css";
-import { get, has } from "lodash";
+import { get, has, map } from "lodash";
 
 import { TYPE_REF_SEARCH } from "../constants";
 
@@ -17,17 +17,19 @@ function CoveoReferenceSearchFieldDisplay({ sdk }) {
     }
   } = sdk;
 
-  const addItem = useCallback(
-    contentId => {
+  const addItems = useCallback(
+    contentIds => {
       const items = field.getValue() || [];
-      const newItems = Array.from(items);
-      newItems.splice(items.length, 0, {
-        sys: {
-          type: "Link",
-          linkType: "Entry",
-          id: contentId
-        }
-      });
+      const newItems = [
+        ...items,
+        ...map(contentIds, contentId => ({
+          sys: {
+            type: "Link",
+            linkType: "Entry",
+            id: contentId
+          }
+        }))
+      ];
       field.setValue(newItems);
     },
     [field]
@@ -43,8 +45,8 @@ function CoveoReferenceSearchFieldDisplay({ sdk }) {
         type: TYPE_REF_SEARCH
       }
     });
-    if (has(data, "contentId")) {
-      addItem(get(data, "contentId"));
+    if (has(data, "selectedContentIds")) {
+      addItems(get(data, "selectedContentIds"));
     }
   };
 
