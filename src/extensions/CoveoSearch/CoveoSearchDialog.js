@@ -204,19 +204,19 @@ function CoveoSearchDialog({ sdk }) {
             </DropdownList>
           </Dropdown>
         </>
-      ) : null}
-      <>
+      ) : (
         <Button
           icon="PlusCircle"
           onClick={() => sdk.close({ selectedContentIds })}
         >
           Save references
         </Button>
-        <div
-          ref={searchContainer}
-          dangerouslySetInnerHTML={{ __html: searchHtml }}
-        />
-      </>
+      )}
+
+      <div
+        ref={searchContainer}
+        dangerouslySetInnerHTML={{ __html: searchHtml }}
+      />
     </>
   );
 }
