@@ -64,8 +64,11 @@ To see the extension in your Contentful instance follow the directions below for
 
 #### Individual Extension Documentation
 
+- [Address](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Address)
 - [Color Picker](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/ColorPicker)
 - [SEO](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Seo)
+- [PersonName](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/PersonName)
+- [PhoneNumber](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/PhoneNumber)
 
 ### Prerequisites
 
@@ -83,7 +86,10 @@ You need an account for Contentful to use these extensions.
 ├── src
 │   ├── __mocks__
 │   ├── extensions
+│   ├── ├── BynderImages
 │   ├── ├── ColorPicker
+│   ├── ├── PersonName
+│   ├── ├── PhoneNumber
 │   ├── ├── Seo
 │   ├── ├── FormStack
 │   ├── shared
