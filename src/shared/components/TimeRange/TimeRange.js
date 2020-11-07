@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { startOfDay, add, format } from "date-fns";
-import { Slider } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { startOfDay, endOfDay, add, format } from 'date-fns';
+import { Slider } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
-const TIME_FORMAT = "h:mm a";
+const TIME_FORMAT = 'h:mm a';
 
 const useStyles = makeStyles({
   marked: {
     marginBottom: 0,
-    marginTop: "1rem"
+    marginTop: '1rem',
   },
   valueLabel: {
-    textAlign: "center",
+    textAlign: 'center',
     top: -22,
-    "& *": {
-      background: "transparent",
-      color: "#000"
-    }
+    '& *': {
+      background: 'transparent',
+      color: '#000',
+    },
   }
 });
 
@@ -38,12 +38,8 @@ function TimeRange({ value, onChange, step, disabled }) {
     const startIndex = dayTimes.indexOf(start);
     const endIndex = dayTimes.indexOf(end);
 
-    const val = [
-      startIndex,
-      endIndex === startIndex && endIndex === 0 ? dayTimes.length - 1 : endIndex
-    ];
+    const val = [startIndex, endIndex === startIndex && endIndex === 0 ? dayTimes.length - 1 : endIndex];
     setSelectedValue(val);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, dayTimes]);
 
   useEffect(() => {
@@ -51,7 +47,7 @@ function TimeRange({ value, onChange, step, disabled }) {
     const end = startOfDay(add(start, { days: 1 }));
 
     const newDayTimes = [];
-
+    
     let tempDate;
     for (tempDate = start; tempDate <= end; tempDate = add(tempDate, step)) {
       const formattedDate = format(tempDate, TIME_FORMAT);
@@ -59,7 +55,6 @@ function TimeRange({ value, onChange, step, disabled }) {
     }
 
     setDayTimes(newDayTimes);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step.minutes]);
 
   function handleChange(e, val) {
@@ -81,7 +76,7 @@ function TimeRange({ value, onChange, step, disabled }) {
       valueLabelFormat={valueLabelFormat}
       classes={{
         marked: classes.marked,
-        valueLabel: classes.valueLabel
+        valueLabel: classes.valueLabel,
       }}
       disabled={disabled}
     />
@@ -92,15 +87,15 @@ TimeRange.propTypes = {
   value: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
   step: PropTypes.shape({
-    minutes: PropTypes.number
+    minutes: PropTypes.number,
   }).isRequired,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
 };
 
 TimeRange.defaultProps = {
   disabled: false,
   onChange: () => {},
-  value: ""
+  value: '',
 };
 
 export default TimeRange;

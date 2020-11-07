@@ -38,25 +38,6 @@ In order to help streamline the process of development we have created a mock SD
 
 This will be a list of all available UI Extensions.
 
-### Using Netlify Lambda Functions
-Some UI Extensions, especially ones that integrate with third party services will nee dto communicate using a serverless function. We use Netlify for hosting and below are the instructions to run them locally
-
-First you need to install the [Netlify CLI Tools](https://github.com/netlify/cli)
-> npm install netlify-cli -g
-
-To start the application use the following command instead of `npm start`. This starts a node server as well as your React application
-> ntl dev
-
-Creating a new function
-> netlify functions:create *function-name*
-
-Functions are located in the `/lambda` folder located in the project root directory. This is defined in the `netlify.toml` file
-
-**Notes on Functions:**
-- You mush specify the headers in the return. For instance you must specify `Access-Control-Allow-Origin` to prevent CORS issues
-- You must include any dependencies you use in your Lambda functions in the main package.json
-- Environment Variables must be set in the Netlify UI and are availalbe locally when running `ntl dev`
-
 ### Using in Contentful
 
 To see the extension in your Contentful instance follow the directions below for each extension.
@@ -91,7 +72,6 @@ You need an account for Contentful to use these extensions.
 │   ├── ├── PersonName
 │   ├── ├── PhoneNumber
 │   ├── ├── Seo
-│   ├── ├── FormStack
 │   ├── shared
 ├── history.js
 ├── index.js
