@@ -4,12 +4,6 @@
 import React from "react";
 import { Router, Route, Switch } from "react-router-dom";
 import PropTypes from "prop-types";
-import ColorPicker from "./ColorPicker";
-import FormStack from "./FormStack";
-import Seo from "./Seo";
-import SeoConfig from "./Seo/SeoConfig";
-import ExtensionsList from "./ExtensionsList";
-import history from "../history";
 
 import Address from "./Address";
 import Bynder from "./Bynder";
@@ -24,6 +18,7 @@ import PersonName from "./PersonName";
 import PhoneNumber from "./PhoneNumber";
 import RecipeSteps from "./RecipeSteps";
 import RecipeIngredients from "./RecipeIngredients";
+import FormStack from "./FormStack";
 import SeoConfig from "./Seo/SeoConfig";
 import ExtensionsList from "./ExtensionsList";
 import history from "../history";
@@ -40,6 +35,7 @@ import phoneNumberMockSdk from "./PhoneNumber/mockSdk";
 import operatingHoursMockSdk from "./OperatingHours/mockSdk";
 import recipeStepsMockSdk from "./RecipeSteps/mockSdk";
 import recipeIngredientsMockSdk from "./RecipeIngredients/mockSdk";
+import formStackMockSdk from "./FormStack/mockSdk";
 import BynderImage from "./BynderImage";
 import { createMockSDK } from "./BynderImage/mockSdk";
 
@@ -169,7 +165,7 @@ const App = ({ sdk, locations }) => {
           path="/formstack"
           exact
           component={() => (
-            <FormStack sdk={sdk || colorPickerMockSdk} locations={locations} />
+            <FormStack sdk={sdk || formStackMockSdk} locations={locations} />
           )}
         />
         <Route
@@ -193,8 +189,8 @@ App.propTypes = {
     LOCATION_DIALOG: PropTypes.string.isRequired,
     LOCATION_ENTRY_EDITOR: PropTypes.string.isRequired,
     LOCATION_PAGE: PropTypes.string.isRequired,
-    LOCATION_APP_CONFIG: PropTypes.string.isRequired,
-  }),
+    LOCATION_APP_CONFIG: PropTypes.string.isRequired
+  })
 };
 
 export default App;

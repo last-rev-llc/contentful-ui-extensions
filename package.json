@@ -58,7 +58,6 @@
     "husky": "^4.2.5",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "lint-staged": "^9.5.0",
-    "netlify-lambda": "^1.6.3",
     "prettier": "^1.19.1",
     "react-test-renderer": "^16.13.1"
   },
