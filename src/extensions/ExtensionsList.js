@@ -75,11 +75,6 @@ export default function ExtensionsList() {
             Seo
           </Link>
         </li>
-        <li>
-          <Link to="/formstack" className="">
-            FormStack
-          </Link>
-        </li>
       </ul>
     </div>
   );

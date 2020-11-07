@@ -6,7 +6,7 @@ import { Router, Route, Switch } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import Address from "./Address";
-import Bynder from "./Bynder";
+import Bynder from './Bynder';
 import ColorPicker from "./ColorPicker";
 import LocalizationLookup from "./LocalizationLookup";
 import LocaleZooms from "./LocaleZooms";
@@ -18,7 +18,6 @@ import PersonName from "./PersonName";
 import PhoneNumber from "./PhoneNumber";
 import RecipeSteps from "./RecipeSteps";
 import RecipeIngredients from "./RecipeIngredients";
-import FormStack from "./FormStack";
 import SeoConfig from "./Seo/SeoConfig";
 import ExtensionsList from "./ExtensionsList";
 import history from "../history";
@@ -35,12 +34,11 @@ import phoneNumberMockSdk from "./PhoneNumber/mockSdk";
 import operatingHoursMockSdk from "./OperatingHours/mockSdk";
 import recipeStepsMockSdk from "./RecipeSteps/mockSdk";
 import recipeIngredientsMockSdk from "./RecipeIngredients/mockSdk";
-import formStackMockSdk from "./FormStack/mockSdk";
 import BynderImage from "./BynderImage";
 import { createMockSDK } from "./BynderImage/mockSdk";
 
-import "@contentful/forma-36-react-components/dist/styles.css";
-import "@contentful/forma-36-fcss/dist/styles.css";
+import '@contentful/forma-36-react-components/dist/styles.css';
+import '@contentful/forma-36-fcss/dist/styles.css';
 
 const App = ({ sdk, locations }) => {
   return (
@@ -51,14 +49,20 @@ const App = ({ sdk, locations }) => {
           path="/address"
           exact
           component={() => (
-            <Address sdk={sdk || addressMockSdk} locations={locations} />
+            <Address
+              sdk={sdk || addressMockSdk}
+              locations={locations}
+            />
           )}
         />
         <Route
           path="/bynder"
           exact
           component={() => (
-            <Bynder sdk={sdk || bynderMockSdk} locations={locations} />
+            <Bynder
+              sdk={sdk || bynderMockSdk}
+              locations={locations}
+            />
           )}
         />
         <Route
@@ -100,7 +104,9 @@ const App = ({ sdk, locations }) => {
           path="/operating-hours"
           exact
           component={() => (
-            <OperatingHours sdk={sdk || operatingHoursMockSdk} />
+            <OperatingHours
+              sdk={sdk || operatingHoursMockSdk}
+            />
           )}
         />
         <Route
@@ -160,13 +166,6 @@ const App = ({ sdk, locations }) => {
             }
             return <Seo sdk={sdk || usedSdk} locations={locations} />;
           }}
-        />
-        <Route
-          path="/formstack"
-          exact
-          component={() => (
-            <FormStack sdk={sdk || formStackMockSdk} locations={locations} />
-          )}
         />
         <Route
           path="/bynder-image"
