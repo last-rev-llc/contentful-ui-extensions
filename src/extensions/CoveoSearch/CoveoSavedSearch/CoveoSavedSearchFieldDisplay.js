@@ -46,7 +46,7 @@ function CoveoSavedSearchFieldDisplay({ sdk }) {
       });
       const cq = get(data, "cq");
       const numberOfItems = get(data, "numberOfItems");
-      field.setValue({ query: pruned, cq, numberOfItems });
+      field.setValue({ query: pruned, cq, numberOfResults: numberOfItems });
     }
   };
 
