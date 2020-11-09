@@ -72,5 +72,8 @@
       "eslint --fix",
       "git add"
     ]
+  },
+  "volta": {
+    "node": "10.16.3"
   }
 }
