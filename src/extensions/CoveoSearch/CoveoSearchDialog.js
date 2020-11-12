@@ -27,7 +27,7 @@ function CoveoSearchDialog({ sdk }) {
         searchPageName,
         type,
         query: existingState = null,
-        cq: existingCq = null,
+        // cq: existingCq = null,
         numberOfItems: existingNumberOfItems = 3
       }
     },
@@ -42,7 +42,7 @@ function CoveoSearchDialog({ sdk }) {
   const [searchJs, setSearchJs] = useState(null);
   const [query, setQuery] = useState(existingState);
   const [results, setResults] = useState([]);
-  const [cq, setCq] = useState(existingCq);
+  // const [cq, setCq] = useState(existingCq);
   const [fieldMapping, setFieldMapping] = useState(null);
   const [isDropdownIOpen, setDropdownOpen] = useState(false);
   const [numberOfItems, setNumberOfItems] = useState(existingNumberOfItems);
@@ -117,10 +117,9 @@ function CoveoSearchDialog({ sdk }) {
         coveoSearch.initCoveo({
           searchContainer: searchContainer.current.firstChild,
           listeners: {
-            deferredQuerySuccess: (args, state) => {
+            deferredQuerySuccess: args => {
               if (type === TYPE_SAVED_SEARCH) {
-                setQuery(state);
-                setCq(get(args, "query.cq"));
+                setQuery(get(args, "query"), null, 2);
               }
               setResults(get(args, "results.results"));
             }
@@ -164,7 +163,7 @@ function CoveoSearchDialog({ sdk }) {
         <>
           <Button
             icon="Download"
-            onClick={() => sdk.close({ query, cq, numberOfItems })}
+            onClick={() => sdk.close({ query, numberOfItems })}
           >
             Save this search
           </Button>
