@@ -1,35 +1,23 @@
 /* eslint-disable react/no-danger */
 /* eslint-disable react/prop-types */
 // TODO: enable prop types
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import ReactDom from "react-dom";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import ReactDom from 'react-dom';
 // import PropTypes from 'prop-types';
-import {
-  Button,
-  Dropdown,
-  DropdownList,
-  DropdownListItem,
-  EmptyState
-} from "@contentful/forma-36-react-components";
-import "@contentful/forma-36-react-components/dist/styles.css";
-import { get, reject, some } from "lodash";
-import "./CoveoSearchDialog.scss";
-import { useCss, useScripts } from "./CoveoSearchHooks";
-import CoveoSearchService from "./CoveoSearchService";
-import CoveosSearchResultList from "./CoveoSearchResultList";
-import { TYPE_SAVED_SEARCH } from "./constants";
+import { Button, Dropdown, DropdownList, DropdownListItem, EmptyState } from '@contentful/forma-36-react-components';
+import '@contentful/forma-36-react-components/dist/styles.css';
+import { get, reject, some } from 'lodash';
+import './CoveoSearchDialog.scss';
+import { useCss, useScripts } from './CoveoSearchHooks';
+import CoveoSearchService from './CoveoSearchService';
+import CoveosSearchResultList from './CoveoSearchResultList';
+import { TYPE_SAVED_SEARCH } from './constants';
 
 function CoveoSearchDialog({ sdk }) {
   const {
     parameters: {
       installation: { endpoint },
-      invocation: {
-        searchPageName,
-        type,
-        query: existingState = null,
-        // cq: existingCq = null,
-        numberOfItems: existingNumberOfItems = 3
-      }
+      invocation: { searchPageName, type, query: existingState = null, numberOfItems: existingNumberOfItems = 3 }
     },
     notifier
   } = sdk;
@@ -42,7 +30,6 @@ function CoveoSearchDialog({ sdk }) {
   const [searchJs, setSearchJs] = useState(null);
   const [query, setQuery] = useState(existingState);
   const [results, setResults] = useState([]);
-  // const [cq, setCq] = useState(existingCq);
   const [fieldMapping, setFieldMapping] = useState(null);
   const [isDropdownIOpen, setDropdownOpen] = useState(false);
   const [numberOfItems, setNumberOfItems] = useState(existingNumberOfItems);
@@ -52,9 +39,9 @@ function CoveoSearchDialog({ sdk }) {
     async function fetchIt() {
       try {
         const response = await fetch(endpoint, {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({
-            action: "GET_SEARCH_PAGE",
+            action: 'GET_SEARCH_PAGE',
             payload: searchPageName
           })
         });
@@ -84,8 +71,8 @@ function CoveoSearchDialog({ sdk }) {
   const searchContainer = useRef(null);
 
   const selectReferenceHandler = useCallback(
-    contentId => {
-      const predicate = id => id === contentId;
+    (contentId) => {
+      const predicate = (id) => id === contentId;
       const newSelectedContent = some(selectedContentIds, predicate)
         ? reject(selectedContentIds, predicate)
         : [...selectedContentIds, contentId];
@@ -95,7 +82,7 @@ function CoveoSearchDialog({ sdk }) {
   );
 
   useEffect(() => {
-    const el = document.querySelector(".CoveoResultList");
+    const el = document.querySelector('.CoveoResultList');
     if (el) {
       ReactDom.render(
         <CoveosSearchResultList
@@ -117,11 +104,11 @@ function CoveoSearchDialog({ sdk }) {
         coveoSearch.initCoveo({
           searchContainer: searchContainer.current.firstChild,
           listeners: {
-            deferredQuerySuccess: args => {
+            deferredQuerySuccess: (args) => {
               if (type === TYPE_SAVED_SEARCH) {
-                setQuery(get(args, "query"), null, 2);
+                setQuery(get(args, 'query'), null, 2);
               }
-              setResults(get(args, "results.results"));
+              setResults(get(args, 'results.results'));
             }
           },
           existingState
@@ -139,7 +126,7 @@ function CoveoSearchDialog({ sdk }) {
     return (
       <EmptyState
         className="no-endpoint-msg"
-        headingProps={{ text: "Coveo Search" }}
+        headingProps={{ text: 'Coveo Search' }}
         customImageElement={
           <img
             src="https://images.ctfassets.net/9o4l1mrd1tci/3ofhr7KXTuiqBhlwkm8h9h/a88289dcfa95fc23a9fcce8418aab94a/lastrev_logo_blk.png"
@@ -147,7 +134,7 @@ function CoveoSearchDialog({ sdk }) {
           />
         }
         descriptionProps={{
-          text: "No endpoint has been configured. Please configure one."
+          text: 'No endpoint has been configured. Please configure one.'
         }}
         testId="CoveoSearchDialog-no-endpoint-msg"
       />
@@ -161,10 +148,7 @@ function CoveoSearchDialog({ sdk }) {
     <>
       {type === TYPE_SAVED_SEARCH ? (
         <>
-          <Button
-            icon="Download"
-            onClick={() => sdk.close({ query, numberOfItems })}
-          >
+          <Button icon="Download" onClick={() => sdk.close({ query, numberOfItems })}>
             Save this search
           </Button>
           <Dropdown
@@ -175,12 +159,10 @@ function CoveoSearchDialog({ sdk }) {
                 size="small"
                 buttonType="muted"
                 indicateDropdown
-                onClick={() => setDropdownOpen(!isDropdownIOpen)}
-              >
+                onClick={() => setDropdownOpen(!isDropdownIOpen)}>
                 Number of Items
               </Button>
-            }
-          >
+            }>
             <DropdownList maxHeight={200}>
               {[...new Array(10)].map((_entry, i) => {
                 const index = i + 1;
@@ -188,14 +170,11 @@ function CoveoSearchDialog({ sdk }) {
                   <DropdownListItem
                     // eslint-disable-next-line react/no-array-index-key
                     key={`key-${index}`}
-                    onClick={e => {
-                      setNumberOfItems(
-                        parseInt(e.currentTarget.textContent, 10)
-                      );
+                    onClick={(e) => {
+                      setNumberOfItems(parseInt(e.currentTarget.textContent, 10));
                       setDropdownOpen(false);
                     }}
-                    isActive={index === numberOfItems}
-                  >
+                    isActive={index === numberOfItems}>
                     {index}
                   </DropdownListItem>
                 );
@@ -204,18 +183,12 @@ function CoveoSearchDialog({ sdk }) {
           </Dropdown>
         </>
       ) : (
-        <Button
-          icon="PlusCircle"
-          onClick={() => sdk.close({ selectedContentIds })}
-        >
+        <Button icon="PlusCircle" onClick={() => sdk.close({ selectedContentIds })}>
           Save references
         </Button>
       )}
 
-      <div
-        ref={searchContainer}
-        dangerouslySetInnerHTML={{ __html: searchHtml }}
-      />
+      <div ref={searchContainer} dangerouslySetInnerHTML={{ __html: searchHtml }} />
     </>
   );
 }
