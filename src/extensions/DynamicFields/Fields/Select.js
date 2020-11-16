@@ -1,23 +1,14 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
 
-import {
-  Select as ContentfulSelect,
-  Option
-} from "@contentful/forma-36-react-components";
+import { Select as ContentfulSelect, Option } from '@contentful/forma-36-react-components';
 
-import { FieldPropTypes, FieldDefaultProps } from "./PropTypes";
-import ContentSection from "./ContentSection";
+import { FieldPropTypes, FieldDefaultProps } from './PropTypes';
+import ContentSection from './ContentSection';
 
 function Select({ about, title, name, onChange, values, options = [] }) {
   return (
     <ContentSection title={title} about={about}>
-      <ContentfulSelect
-        id="optionSelect"
-        name="optionSelect"
-        onChange={onChange}
-        value={values[name]}
-      >
+      <ContentfulSelect id="optionSelect" name="optionSelect" onChange={onChange} value={values[name]}>
         {options.map(({ value, label = value }) => (
           <Option key={value} value={value} onClick={onChange}>
             {label}

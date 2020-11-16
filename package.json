@@ -21,6 +21,7 @@
     "contentful": "^7.14.5",
     "contentful-ui-extensions-sdk": "^3.16.1",
     "date-fns": "^2.16.1",
+    "dotenv": "^8.2.0",
     "history": "^4.10.1",
     "lodash": "^4.17.19",
     "node-htmldiff": "^0.9.3",
@@ -44,8 +45,16 @@
     "lint": "eslint . --fix"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
-    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
     "eslint-config-airbnb": "^18.2.0",
@@ -64,7 +73,11 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,json,css}": ["prettier --write", "eslint --fix", "git add"]
+    "src/**/*.{js,jsx,json,css}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
   },
   "volta": {
     "node": "10.16.3"

@@ -1,7 +1,11 @@
 import { curry } from 'lodash';
 import { branch as recomposeBranch, renderComponent } from 'recompose';
 
-const branch = curry((testFunction, ComponentIfTrue, ComponentIfFalse) =>
+function noop() {
+  return null;
+}
+
+const renderIf = curry((testFunction, ComponentIfTrue) =>
   recomposeBranch(
     // Will be called with component props
     testFunction,
@@ -9,7 +13,7 @@ const branch = curry((testFunction, ComponentIfTrue, ComponentIfFalse) =>
     renderComponent(ComponentIfTrue)
 
     // Will render only if test function returns false
-  )(ComponentIfFalse)
+  )(noop)
 );
 
-export default branch;
+export default renderIf;
