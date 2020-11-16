@@ -6,12 +6,12 @@ import {
   Option
 } from "@contentful/forma-36-react-components";
 
-import styles from "./Fields.module.scss";
+import { FieldPropTypes, FieldDefaultProps } from "./PropTypes";
 import ContentSection from "./ContentSection";
 
-function Select({ about, name, onChange, values, options = [] }) {
+function Select({ about, title, name, onChange, values, options = [] }) {
   return (
-    <ContentSection about={about}>
+    <ContentSection title={title} about={about}>
       <ContentfulSelect
         id="optionSelect"
         name="optionSelect"
@@ -28,16 +28,7 @@ function Select({ about, name, onChange, values, options = [] }) {
   );
 }
 
-Select.propTypes = {
-  about: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  values: PropTypes.object.isRequired,
-  options: PropTypes.arrayOf(PropTypes.any).isRequired
-};
-
-Select.defaultProps = {
-  about: ""
-};
+Select.propTypes = FieldPropTypes;
+Select.defaultProps = FieldDefaultProps;
 
 export default Select;

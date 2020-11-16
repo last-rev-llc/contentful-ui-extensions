@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import TextField from "./Fields/Text";
 import SelectField from "./Fields/Select";
 import SlideIn from "./Fields/SlideIn";
+import EntrySelector from "./Fields/EntrySelector";
 
 function DynamicFields({ sdk }) {
   const [fieldValues, setFieldValues] = useState({});
@@ -43,9 +44,9 @@ function DynamicFields({ sdk }) {
         onChange={handleFieldChange("linkText")}
       />
       <SelectField
+        required
         name="action"
         values={fieldValues}
-        required
         title="Action"
         about="What will this CTA do?"
         onChange={handleFieldChange("action")}
@@ -69,6 +70,16 @@ function DynamicFields({ sdk }) {
           { value: "reference_asset", label: "Asset reference" }
         ]}
       />
+      {fieldValues.destination === "reference_content" && (
+        <EntrySelector
+          required
+          name="contentReference"
+          title="Content Reference"
+          about="If the CTA links to a page on impossiblefoods.com, select it here."
+          values={fieldValues}
+          onChange={handleFieldChange("contentReference")}
+        />
+      )}
       {fieldValues.destination === "manual_text" && (
         <SlideIn>
           <TextField

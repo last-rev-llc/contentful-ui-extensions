@@ -1,16 +1,63 @@
 import React from "react";
-import cx from "classnames";
 import PropTypes from "prop-types";
+import styled from "styled-components";
 
 import { HelpText } from "@contentful/forma-36-react-components";
 
-import styles from "./Fields.module.scss";
+import { FieldPropTypes, FieldDefaultProps } from "./PropTypes";
+import { colors } from "../../../utils/styles";
+
+const ContentSectionStyle = styled.div`
+  margin-bottom: 20px;
+  padding-left: 14px;
+  border-left: 3px solid rgb(211, 220, 224);
+
+  display: flex;
+  flex-direction: column;
+
+  &:first-of-type {
+    margin-top: 20px;
+  }
+
+  label {
+    display: inline-block;
+
+    color: #192532;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+
+  ${({ hasError }) => hasError && `border-left: 3px solid ${colors.error};`}
+`;
+
+const RequiredLabelStyle = styled.label`
+  font-weight: 400;
+  margin-left: 0.25rem;
+`;
+
+const ErrorTextStyle = styled.span`
+  color: ${colors.error};
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  svg {
+    fill: ${colors.error};
+    margin-right: 4px;
+  }
+`;
+
+const HelpTextStyle = styled(HelpText)`
+  margin-top: 8px;
+  font-style: italic;
+`;
 
 function ErrorText({ children }) {
   if (!children) return null;
 
   return (
-    <span className={styles.errorText}>
+    <ErrorTextStyle>
       <svg
         width="18"
         height="18"
@@ -21,7 +68,7 @@ function ErrorText({ children }) {
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
       </svg>
       {children}
-    </span>
+    </ErrorTextStyle>
   );
 }
 
@@ -29,30 +76,21 @@ ErrorText.propTypes = { children: PropTypes.node.isRequired };
 
 function ContentSection({ children, error, title, about, required }) {
   return (
-    <div className={cx(styles.contentSection, { [styles.hasError]: error })}>
+    <ContentSectionStyle hasError={error}>
       {title && <label>{title}</label>}
-      {required && <label className={styles.required}>(required)</label>}
+      {required && <RequiredLabelStyle>(required)</RequiredLabelStyle>}
       {children}
       <ErrorText>{error}</ErrorText>
-      <HelpText className={styles.helpText}>{about}</HelpText>
-    </div>
+      {about && (
+        <HelpTextStyle>
+          <span>{about}</span>
+        </HelpTextStyle>
+      )}
+    </ContentSectionStyle>
   );
 }
 
-ContentSection.propTypes = {
-  children: PropTypes.node,
-  error: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  title: PropTypes.string,
-  about: PropTypes.string,
-  required: PropTypes.bool
-};
-
-ContentSection.defaultProps = {
-  children: null,
-  error: false,
-  title: null,
-  about: null,
-  required: false
-};
+ContentSection.propTypes = FieldPropTypes;
+ContentSection.defaultProps = FieldDefaultProps;
 
 export default ContentSection;

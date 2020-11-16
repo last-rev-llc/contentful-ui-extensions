@@ -1,9 +1,20 @@
 import React from "react";
+import styled from "styled-components";
 import { TextField } from "@contentful/forma-36-react-components";
 
 import PropTypes from "prop-types";
-import styles from "./Fields.module.scss";
 import ContentSection from "./ContentSection";
+import { fontDefault } from "../../../utils/styles";
+
+const ValidationPromptStyle = styled.p`
+  margin-top: 8px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  ${fontDefault}
+`;
 
 function Text({ about, title, name, onChange, values, maxLen }) {
   const currentValue = values[name] || "";
@@ -23,10 +34,10 @@ function Text({ about, title, name, onChange, values, maxLen }) {
         labelText={title}
         textInputProps={{ onChange }}
       />
-      <p className={styles.validationPrompt}>
+      <ValidationPromptStyle>
         <span>{currentValue.length} characters</span>
         <span>Maximum {maxLen} characters</span>
-      </p>
+      </ValidationPromptStyle>
     </ContentSection>
   );
 }
