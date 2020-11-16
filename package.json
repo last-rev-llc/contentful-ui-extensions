@@ -16,6 +16,7 @@
     "@testing-library/user-event": "^7.1.2",
     "@types/jest": "^25.2.3",
     "axios": "^0.19.2",
+    "classnames": "^2.2.6",
     "contentful": "^7.14.5",
     "contentful-ui-extensions-sdk": "^3.16.1",
     "date-fns": "^2.16.1",
@@ -40,11 +41,7 @@
   },
   "browserslist": {
     "production": [">0.2%", "not dead", "not op_mini all"],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   },
   "devDependencies": {
     "eslint-config-airbnb": "^18.2.0",
@@ -63,11 +60,7 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,json,css}": [
-      "prettier --write",
-      "eslint --fix",
-      "git add"
-    ]
+    "src/**/*.{js,jsx,json,css}": ["prettier --write", "eslint --fix", "git add"]
   },
   "volta": {
     "node": "10.16.3"
