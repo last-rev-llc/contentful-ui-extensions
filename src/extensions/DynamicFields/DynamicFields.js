@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { curry } from 'lodash';
 import PropTypes from 'prop-types';
 
 import TextField from './Fields/Text';
@@ -17,14 +18,19 @@ function DynamicFields({ sdk }) {
     }
   }, [sdk.field]);
 
-  const handleFieldChange = (fieldName) => (value) => {
-    fieldValues[fieldName] = value;
-
-    sdk.field.setValue(fieldValues);
+  const setValues = (newValues) => {
+    sdk.field.setValue(newValues);
 
     // Copy values to ensure we render again
-    setFieldValues({ ...fieldValues });
+    setFieldValues({ ...newValues });
   };
+
+  const handleFieldChange = curry((fieldName, value) =>
+    setValues({
+      ...fieldValues,
+      [fieldName]: value
+    })
+  );
 
   const handleClickChange = (fieldName) => (e) => handleFieldChange(fieldName)(e.currentTarget.value);
 
@@ -65,14 +71,14 @@ function DynamicFields({ sdk }) {
         about="What content does the link point to?"
         name="destination"
         values={fieldValues}
-        onChange={handleClickChange('destination')}
+        setValues={setValues}
         options={[
-          { value: 'manual_text', label: 'Manual text entry' },
-          { value: 'reference_content', label: 'Content reference' },
-          { value: 'reference_asset', label: 'Asset reference' }
+          { value: 'textManual', label: 'Manual text entry' },
+          { value: 'contentReference', label: 'Content reference' },
+          { value: 'assetReference', label: 'Asset reference' }
         ]}
       />
-      {fieldValues.destination === 'reference_content' && (
+      {fieldValues.destination === 'contentReference' && (
         <EntrySelector
           required
           name="contentReference"
@@ -82,7 +88,17 @@ function DynamicFields({ sdk }) {
           onChange={handleFieldChange('contentReference')}
         />
       )}
-      {fieldValues.destination === 'manual_text' && (
+      {fieldValues.destination === 'assetReference' && (
+        <EntrySelector
+          required
+          name="assetReference"
+          title="Asset Reference"
+          about="If the CTA links to an image or video, please select it here."
+          values={fieldValues}
+          onChange={handleFieldChange('assetReference')}
+        />
+      )}
+      {fieldValues.destination === 'textManual' && (
         <SlideIn>
           <TextField
             required

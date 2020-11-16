@@ -19,12 +19,12 @@ function EntryCard({ item, onChange, canRemove }) {
       description={fields.internalTitle?.['en-US']}
       status={sys.publishedCounter > 0 ? 'published' : 'draft'}
       dropdownListElements={
-        canRemove && (
+        canRemove ? (
           <DropdownList>
             <DropdownListItem isTitle>Actions</DropdownListItem>
             <DropdownListItem onClick={() => onChange(null)}>Remove</DropdownListItem>
           </DropdownList>
-        )
+        ) : null
       }
     />
   );
