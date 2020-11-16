@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import Address from "./Address";
 import Bynder from "./Bynder";
 import ColorPicker from "./ColorPicker";
+import DynamicFields from "./DynamicFields";
 import LocalizationLookup from "./LocalizationLookup";
 import LocaleZooms from "./LocaleZooms";
 import ContentDiff from "./ContentDiff";
@@ -25,6 +26,7 @@ import history from "../history";
 
 import addressMockSdk from "./Address/mockSdk";
 import bynderMockSdk from "./Bynder/mockSdk";
+import dynamicFieldsMockSdk from "./DynamicFields/mockSdk";
 import localizationLookupMockSdk from "./LocalizationLookup/mockSdk";
 import localeZoomsMockSdk from "./LocaleZooms/mockSdk";
 import contentDiffMockSdk from "./ContentDiff/mockSdk";
@@ -75,6 +77,16 @@ const App = ({ sdk, locations }) => {
           path="/coveo-search"
           exact
           component={() => <CoveoSearch sdk={sdk || coveoSearchMock} />}
+        />
+        <Route
+          path="/dynamic-fields"
+          exact
+          component={() => (
+            <DynamicFields
+              sdk={sdk || dynamicFieldsMockSdk}
+              locations={locations}
+            />
+          )}
         />
         <Route
           path="/localization-lookup"

@@ -19,14 +19,14 @@ const BynderImage = ({ sdk }) => {
   const { fields } = sdk.entry;
 
   const onBynderImageChange = useCallback(
-    newValue => {
-      if (!Array.isArray(newValue)) return;
-      if (newValue.length === 0) {
+    value => {
+      if (!Array.isArray(value)) return;
+      if (value.length === 0) {
         fields.bynderId.setValue("");
         fields.imageName.setValue("");
         fields.altText.setValue("");
       } else {
-        const bynderData = get(newValue, "[0]", {});
+        const bynderData = get(value, "[0]", {});
         const description = get(bynderData, "description", "");
         const title = get(bynderData, "name", "");
         const web = get(bynderData, "thumbnails.webimage");
@@ -39,19 +39,18 @@ const BynderImage = ({ sdk }) => {
         setIfEmpty(sdk, "altTextOverride", description);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [fields.bynderImage, fields.altText, fields.bynderId, fields.webImage, sdk]
+    [fields.altText, fields.bynderId, fields.imageName, fields.webImage, sdk]
   );
 
-  const onExternalChange = newValue => {
-    setValue(newValue);
+  const onExternalChange = value => {
+    setValue(value);
   };
 
   const onChange = e => {
-    const { value: newValue } = e.currentTarget;
-    setValue(newValue);
-    if (newValue) {
-      sdk.field.setValue(newValue);
+    const { value } = e.currentTarget;
+    setValue(value);
+    if (value) {
+      sdk.field.setValue(value);
     } else {
       sdk.field.removeValue();
     }
@@ -62,8 +61,8 @@ const BynderImage = ({ sdk }) => {
     const bynderField = get(sdk, 'entry.fields["bynderData"]', null);
     if (bynderField) {
       bynderField.onValueChanged(onBynderImageChange);
-      const newValue = bynderField.getValue();
-      onBynderImageChange(newValue);
+      const value = bynderField.getValue();
+      onBynderImageChange(value);
     }
     sdk.field.onValueChanged(onExternalChange);
   }, [sdk, onBynderImageChange]);
@@ -83,7 +82,6 @@ const BynderImage = ({ sdk }) => {
 };
 
 BynderImage.propTypes = {
-  // eslint-disable-next-line
   sdk: PropTypes.object.isRequired
 };
 

@@ -10,11 +10,10 @@ export default function PersonName({ sdk }) {
       setFieldValue(sdk.field.getValue());
     } else {
       setFieldValue({});
-    };
-
+    }
   }, [sdk.field]);
 
-  const handleFieldChange = (fieldName) => (e) => {
+  const handleFieldChange = fieldName => e => {
     fieldValue[fieldName] = e.currentTarget.value;
     sdk.field.setValue(fieldValue);
     setFieldValue(fieldValue);
@@ -28,7 +27,7 @@ export default function PersonName({ sdk }) {
         name="salutation"
         labelText="Salutation"
         textInputProps={{
-          onChange: handleFieldChange('salutation'),
+          onChange: handleFieldChange("salutation")
         }}
       />
       <TextField
@@ -38,7 +37,7 @@ export default function PersonName({ sdk }) {
         labelText="First Name"
         required
         textInputProps={{
-          onChange: handleFieldChange('firstName'),
+          onChange: handleFieldChange("firstName")
         }}
       />
       <TextField
@@ -47,8 +46,9 @@ export default function PersonName({ sdk }) {
         name="middleName"
         labelText="Middle Name"
         textInputProps={{
-          onChange: handleFieldChange('middleName'),
-        }} />
+          onChange: handleFieldChange("middleName")
+        }}
+      />
       <TextField
         value={fieldValue.lastName || ""}
         id="lastName"
@@ -56,24 +56,27 @@ export default function PersonName({ sdk }) {
         labelText="Last Name"
         required
         textInputProps={{
-          onChange: handleFieldChange('lastName'),
-        }} />
+          onChange: handleFieldChange("lastName")
+        }}
+      />
       <TextField
         value={fieldValue.suffix || ""}
         id="suffix"
         name="suffix"
         labelText="Suffix"
         textInputProps={{
-          onChange: handleFieldChange('suffix'),
-        }} />
+          onChange: handleFieldChange("suffix")
+        }}
+      />
       <TextField
         value={fieldValue.nickname || ""}
         id="nickname"
         name="nickname"
         labelText="Nickname"
         textInputProps={{
-          onChange: handleFieldChange('nickname'),
-        }} />
+          onChange: handleFieldChange("nickname")
+        }}
+      />
     </div>
   );
 }
@@ -82,7 +85,7 @@ PersonName.propTypes = {
   sdk: PropTypes.shape({
     field: PropTypes.shape({
       getValue: PropTypes.func.isRequired,
-      setValue: PropTypes.func.isRequired,
-    }),
-  }).isRequired,
+      setValue: PropTypes.func.isRequired
+    })
+  }).isRequired
 };
