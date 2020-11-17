@@ -11,13 +11,13 @@ function StepDialog({ sdk }) {
   const [stepErrorMessage, setStepErrorMessage] = useState('');
   const [titleErrorMessage, setTitleErrorMessage] = useState('');
 
-  const setFieldsFromStep = (currentStep) => {
+  const setFieldsFromStep = (currentStep, onlyKey = false) => {
     const toSet = {};
     Object.keys(currentStep).forEach((key) => {
       // Our built in keys
       if (['step', 'title'].includes(key)) return;
 
-      toSet[key] = currentStep[key] || '';
+      toSet[key] = onlyKey ? '' : currentStep[key] || '';
     });
     setFields(toSet);
   };
@@ -25,13 +25,12 @@ function StepDialog({ sdk }) {
   useEffect(() => {
     const { steps, step: currentStep } = sdk.parameters.invocation;
 
-    console.log(steps, currentStep);
     if (currentStep) {
       setFieldsFromStep(currentStep);
       setStep(currentStep.step);
       setTitle(currentStep.title);
     } else if (steps) {
-      setFieldsFromStep(steps[0]);
+      setFieldsFromStep(steps[0], true);
     }
   }, [sdk]);
 
@@ -42,7 +41,6 @@ function StepDialog({ sdk }) {
   const saveStep = () => {
     const errorMessage = 'This item is required';
     if (step && title) {
-      console.log(fields);
       sdk.close({ step: +step, title, ...fields });
     } else {
       setStepErrorMessage(!step ? errorMessage : '');

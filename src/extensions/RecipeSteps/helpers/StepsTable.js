@@ -15,10 +15,12 @@ function useEditable(defaultValue = '') {
   const [isEditing, setEditing] = useState(false);
   const [value, setValue] = useState(defaultValue);
 
-  return [isEditing, setEditing, value, setValue];
+  const clearValue = () => setValue(defaultValue);
+
+  return [isEditing, setEditing, value, setValue, clearValue];
 }
 
-function TableHeaderCell({ children, colRemove, isEditing, setEditing, setFieldName }) {
+function TableHeaderCell({ children, colRemove, isEditing, setFieldName }) {
   const canEdit = ['title', 'step'].includes(children) === false;
 
   if (canEdit && isEditing)
@@ -26,7 +28,6 @@ function TableHeaderCell({ children, colRemove, isEditing, setEditing, setFieldN
       <HeaderCellStyle $canEdit={isEditing}>
         <div>
           <TextInput defaultValue={children} onChange={(e) => setFieldName(children, e.currentTarget.value)} />
-          {getIconButton('Cancel', 'primary', 'CheckCircle', 'medium', () => setEditing(false))}
         </div>
       </HeaderCellStyle>
     );
@@ -43,12 +44,11 @@ function TableHeaderCell({ children, colRemove, isEditing, setEditing, setFieldN
 TableHeaderCell.propTypes = {
   children: PropTypes.node.isRequired,
   isEditing: PropTypes.bool.isRequired,
-  setEditing: PropTypes.func.isRequired,
   setFieldName: PropTypes.func.isRequired,
   colRemove: PropTypes.func.isRequired
 };
 
-function HeaderActionsCell({ colAdd, colEdit, fieldNames, setEditing, isEditing }) {
+function HeaderActionsCell({ colAdd, colEdit, fieldNames, clearFields, setEditing, isEditing }) {
   const [isAdding, setAdding, text, setText] = useEditable('');
 
   const cancel = () => {
@@ -69,6 +69,7 @@ function HeaderActionsCell({ colAdd, colEdit, fieldNames, setEditing, isEditing 
             // Rename each of the old field name to be the new field name
             colEdit(oldName, newName)
           );
+          clearFields();
           setEditing(false);
         })}
       </HeaderActionsStyle>
@@ -99,6 +100,7 @@ function HeaderActionsCell({ colAdd, colEdit, fieldNames, setEditing, isEditing 
 HeaderActionsCell.propTypes = {
   isEditing: PropTypes.bool.isRequired,
   setEditing: PropTypes.func.isRequired,
+  clearFields: PropTypes.func.isRequired,
   colAdd: PropTypes.func.isRequired,
   colEdit: PropTypes.func.isRequired,
   fieldNames: PropTypes.object.isRequired
@@ -109,7 +111,7 @@ function StepsTable({ steps, colAdd, colEdit, colRemove, edit, remove }) {
    * Control the header editable state
    * When editing each header will be replaced by an input field
    */
-  const [isEditing, setEditing, fieldNames, setFieldNames] = useEditable({});
+  const [isEditing, setEditing, fieldNames, setFieldNames, clearFields] = useEditable({});
 
   const setFieldName = (oldFieldName, newFieldName) => {
     setFieldNames(merge(fieldNames, { [oldFieldName]: newFieldName }));
@@ -121,18 +123,14 @@ function StepsTable({ steps, colAdd, colEdit, colRemove, edit, remove }) {
         <TableHead isSticky>
           <HeaderRowStyle>
             {sortedKeys(steps[0]).map((title) => (
-              <TableHeaderCell
-                key={title}
-                colRemove={colRemove}
-                isEditing={isEditing}
-                setEditing={setEditing}
-                setFieldName={setFieldName}>
+              <TableHeaderCell key={title} colRemove={colRemove} isEditing={isEditing} setFieldName={setFieldName}>
                 {title}
               </TableHeaderCell>
             ))}
             <HeaderActionsCell
               colAdd={colAdd}
               colEdit={colEdit}
+              clearFields={clearFields}
               fieldNames={fieldNames}
               setEditing={setEditing}
               isEditing={isEditing}
