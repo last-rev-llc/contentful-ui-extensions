@@ -1,21 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import { merge, pickBy } from 'lodash/fp';
 import PropTypes from 'prop-types';
-import { getStepsTable } from './helpers';
+import { StepsTable } from './helpers';
 import { openDialog } from './dialogs';
 import { getIconButton } from '../../shared/helpers';
+
+const removeEmptyKeys = pickBy((value) => [undefined, null, false].includes(value) === false);
 
 const StepList = ({ sdk }) => {
   const [steps, setSteps] = useState([]);
 
   useEffect(() => {
-    if(sdk.field.getValue()) {
+    if (sdk.field.getValue()) {
       setSteps(sdk.field.getValue());
     }
   }, [sdk.field]);
 
+  const colAdd = (name) => {
+    const updatedSteps = steps.map((step) => removeEmptyKeys(merge({ [name]: '' }, step)));
+    sdk.field.setValue(updatedSteps);
+    setSteps(updatedSteps);
+  };
+
+  const colRemove = (name) => {
+    const updatedSteps = steps.map((step) => removeEmptyKeys(merge(step, { [name]: null })));
+    sdk.field.setValue(updatedSteps);
+    setSteps(updatedSteps);
+  };
+
   const addStep = (step) => {
     if (step) {
-      const updatedSteps = [ ...steps ];
+      const updatedSteps = [...steps];
       updatedSteps.push(step);
       sdk.field.setValue(updatedSteps);
       setSteps(updatedSteps);
@@ -28,7 +43,7 @@ const StepList = ({ sdk }) => {
   };
 
   const editStep = (step, stepIndex) => {
-    const updatedSteps = [ ...steps ];
+    const updatedSteps = [...steps];
     if (step && updatedSteps[stepIndex]) {
       updatedSteps[stepIndex] = step;
       sdk.field.setValue(updatedSteps);
@@ -56,13 +71,12 @@ const StepList = ({ sdk }) => {
 
   return (
     <>
-      {getStepsTable(steps, openEditModal, deleteStep)}
-      <div id='add-table-row-wrap'>
+      <StepsTable steps={steps} colRemove={colRemove} colAdd={colAdd} edit={openEditModal} remove={deleteStep} />
+      <div id="add-table-row-wrap">
         {getIconButton('Click to add a new row', 'positive', 'PlusCircle', 'large', openAddModal)}
       </div>
     </>
   );
-  
 };
 
 StepList.propTypes = {
@@ -76,9 +90,8 @@ StepList.propTypes = {
     field: PropTypes.shape({
       getValue: PropTypes.func.isRequired,
       setValue: PropTypes.func.isRequired
-    }),
+    })
   }).isRequired
 };
 
 export default StepList;
-

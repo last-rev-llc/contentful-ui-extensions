@@ -1,17 +1,5 @@
-import {
-  getTextInput,
-  getTextInputWithLabel,
-  getTextArea,
-  getTextAreaWithLabel,
-  getStepRows,
-  getStepsTable
-} from './formControl';
+import { getTextInput, getTextInputWithLabel, getTextArea, getTextAreaWithLabel, getStepRows } from './formControl';
 
-export {
-  getTextInput,
-  getTextInputWithLabel,
-  getTextArea,
-  getTextAreaWithLabel,
-  getStepRows,
-  getStepsTable
-};
+export { default as StepsTable } from './StepsTable';
+
+export { getTextInput, getTextInputWithLabel, getTextArea, getTextAreaWithLabel, getStepRows };
