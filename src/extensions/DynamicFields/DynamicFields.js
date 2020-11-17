@@ -57,7 +57,7 @@ function DynamicFields({ sdk }) {
         values={fieldValues}
         title="Action"
         about="What will this CTA do?"
-        onChange={handleClickChange('action')}
+        setValues={setValues}
         options={[
           { value: 'window_same', label: 'Open in same window' },
           { value: 'window_new', label: 'Open in a new window' },
@@ -99,16 +99,14 @@ function DynamicFields({ sdk }) {
         />
       )}
       {fieldValues.destination === 'textManual' && (
-        <SlideIn>
-          <TextField
-            required
-            title="Manual url input"
-            about="If the CTA links to page outside of the impossiblfoods.com domain, please specify the entire URL here."
-            name="manualUrl"
-            values={fieldValues}
-            onChange={handleClickChange('manualUrl')}
-          />
-        </SlideIn>
+        <TextField
+          required
+          title="Manual url input"
+          about="If the CTA links to page outside of the impossiblfoods.com domain, please specify the entire URL here."
+          name="manualUrl"
+          values={fieldValues}
+          onChange={handleClickChange('manualUrl')}
+        />
       )}
       <SelectField
         required
@@ -116,7 +114,7 @@ function DynamicFields({ sdk }) {
         sabout="How should the browser open the link destination? _blank = opens the link in a new window _self = opens the link content in the same frame as the link _parent = opens the link content in the parent frame of the link _top = opens the link in the full body of the window"
         name="target"
         values={fieldValues}
-        onChange={handleClickChange('target')}
+        setValues={setValues}
         options={[{ value: '_blank' }, { value: '_parent' }, { value: '_self' }, { value: '_top' }]}
       />
     </div>

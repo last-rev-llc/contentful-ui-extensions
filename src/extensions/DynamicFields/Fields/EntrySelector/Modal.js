@@ -10,7 +10,11 @@ import { useAsync, renderIf } from '../../../../utils';
 
 function EntrySelectorModal({ isShown, setShown, onChange }) {
   const sdk = useContext(SDKContext);
-  const { error, response, loading } = useAsync(() => sdk.space.getEntries({ content_type: 'pageGeneral' }));
+  const { error, response, loading } = useAsync(() =>
+    sdk.space.getEntries({
+      content_type: 'pageGeneral'
+    })
+  );
 
   if (loading) {
     return (
