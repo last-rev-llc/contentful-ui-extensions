@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 // TODO: enable proptypes
-import React, { useEffect, useState } from "react";
-import { Button } from "@contentful/forma-36-react-components";
-import "@contentful/forma-36-react-components/dist/styles.css";
-import { get, has, isArray, pickBy } from "lodash";
-import { TYPE_SAVED_SEARCH } from "../constants";
+import React, { useEffect, useState } from 'react';
+import { Button } from '@contentful/forma-36-react-components';
+import '@contentful/forma-36-react-components/dist/styles.css';
+import { get, has, isArray, pickBy } from 'lodash';
+import { TYPE_SAVED_SEARCH } from '../constants';
 
 function CoveoSavedSearchFieldDisplay({ sdk }) {
   const {
@@ -28,25 +28,25 @@ function CoveoSavedSearchFieldDisplay({ sdk }) {
 
   const openDialog = async () => {
     const data = await openDialogExtension({
-      width: "fullWidth",
-      title: "Last Rev Coveo Saved Search",
+      width: 'fullWidth',
+      title: 'Last Rev Coveo Saved Search',
       allowHeightOverflow: true,
       parameters: {
         type: TYPE_SAVED_SEARCH,
         searchPageName,
-        query: get(fieldValue, "query"),
-        cq: get(fieldValue, "cq")
+        query: get(fieldValue, 'query'),
+        state: get(fieldValue, 'state')
       }
     });
-    if (has(data, "query")) {
-      const pruned = pickBy(get(data, "query"), val => {
+    if (has(data, 'state') && has(data, 'query')) {
+      const pruned = pickBy(get(data, 'state'), (val) => {
         if (!val) return false;
         if (isArray(val) && !val.length) return false;
         return true;
       });
-      const cq = get(data, "cq");
-      const numberOfItems = get(data, "numberOfItems");
-      field.setValue({ query: pruned, cq, numberOfResults: numberOfItems });
+
+      const numberOfItems = get(data, 'numberOfItems');
+      field.setValue({ query: { ...get(data, 'query'), numberOfResults: numberOfItems }, state: pruned });
     }
   };
 
@@ -66,7 +66,7 @@ function CoveoSavedSearchFieldDisplay({ sdk }) {
       )}
 
       <Button buttonType="primary" onClick={() => openDialog()}>
-        {fieldValue ? "Edit the saved search" : "Generate a new search"}
+        {fieldValue ? 'Edit the saved search' : 'Generate a new search'}
       </Button>
       {fieldValue ? (
         <Button buttonType="primary" onClick={() => removeSavedSearch()}>
