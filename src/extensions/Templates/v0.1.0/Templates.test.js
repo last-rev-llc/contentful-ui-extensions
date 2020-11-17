@@ -11,30 +11,30 @@ const mockTemplates = [
     name: 'Blog Post',
     refs: [
       {
-        byRef: '12345',
+        byRef: '12345'
       },
       {
-        new: 'sectionHero',
+        new: 'sectionHero'
       },
       {
-        new: 'sectionCards',
-      },
-    ],
+        new: 'sectionCards'
+      }
+    ]
   },
   {
     name: 'Customer Story',
     refs: [
       {
-        byRef: 'sectionHero',
+        byRef: 'sectionHero'
       },
       {
-        new: '1234',
+        new: '1234'
       },
       {
-        new: '1234',
-      },
-    ],
-  },
+        new: '1234'
+      }
+    ]
+  }
 ];
 
 console.error = jest.fn();
@@ -44,7 +44,6 @@ afterEach(() => {
   cleanup();
   console.error.mockClear();
 });
-
 
 describe('<Templates />', () => {
   test('only shows select field if ref field is empty', () => {

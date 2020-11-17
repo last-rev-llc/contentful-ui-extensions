@@ -3,9 +3,16 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { get, set, startCase } from 'lodash';
 import {
-  Heading, Button, TextField, Table, TableHead, TableBody, TableRow, TableCell,
+  Heading,
+  Button,
+  TextField,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@contentful/forma-36-react-components';
-import resolveEntries from '../../../../global/scripts/resolveEntries';
+import resolveEntries from '../../../global/scripts/resolveEntries';
 import './Templates.scss';
 
 function TemplateCreateDialog({ entries, api }) {
@@ -20,7 +27,7 @@ function TemplateCreateDialog({ entries, api }) {
       setFullEntries(await resolveEntries(entries, api));
     };
     getFullEntries();
-  }, []);
+  }, [api, entries]);
 
   const handleRadioChange = () => {
     const refArray = [];
@@ -28,7 +35,7 @@ function TemplateCreateDialog({ entries, api }) {
       if (input.type === 'radio' && input.checked) {
         refArray.push({
           reftype: input.getAttribute('data-reftype'),
-          id: input.getAttribute('data-id'),
+          id: input.getAttribute('data-id')
         });
       }
     });
@@ -41,7 +48,7 @@ function TemplateCreateDialog({ entries, api }) {
 
     templates.push({
       name: templateName,
-      options: templateOptions,
+      options: templateOptions
     });
 
     api.space.updateEntry(set(globalSettings, 'fields.templates.en-US', templates));
@@ -86,10 +93,7 @@ function TemplateCreateDialog({ entries, api }) {
         </TableHead>
         <TableBody>
           {fullEntries.map((entry, index) => (
-            <TableRow
-              key={Math.random()}
-              className="entry"
-            >
+            <TableRow key={Math.random()} className="entry">
               <TableCell>
                 <input
                   type="radio"
@@ -116,10 +120,8 @@ function TemplateCreateDialog({ entries, api }) {
           ))}
         </TableBody>
       </Table>
-      <Button
-        onClick={handleTemplateCreate}
-        buttonType="positive"
-      >Create Template
+      <Button onClick={handleTemplateCreate} buttonType="positive">
+        Create Template
       </Button>
     </div>
   );
@@ -127,7 +129,7 @@ function TemplateCreateDialog({ entries, api }) {
 
 TemplateCreateDialog.propTypes = {
   entries: PropTypes.arrayOf(PropTypes.object).isRequired,
-  api: PropTypes.object.isRequired,
+  api: PropTypes.object.isRequired
 };
 
 export default TemplateCreateDialog;
