@@ -1,120 +1,143 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import { merge } from 'lodash/fp';
 import PropTypes from 'prop-types';
-import { Table, TableHead, TableBody, TableCell, TableRow, TextInput } from '@contentful/forma-36-react-components';
+import { Table, TableHead, TableBody, TextInput } from '@contentful/forma-36-react-components';
 
 import { getStepRows } from './formControl';
 import { getIconButton } from '../../../shared/helpers';
 import { sortedKeys } from './helpers';
 
-function addHoverEditEffect({ canEdit }) {
-  if (!canEdit) return '';
+import { HeaderRowStyle, HeaderCellStyle, HeaderActionsStyle } from './styles';
 
-  return `
-  &:hover {
-    > div {
-      // Remove hidden svg padding
-      padding-right: 0;
-    }
+function useEditable(defaultValue = '') {
+  const [isEditing, setEditing] = useState(false);
+  const [value, setValue] = useState(defaultValue);
 
-    svg {
-      display: block;
-    }
-  }
-`;
+  return [isEditing, setEditing, value, setValue];
 }
 
-const TableHeaderStyle = styled(TableCell)`
-  text-transform: capitalize;
-
-  > div {
-    display: flex;
-    align-items: center;
-
-    // Padding for hidden svg
-    padding-right: 18px;
-  }
-
-  svg {
-    display: none;
-  }
-
-  ${addHoverEditEffect}
-`;
-
-const AddColStyle = styled(TableCell)`
-  display: flex;
-  flex-direction: row;
-
-  input {
-    max-height: 21px;
-    min-width: 80px;
-  }
-`;
-
-function TableHeader({ children, colRemove }) {
+function TableHeaderCell({ children, colRemove, isEditing, setEditing, setFieldName }) {
   const canEdit = ['title', 'step'].includes(children) === false;
 
+  if (canEdit && isEditing)
+    return (
+      <HeaderCellStyle $canEdit={isEditing}>
+        <div>
+          <TextInput defaultValue={children} onChange={(e) => setFieldName(children, e.currentTarget.value)} />
+          {getIconButton('Cancel', 'primary', 'CheckCircle', 'medium', () => setEditing(false))}
+        </div>
+      </HeaderCellStyle>
+    );
+
   return (
-    <TableHeaderStyle canEdit={canEdit}>
+    <HeaderCellStyle $canEdit={canEdit}>
       <div>
         {children}
         {canEdit && getIconButton('Cancel', 'negative', 'Delete', 'small', () => colRemove(children))}
       </div>
-    </TableHeaderStyle>
+    </HeaderCellStyle>
   );
 }
-TableHeader.propTypes = {
+TableHeaderCell.propTypes = {
   children: PropTypes.node.isRequired,
+  isEditing: PropTypes.bool.isRequired,
+  setEditing: PropTypes.func.isRequired,
+  setFieldName: PropTypes.func.isRequired,
   colRemove: PropTypes.func.isRequired
 };
 
-function AddColHeader({ add }) {
-  const [isEditCol, setEditCol] = useState(false);
-  const [textValue, setText] = useState('');
+function HeaderActionsCell({ colAdd, colEdit, fieldNames, setEditing, isEditing }) {
+  const [isAdding, setAdding, text, setText] = useEditable('');
 
-  const cancelEdit = () => {
+  const cancel = () => {
     setText('');
-    setEditCol(false);
+    setAdding(false);
   };
 
-  if (isEditCol) {
+  /**
+   * When we're editing all the header fields at once
+   * we'll show a check circle which when clicked updates
+   * all the field names. See the parent for controller
+   */
+  if (isEditing) {
     return (
-      <AddColStyle className="col-actions">
-        <TextInput value={textValue} onChange={(e) => setText(e.currentTarget.value)} />
+      <HeaderActionsStyle>
         {getIconButton('Cancel', 'primary', 'CheckCircle', 'medium', () => {
-          add(textValue);
-          cancelEdit();
+          Object.entries(fieldNames).forEach(([oldName, newName]) =>
+            // Rename each of the old field name to be the new field name
+            colEdit(oldName, newName)
+          );
+          setEditing(false);
         })}
-        {getIconButton('Cancel', 'negative', 'Delete', 'medium', cancelEdit)}
-      </AddColStyle>
+      </HeaderActionsStyle>
+    );
+  }
+
+  if (isAdding) {
+    return (
+      <HeaderActionsStyle>
+        <TextInput value={text} onChange={(e) => setText(e.currentTarget.value)} />
+        {getIconButton('Cancel', 'primary', 'CheckCircle', 'medium', () => {
+          colAdd(text);
+          cancel();
+        })}
+        {getIconButton('Cancel', 'negative', 'Delete', 'medium', cancel)}
+      </HeaderActionsStyle>
     );
   }
 
   return (
-    <AddColStyle className="col-actions">
-      {getIconButton('Add a column', 'primary', 'PlusCircle', 'medium', () => setEditCol(true))}
-    </AddColStyle>
+    <HeaderActionsStyle className="col-actions">
+      {getIconButton('Cancel', 'primary', 'Edit', 'medium', () => setEditing(true))}
+      {getIconButton('Add a column', 'primary', 'PlusCircle', 'medium', () => setAdding(true))}
+    </HeaderActionsStyle>
   );
 }
 
-AddColHeader.propTypes = {
-  add: PropTypes.func.isRequired
+HeaderActionsCell.propTypes = {
+  isEditing: PropTypes.bool.isRequired,
+  setEditing: PropTypes.func.isRequired,
+  colAdd: PropTypes.func.isRequired,
+  colEdit: PropTypes.func.isRequired,
+  fieldNames: PropTypes.object.isRequired
 };
 
-function StepsTable({ steps, colAdd, colRemove, edit, remove }) {
+function StepsTable({ steps, colAdd, colEdit, colRemove, edit, remove }) {
+  /**
+   * Control the header editable state
+   * When editing each header will be replaced by an input field
+   */
+  const [isEditing, setEditing, fieldNames, setFieldNames] = useEditable({});
+
+  const setFieldName = (oldFieldName, newFieldName) => {
+    setFieldNames(merge(fieldNames, { [oldFieldName]: newFieldName }));
+  };
+
   return steps.length === 0 ? null : (
     <>
       <Table className="steps-table">
         <TableHead isSticky>
-          <TableRow>
+          <HeaderRowStyle>
             {sortedKeys(steps[0]).map((title) => (
-              <TableHeader key={title} colRemove={colRemove}>
+              <TableHeaderCell
+                key={title}
+                colRemove={colRemove}
+                isEditing={isEditing}
+                setEditing={setEditing}
+                setFieldName={setFieldName}>
                 {title}
-              </TableHeader>
+              </TableHeaderCell>
             ))}
-            <AddColHeader add={colAdd} />
-          </TableRow>
+            <HeaderActionsCell
+              colAdd={colAdd}
+              colEdit={colEdit}
+              fieldNames={fieldNames}
+              setEditing={setEditing}
+              isEditing={isEditing}
+            />
+          </HeaderRowStyle>
         </TableHead>
         <TableBody>{getStepRows(steps, edit, remove)}</TableBody>
       </Table>
@@ -125,6 +148,7 @@ function StepsTable({ steps, colAdd, colRemove, edit, remove }) {
 StepsTable.propTypes = {
   edit: PropTypes.func.isRequired,
   colAdd: PropTypes.func.isRequired,
+  colEdit: PropTypes.func.isRequired,
   colRemove: PropTypes.func.isRequired,
   remove: PropTypes.func.isRequired,
   steps: PropTypes.arrayOf(PropTypes.object).isRequired
