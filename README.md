@@ -1,19 +1,159 @@
-# Last Rev Contentful UI Extensions
-Useful UI Extensions we use at Last Rev for customer projects
+# Last Rev UI Extension Library
 
-- Conversations: A simple workflow tool for having conversations around content
-- Category Tree: Make selecting categories easier when they are defined as referenced entries
-- SEO: Creates additional SEO related fields to store in a JSON object within a contentful content item
+A collection of UI Extensions for Contentful like a Color picker, SEO, Categories and more.
 
-Run Locally:
-- Clone Repo
-- npm install
-- npm start
+## Getting Started
 
-When setting up your UI extension, choose self hosted and put the following URL
+### Clone the repository
 
+```shell
+git clone git@github.com:last-rev-llc/contentful-ui-extensions.git
 ```
-localhost:3000/<extension name>
 
-ex. localhost:3000/conversations
+### Install Dependencies
+
+```shell
+npm install
 ```
+
+OR
+
+```shell
+yarn install
+```
+
+### Start the application
+
+```shell
+npm start
+```
+
+### Running Locally
+
+In order to help streamline the process of development we have created a mock SDK that allows you to run the extensions locally with hot reload. You can also use this to see mock examples of the expected response from Contentful and data structure or objects.
+
+#### Open the browser
+
+> [http://localhost:3000/](http://localhost:3000/)
+
+This will be a list of all available UI Extensions.
+
+### Using Netlify Lambda Functions
+Some UI Extensions, especially ones that integrate with third party services will nee dto communicate using a serverless function. We use Netlify for hosting and below are the instructions to run them locally
+
+First you need to install the [Netlify CLI Tools](https://github.com/netlify/cli)
+> npm install netlify-cli -g
+
+To start the application use the following command instead of `npm start`. This starts a node server as well as your React application
+> ntl dev
+
+Creating a new function
+> netlify functions:create *function-name*
+
+Functions are located in the `/lambda` folder located in the project root directory. This is defined in the `netlify.toml` file
+
+**Notes on Functions:**
+- You mush specify the headers in the return. For instance you must specify `Access-Control-Allow-Origin` to prevent CORS issues
+- You must include any dependencies you use in your Lambda functions in the main package.json
+- Environment Variables must be set in the Netlify UI and are availalbe locally when running `ntl dev`
+
+### Using in Contentful
+
+To see the extension in your Contentful instance follow the directions below for each extension.
+> When running locally you will need to allow "unsafe" scripts to be allowed. This is because you run localhost with http and since Contentful injects it using an iFrame browsers will block them by default.
+
+#### Individual Extension Documentation
+
+- [Address](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Address)
+- [Color Picker](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/ColorPicker)
+- [SEO](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/Seo)
+- [PersonName](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/PersonName)
+- [PhoneNumber](https://github.com/last-rev-llc/contentful-ui-extensions/tree/master/src/extensions/PhoneNumber)
+
+### Prerequisites
+
+You need an account for Contentful to use these extensions.
+
+- Go to [www.contentful.com](https://www.contentful.com/sign-up/?utm_campaign=lastrev-ui-extension)
+- Fill out the form and you will go to your first space
+- Please Follow the instructions for [Installing and using Extensions](https://www.contentful.com/developers/docs/extensibility/ui-extensions/managing-a-ui-extension-with-webapp/)
+
+### Application Structure
+
+```text
+.
+├── public
+├── src
+│   ├── __mocks__
+│   ├── extensions
+│   ├── ├── BynderImages
+│   ├── ├── ColorPicker
+│   ├── ├── PersonName
+│   ├── ├── PhoneNumber
+│   ├── ├── Seo
+│   ├── ├── FormStack
+│   ├── shared
+├── history.js
+├── index.js
+├── .env.local
+├── .eslintrc.js
+├── .gitignore
+├── .nvmrc
+└── README.md
+```
+
+## Testing
+
+We use [Jest](https://jestjs.io/) and [React Testing Library](https://github.com/testing-library/react-testing-library) for all integration testing.
+
+### Running Tests
+
+Normal watch mode
+
+```shell
+npm test
+```
+
+### Mocks
+
+```text
+.
+├── __mocks__
+│   ├── mockContentfulAsset.js          # Mock Asset response from Contentful
+│   ├── mockContentfulContentType.js    # Mock Content Type Response from Contentful
+│   └── mockContentfulSdk.js            # Mock SDK used for mocking functions and data returned by Contentful
+│   └── mockLocations.js                # Mock locations for Contentful
+└── extensions
+│   ├── Seo                             # Each extension has a _mocks_ folder and a mockFieldValue and mockAppConfig (for apps alpha)
+│   ├── ├── __mocks__                   # mockFieldValue and mockAppConfig for SEO
+```
+
+## Deployment
+
+You can deploy this to Netlify with one click
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/last-rev-llc/contentful-ui-extensions/)
+
+## Built With
+
+- [Create React App](https://github.com/facebook/create-react-app)
+- [Contentful Management API](https://www.contentful.com/developers/docs/references/content-management-api/)
+- [Contentful UI Extensions](https://www.contentful.com/developers/docs/extensibility/ui-extensions/)
+
+## Contributing
+
+If you would like to contribute please submit a pull request. Make sure you write tests and it passes the linter before submitting.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
+
+## Authors
+
+- **Brad Taylor** - *Initial work* - [bradtaylorsf](https://github.com/bradtaylorsf)
+
+See also the list of [contributors](https://github.com/last-rev-llc/contentful-ui-extensions/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details

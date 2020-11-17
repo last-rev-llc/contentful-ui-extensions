@@ -1,0 +1,2 @@
+export const TYPE_SAVED_SEARCH = 'TYPE_SAVED_SEARCH';
+export const TYPE_REF_SEARCH = 'TYPE_REF_SEARCH';

@@ -1,0 +1,49 @@
+.seo-config {
+  margin: 20px auto;
+  width: 90%;
+}
+
+.tab-panel {
+  padding: 10px;
+}
+
+.fieldset {
+  margin-top: 10px;
+}
+
+.search-preview {
+  font-family: arial,sans-serif;
+  line-height: 1.57;
+  font-size: small;
+  font-weight: normal;
+  margin: 0;
+  & a {
+    text-decoration: none;
+  }
+  & h3 {
+    font-size: 20px;
+    line-height: 1.3;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    color: #1a0dab;
+  }
+  & .cite {
+    padding-bottom: 0px;
+    padding-top: 1px;
+    display: inline-block;
+    & cite {
+      font-size: 16px;
+      padding-top: 1px;
+      line-height: 1.5;
+      color: #006621;
+      font-style: normal;
+    }
+  }
+  & .description {
+    color: #545454;
+    max-width: 48em;
+    font-size: 14px;
+  }
+}
+

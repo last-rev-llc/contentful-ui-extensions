@@ -1,16 +1,25 @@
 {
-  "name": "gatsby-starter-default",
-  "private": true,
-  "description": "A simple starter to get up and developing quickly with Gatsby",
+  "name": "my-app",
   "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
+  "private": true,
   "dependencies": {
-    "@contentful/forma-36-react-components": "^3.21.0",
+    "@contentful/field-editor-reference": "^2.1.0",
     "@contentful/forma-36-fcss": "^0.0.31",
+    "@contentful/forma-36-react-components": "^3.21.0",
+    "@contentful/rich-text-html-renderer": "^14.1.1",
+    "@contentful/rich-text-types": "^14.1.1",
+    "@material-ui/core": "^4.11.0",
+    "@sentry/react": "^5.20.0",
+    "@testing-library/dom": "^7.20.0",
     "@testing-library/jest-dom": "^4.2.0",
     "@testing-library/react": "^9.3.0",
+    "@testing-library/user-event": "^7.1.2",
+    "@types/jest": "^25.2.3",
+    "axios": "^0.19.2",
     "bootstrap": "^4.3.1",
-    "contentful-ui-extensions-sdk": "^3.10.0",
+    "contentful": "^7.14.5",
+    "contentful-ui-extensions-sdk": "^3.16.1",
+    "date-fns": "^2.16.1",
     "faker": "^4.1.0",
     "gatsby": "^2.16.1",
     "gatsby-image": "^2.2.29",
@@ -21,46 +30,61 @@
     "gatsby-plugin-sharp": "^2.2.31",
     "gatsby-source-filesystem": "^2.1.33",
     "gatsby-transformer-sharp": "^2.2.23",
-    "lodash": "^4.17.15",
+    "history": "^4.10.1",
+    "lodash": "^4.17.19",
+    "node-htmldiff": "^0.9.3",
+    "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",
-    "react": "^16.10.2",
-    "react-bootstrap": "^1.0.0-beta.14",
-    "react-dom": "^16.10.2",
-    "react-helmet": "^5.2.1",
-    "sass": "^1.23.1"
+    "react": "^16.13.1",
+    "react-datepicker": "^3.2.2",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.3.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jest-environment-jsdom-sixteen",
+    "testfull": "react-scripts test --verbose",
+    "eject": "react-scripts eject",
+    "lint": "eslint . --fix"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
-    "babel-jest": "^24.9.0",
-    "dotenv": "^8.2.0",
-    "eslint": "^6.6.0",
-    "eslint-config-airbnb": "^18.0.1",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-loader": "^3.0.2",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.16.0",
-    "eslint-plugin-react-hooks": "^2.2.0",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^24.9.0",
-    "prettier": "^1.18.2"
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
+    "jest-environment-jsdom-sixteen": "^1.0.3",
+    "lint-staged": "^9.5.0",
+    "prettier": "^1.19.1",
+    "react-test-renderer": "^16.13.1"
   },
-  "keywords": [
-    "gatsby"
-  ],
-  "license": "MIT",
-  "scripts": {
-    "build": "gatsby build",
-    "develop": "gatsby develop",
-    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "start": "npm run develop",
-    "serve": "gatsby serve",
-    "test": "jest --watch"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+  "lint-staged": {
+    "src/**/*.{js,jsx,json,css}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
   },
-  "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
+  "volta": {
+    "node": "10.16.3"
   }
 }
