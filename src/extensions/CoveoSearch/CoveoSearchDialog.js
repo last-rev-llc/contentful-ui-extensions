@@ -172,7 +172,7 @@ function CoveoSearchDialog({ sdk }) {
               </Button>
             }>
             <DropdownList maxHeight={200}>
-              {[...new Array(10)].map((_entry, i) => {
+              {[...new Array(20)].map((_entry, i) => {
                 const index = i + 1;
                 return (
                   <DropdownListItem
