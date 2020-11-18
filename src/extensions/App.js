@@ -35,6 +35,7 @@ import phoneNumberMockSdk from './PhoneNumber/mockSdk';
 import operatingHoursMockSdk from './OperatingHours/mockSdk';
 import recipeStepsMockSdk from './RecipeSteps/mockSdk';
 import recipeIngredientsMockSdk from './RecipeIngredients/mockSdk';
+import TemplateModules from './TemplateModules';
 import formStackMockSdk from './FormStack/mockSdk';
 import BynderImage from './BynderImage';
 import { createMockSDK } from './BynderImage/mockSdk';
@@ -111,6 +112,11 @@ const App = ({ sdk, locations }) => {
           path="/bynder-image"
           exact
           component={() => <BynderImage sdk={sdk || createMockSDK()} locations={locations} />}
+        />
+        <Route
+          path="/template-modules"
+          exact
+          component={() => <TemplateModules sdk={sdk || createMockSDK()} locations={locations} />}
         />
       </Switch>
     </Router>

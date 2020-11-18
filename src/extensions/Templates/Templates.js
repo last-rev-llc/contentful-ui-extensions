@@ -42,7 +42,8 @@ function Templates() {
         api.notifier.success(`${data.templateName} was succesfully created`);
       })
       .catch((error) => {
-        console.log('ERROR', error);
+        // eslint-disable-next-line no-console
+        console.error('ERROR', error);
       });
   };
 
@@ -63,34 +64,34 @@ function Templates() {
       });
   };
 
+  if (get(api, 'parameters.invocation.openDialog')) {
+    return (
+      <div id="templates">
+        <TemplateCreateDialog entries={get(api, 'parameters.invocation.entries')} api={api} />
+      </div>
+    );
+  }
+
   return (
     <div id="templates">
-      {get(api, 'parameters.invocation.openDialog') ? (
-        <TemplateCreateDialog entries={get(api, 'parameters.invocation.entries')} api={api} />
-      ) : (
-        <>
-          <Button
-            buttonType="positive"
-            data-testid="template-new-button"
-            className="w-100 mb-4"
-            onClick={() => {
-              handModalOpen(true);
-            }}>
-            Save as New Template
-          </Button>
+      <Button
+        buttonType="positive"
+        data-testid="template-new-button"
+        className="w-100 mb-4"
+        onClick={() => handModalOpen(true)}>
+        Save as New Template
+      </Button>
 
-          <Select data-testid="template-select-field" dropdownType="positive" onChange={handleTemplateSelectChange}>
-            <option isTitle name="none">
-              Load Template
-            </option>
-            {templates.map((template) => (
-              <option data-testid="template-select-option" key={Math.random()} value={template.name}>
-                {template.name}
-              </option>
-            ))}
-          </Select>
-        </>
-      )}
+      <Select data-testid="template-select-field" dropdownType="positive" onChange={handleTemplateSelectChange}>
+        <option isTitle name="none">
+          Load Template
+        </option>
+        {templates.map((template) => (
+          <option data-testid="template-select-option" key={Math.random()} value={template.name}>
+            {template.name}
+          </option>
+        ))}
+      </Select>
     </div>
   );
 }
