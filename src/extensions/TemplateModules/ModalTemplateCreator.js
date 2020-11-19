@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-prop-types */
-import React, { useState, useContext } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { get, set } from 'lodash';
 import {
@@ -13,30 +13,47 @@ import {
   TableCell
 } from '@contentful/forma-36-react-components';
 
+import ModalLoading from './ModalLoading';
 import { SDKContext } from '../../context';
 
 import { getId, getTitle } from './CardEntry';
 import { ModalStyle } from './styles';
 import { getGlobalSettings, setGlobalTemplates } from './utils';
 
+function buildTemplateOptions(entries) {
+  const toReturn = {};
+
+  entries.forEach((entry) => {
+    toReturn[getId(entry)] = {
+      id: getId(entry),
+      reftype: 'byref'
+    };
+  });
+
+  return toReturn;
+}
+
 function TemplateCreatorDialog() {
   const sdk = useContext(SDKContext);
 
   const { entries } = sdk.parameters.invocation;
-  const [templateOptions, setTemplateOptions] = useState([]);
+
+  const [isLoading, setLoading] = useState(false);
+  const [templateOptions, setTemplateOptions] = useState(buildTemplateOptions(entries));
   const [templateName, setTemplateName] = useState('');
 
-  const handleRadioChange = () => {
-    const refArray = [];
-    [...document.getElementsByTagName('input')].map((input) => {
-      if (input.type === 'radio' && input.checked) {
-        refArray.push({
-          reftype: input.getAttribute('data-reftype'),
-          id: input.getAttribute('data-id')
-        });
+  if (isLoading) return <ModalLoading />;
+
+  const handleRadioChange = (event) => {
+    const input = event.target;
+
+    setTemplateOptions({
+      ...templateOptions,
+      [input.getAttribute('data-id')]: {
+        id: input.getAttribute('data-id'),
+        reftype: input.getAttribute('data-reftype')
       }
     });
-    setTemplateOptions(refArray);
   };
 
   const handleTemplateCreate = async () => {
@@ -45,23 +62,16 @@ function TemplateCreatorDialog() {
 
     templates.push({
       name: templateName,
-      options: templateOptions
+      entries: Object.values(templateOptions)
     });
 
+    setLoading(true);
     await setGlobalTemplates(sdk, templates);
-    sdk.close({ templateName, templates });
+    sdk.close({ templates });
   };
 
   const handleTemplateNameChange = (e) => {
     setTemplateName(e.currentTarget.value);
-  };
-
-  const isChecked = (index, reftype) => {
-    const curRow = templateOptions[index];
-    if (curRow && curRow.reftype === reftype) {
-      return true;
-    }
-    return false;
   };
 
   return (
@@ -90,12 +100,11 @@ function TemplateCreatorDialog() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {entries.map((entry, index) => {
+          {entries.map((entry) => {
             const id = getId(entry);
 
-            const byNewChecked = isChecked(index, 'new');
-            const byRefChecked = isChecked(index, 'byref');
-            const someChecked = byNewChecked || byRefChecked;
+            const byNewChecked = templateOptions[id].reftype === 'new';
+            const byRefChecked = templateOptions[id].reftype === 'byref';
 
             return (
               <TableRow key={id} className="entry">
@@ -113,10 +122,10 @@ function TemplateCreatorDialog() {
                   <input
                     type="radio"
                     name={id}
-                    data-id={entry.sys.contentType.sys.id}
+                    data-id={id}
                     data-reftype="new"
                     onChange={handleRadioChange}
-                    checked={someChecked ? byNewChecked : true}
+                    checked={byNewChecked}
                   />
                 </TableCell>
                 <TableCell>{getTitle(entry)}</TableCell>
@@ -126,7 +135,7 @@ function TemplateCreatorDialog() {
           })}
         </TableBody>
       </Table>
-      <Button onClick={handleTemplateCreate} buttonType="positive">
+      <Button onClick={handleTemplateCreate} disabled={!templateName} buttonType="positive">
         Create Template
       </Button>
     </ModalStyle>
