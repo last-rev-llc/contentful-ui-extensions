@@ -2,19 +2,18 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { Heading, Spinner } from '@contentful/forma-36-react-components';
+import { DropdownList, DropdownListItem, Heading, Spinner } from '@contentful/forma-36-react-components';
 
 import { SDKContext } from '../../context';
 import { useAsync } from '../../utils/hooks';
-import EntryCard, { getId } from './EntryCard';
 
-import { ModalStyle } from './styles';
-import { GLOBALSETTINGS_ID } from './utils';
+import { ModalStyle, TemplateCard } from './styles';
+import { getGlobalTemplates } from './utils';
 
 function ModalTemplateSelector() {
   const sdk = useContext(SDKContext);
 
-  const { error, response, loading } = useAsync(() => sdk.space.getEntry(GLOBALSETTINGS_ID));
+  const { error, response = [], loading } = useAsync(() => getGlobalTemplates(sdk));
 
   if (loading) {
     return (
@@ -38,17 +37,34 @@ function ModalTemplateSelector() {
     );
   }
 
-  console.log(response, error);
   const templates = response || [];
   const handleItemSelect = (item) => () => sdk.close({});
 
+  console.log(templates);
   return (
     <ModalStyle>
       <Heading>Insert existing entry</Heading>
-      {templates.map((item) => {
-        console.log(item);
-        return null;
-      })}
+      <div>
+        {templates.map(({ name, refs = [] }) => {
+          return (
+            <TemplateCard
+              key={name}
+              contentType="template"
+              title={name}
+              status="published"
+              description={`${refs.length} content entries`}
+              dropdownListElements={
+                <>
+                  <DropdownList>
+                    <DropdownListItem isTitle>Actions</DropdownListItem>
+                    <DropdownListItem>Remove</DropdownListItem>
+                  </DropdownList>
+                </>
+              }
+            />
+          );
+        })}
+      </div>
     </ModalStyle>
   );
 }
