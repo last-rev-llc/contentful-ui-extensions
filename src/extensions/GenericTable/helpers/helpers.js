@@ -4,7 +4,7 @@ export const alphabetical = orderBy([(item) => item.toLowerCase()], ['asc']);
 export const alphabeticalKeys = flow(Object.keys, alphabetical);
 
 export function sortedKeys(step) {
-  const toReturn = ['step', 'title'];
+  const toReturn = ['title'];
 
   alphabeticalKeys(step)
     .filter((key) => toReturn.includes(key) === false)

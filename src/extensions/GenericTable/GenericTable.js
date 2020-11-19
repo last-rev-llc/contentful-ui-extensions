@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { locations } from 'contentful-ui-extensions-sdk';
 import StepList from './StepList';
-import './RecipeSteps.scss';
+import './GenericTable.scss';
 import { StepDialog } from './dialogs';
 
-const RecipeSteps = ({ sdk }) => {
+const GenericTable = ({ sdk }) => {
   return !sdk.location.is(locations.LOCATION_DIALOG) ? (
     <>
       <StepList sdk={sdk} />
@@ -17,7 +17,7 @@ const RecipeSteps = ({ sdk }) => {
   );
 };
 
-RecipeSteps.propTypes = {
+GenericTable.propTypes = {
   sdk: PropTypes.shape({
     field: PropTypes.shape({
       getValue: PropTypes.func.isRequired,
@@ -29,4 +29,4 @@ RecipeSteps.propTypes = {
   }).isRequired
 };
 
-export default RecipeSteps;
+export default GenericTable;

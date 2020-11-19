@@ -21,7 +21,7 @@ function useEditable(defaultValue = '') {
 }
 
 function TableHeaderCell({ children, colRemove, isEditing, setFieldName }) {
-  const canEdit = ['title', 'step'].includes(children) === false;
+  const canEdit = ['title'].includes(children) === false;
 
   if (canEdit && isEditing)
     return (
@@ -117,29 +117,29 @@ function StepsTable({ steps, colAdd, colEdit, colRemove, edit, remove }) {
     setFieldNames(merge(fieldNames, { [oldFieldName]: newFieldName }));
   };
 
-  return steps.length === 0 ? null : (
-    <>
-      <Table className="steps-table">
-        <TableHead isSticky>
-          <HeaderRowStyle>
-            {sortedKeys(steps[0]).map((title) => (
-              <TableHeaderCell key={title} colRemove={colRemove} isEditing={isEditing} setFieldName={setFieldName}>
-                {title}
-              </TableHeaderCell>
-            ))}
-            <HeaderActionsCell
-              colAdd={colAdd}
-              colEdit={colEdit}
-              clearFields={clearFields}
-              fieldNames={fieldNames}
-              setEditing={setEditing}
-              isEditing={isEditing}
-            />
-          </HeaderRowStyle>
-        </TableHead>
-        <TableBody>{getStepRows(steps, edit, remove)}</TableBody>
-      </Table>
-    </>
+  const tableKeys = steps.length > 0 ? sortedKeys(steps[0]) : ['title'];
+
+  return (
+    <Table className="steps-table">
+      <TableHead isSticky>
+        <HeaderRowStyle>
+          {tableKeys.map((title) => (
+            <TableHeaderCell key={title} colRemove={colRemove} isEditing={isEditing} setFieldName={setFieldName}>
+              {title}
+            </TableHeaderCell>
+          ))}
+          <HeaderActionsCell
+            colAdd={colAdd}
+            colEdit={colEdit}
+            clearFields={clearFields}
+            fieldNames={fieldNames}
+            setEditing={setEditing}
+            isEditing={isEditing}
+          />
+        </HeaderRowStyle>
+      </TableHead>
+      <TableBody>{getStepRows(steps, edit, remove)}</TableBody>
+    </Table>
   );
 }
 

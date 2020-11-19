@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, cleanup, configure, fireEvent } from '@testing-library/react';
-import RecipeSteps from './RecipeSteps';
+import GenericTable from './GenericTable';
 import defaultSdk, { sdkList } from './mockSdk';
 
-const renderComponent = (sdk = defaultSdk) => render(<RecipeSteps sdk={sdk} />);
+const renderComponent = (sdk = defaultSdk) => render(<GenericTable sdk={sdk} />);
 
 configure({
   testIdAttribute: 'data-testid'
@@ -13,9 +13,9 @@ afterEach(() => {
   cleanup();
 });
 
-describe('RecipeSteps helper methods', () => {});
+describe('GenericTable helper methods', () => {});
 
-describe('<RecipeSteps />', () => {
+describe('<GenericTable />', () => {
   describe('StepDialog', () => {
     test('renders correctly', () => {
       const { getByTestId } = renderComponent();

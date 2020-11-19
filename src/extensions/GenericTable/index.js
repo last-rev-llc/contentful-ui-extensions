@@ -1,3 +1,3 @@
-import RecipeSteps from './RecipeSteps';
+import GenericTable from './GenericTable';
 
-export default RecipeSteps;
+export default GenericTable;

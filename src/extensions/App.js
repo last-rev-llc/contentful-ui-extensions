@@ -20,6 +20,7 @@ import OperatingHours from './OperatingHours';
 import Seo from './Seo';
 import PersonName from './PersonName';
 import PhoneNumber from './PhoneNumber';
+import GenericTable from './GenericTable';
 import RecipeSteps from './RecipeSteps';
 import RecipeIngredients from './RecipeIngredients';
 import FormStack from './FormStack';
@@ -93,6 +94,11 @@ const App = ({ sdk, locations }) => {
             path="/phone-number"
             exact
             component={() => <PhoneNumber sdk={sdk || phoneNumberMockSdk} locations={locations} />}
+          />
+          <Route
+            path="/generic-table"
+            exact
+            component={() => <GenericTable sdk={sdk || recipeIngredientsMockSdk} locations={locations} />}
           />
           <Route
             path="/recipe-ingredients"

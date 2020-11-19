@@ -5,17 +5,15 @@ import { getTextAreaWithLabel } from '../helpers';
 import { getButton, getTextField } from '../../../shared/helpers';
 
 function StepDialog({ sdk }) {
-  const [step, setStep] = useState('');
   const [title, setTitle] = useState('');
   const [fields, setFields] = useState('');
-  const [stepErrorMessage, setStepErrorMessage] = useState('');
   const [titleErrorMessage, setTitleErrorMessage] = useState('');
 
-  const setFieldsFromStep = (currentStep, onlyKey = false) => {
+  const setFieldsFromStep = (currentStep = {}, onlyKey = false) => {
     const toSet = {};
     Object.keys(currentStep).forEach((key) => {
       // Our built in keys
-      if (['step', 'title'].includes(key)) return;
+      if (['title'].includes(key)) return;
 
       toSet[key] = onlyKey ? '' : currentStep[key] || '';
     });
@@ -27,7 +25,6 @@ function StepDialog({ sdk }) {
 
     if (currentStep) {
       setFieldsFromStep(currentStep);
-      setStep(currentStep.step);
       setTitle(currentStep.title);
     } else if (steps) {
       setFieldsFromStep(steps[0], true);
@@ -40,10 +37,9 @@ function StepDialog({ sdk }) {
 
   const saveStep = () => {
     const errorMessage = 'This item is required';
-    if (step && title) {
-      sdk.close({ step: +step, title, ...fields });
+    if (title) {
+      sdk.close({ title, ...fields });
     } else {
-      setStepErrorMessage(!step ? errorMessage : '');
       setTitleErrorMessage(!title ? errorMessage : '');
     }
   };
@@ -53,14 +49,6 @@ function StepDialog({ sdk }) {
   return (
     <div id="dialog-step-wrap" data-testid="StepDialog">
       <Form spacing="default" data-testid="StepDialog-Form">
-        <FieldGroup>
-          {getTextField(step, (event) => setStep(event.currentTarget.value), stepErrorMessage, {
-            id: 'stepNumber',
-            type: 'number',
-            labelText: 'Step Number',
-            required: true
-          })}
-        </FieldGroup>
         <FieldGroup>
           {getTextField(title, (event) => setTitle(event.currentTarget.value), titleErrorMessage, {
             id: 'title',
