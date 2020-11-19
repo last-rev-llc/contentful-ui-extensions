@@ -1,6 +1,4 @@
 import React, { useContext } from 'react';
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 
 import { DropdownList, DropdownListItem, Heading } from '@contentful/forma-36-react-components';

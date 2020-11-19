@@ -1,7 +1,6 @@
 /* eslint-disable react/forbid-prop-types */
-import React, { useContext, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { get, set } from 'lodash';
+import React, { useContext, useState } from 'react';
+import { get } from 'lodash';
 import {
   Heading,
   Button,
