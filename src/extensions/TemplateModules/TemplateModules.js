@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import { isEmpty } from 'lodash';
 import { CardDragHandle, DropdownList, DropdownListItem, IconButton } from '@contentful/forma-36-react-components';
 import { darken } from 'polished';
 
@@ -7,7 +9,7 @@ import EntryCard, { getId } from './CardEntry';
 import ModalEntitySelector from './ModalEntitySelector';
 import ModalTemplateCreator from './ModalTemplateCreator';
 import ModalTemplateSelector from './ModalTemplateSelector';
-import { entriesList } from './mock';
+import CardNothing from './CardNothing';
 
 const cardHeight = '100px';
 
@@ -57,22 +59,36 @@ function getModal(sdk) {
 }
 
 function TemplateModules({ sdk }) {
-  const [entries, setEntries] = useState(entriesList);
+  const [entries, setEntries] = useState([]);
 
-  const removeItem = (entryId) => setEntries(entries.filter((item) => entryId !== getId(item)));
+  useEffect(() => {
+    if (sdk.field && sdk.field.getValue()) {
+      setEntries(sdk.field.getValue());
+    } else {
+      setEntries([]);
+    }
+  }, [sdk.field]);
 
-  const addItem = ({ item } = {}) => item && setEntries(entries.concat(item));
+  const handleSetEntries = (newEntries) => {
+    sdk.field.setValue(newEntries);
+    setEntries(newEntries);
+  };
 
-  const selectTemplate = async ({ id, entries: templateEntries }) => {
+  const removeItem = (entryId) => handleSetEntries(entries.filter((item) => entryId !== getId(item)));
+
+  const addItem = ({ item } = {}) => item && handleSetEntries(entries.concat(item));
+
+  const selectTemplate = async ({ entries: templateEntries } = {}) => {
+    if (!entries) return;
     const resolvedEntries = await Promise.all(templateEntries.map(({ id }) => sdk.space.getEntry(id)));
-    setEntries(resolvedEntries);
+    handleSetEntries(resolvedEntries);
   };
 
   const moveToPosition = (entryId, position) => {
     const found = entries.find((item) => entryId === getId(item));
     const toUpdate = entries.filter((item) => entryId !== getId(item));
     toUpdate.splice(position, 0, found);
-    setEntries(toUpdate);
+    handleSetEntries(toUpdate);
   };
 
   const showModal = (modalName, parameters = {}) =>
@@ -104,6 +120,7 @@ function TemplateModules({ sdk }) {
 
   return (
     <>
+      {isEmpty(entries) && <CardNothing type="entries" />}
       {entries.map((item, index) => {
         const id = getId(item);
         return (
@@ -137,16 +154,31 @@ function TemplateModules({ sdk }) {
           <span>Add content</span>
         </ContentButton>
         <ContentButton onClick={() => showModal('ModalTemplateCreator', { entries })}>
-          <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
+          <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'Copy', size: 'small' }} />
           <span>Save as template</span>
         </ContentButton>
         <ContentButton onClick={() => showModal('ModalTemplateSelector').then(selectTemplate)}>
-          <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
+          <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'References', size: 'small' }} />
           <span>Load from template</span>
         </ContentButton>
       </AddContentStyle>
     </>
   );
 }
+
+TemplateModules.propTypes = {
+  sdk: PropTypes.shape({
+    window: PropTypes.shape({
+      updateHeight: PropTypes.func.isRequired
+    }),
+    dialogs: PropTypes.shape({
+      openExtension: PropTypes.func.isRequired
+    }),
+    field: PropTypes.shape({
+      getValue: PropTypes.func.isRequired,
+      setValue: PropTypes.func.isRequired
+    })
+  }).isRequired
+};
 
 export default TemplateModules;

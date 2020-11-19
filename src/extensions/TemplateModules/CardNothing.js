@@ -15,7 +15,7 @@ const CardStyle = styled(ContentfulCard)`
 `;
 
 function EntryCard({ type }) {
-  return <CardStyle contentType="Not found" title={`No ${type}s found`} />;
+  return <CardStyle contentType="Not found" title={`No ${type} found`} />;
 }
 
 EntryCard.propTypes = { type: PropTypes.string };

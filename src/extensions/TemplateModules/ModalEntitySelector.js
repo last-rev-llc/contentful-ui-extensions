@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
 
-import { Heading, Spinner } from '@contentful/forma-36-react-components';
+import { isEmpty } from 'lodash';
+import { Heading } from '@contentful/forma-36-react-components';
 
 import { SDKContext } from '../../context';
 import { useAsync } from '../../utils/hooks';
@@ -11,12 +10,13 @@ import EntryCard, { getId } from './CardEntry';
 import { ModalStyle } from './styles';
 import ModalError from './ModalError';
 import ModalLoading from './ModalLoading';
+import CardNothing from './CardNothing';
 
 function EntrySelectorModal() {
   const sdk = useContext(SDKContext);
 
   const { selectedEntryIds = [] } = sdk.parameters.invocation;
-  const { error, response, loading } = useAsync(() =>
+  const { error, response: entries, loading } = useAsync(() =>
     sdk.space
       .getEntries({ content_type: 'blogPost' })
 
@@ -33,7 +33,8 @@ function EntrySelectorModal() {
     <ModalStyle>
       <Heading>Insert existing entry</Heading>
       <div>
-        {response.map((item) => (
+        {isEmpty(entries) && <CardNothing type="entries" />}
+        {entries.map((item) => (
           <EntryCard key={getId(item)} item={item} onClick={handleItemSelect(item)} />
         ))}
       </div>
