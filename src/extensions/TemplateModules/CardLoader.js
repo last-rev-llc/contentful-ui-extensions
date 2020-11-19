@@ -10,7 +10,7 @@ const LoaderCard = styled(CardStyle)`
   padding-left: 40%;
 `;
 
-function EntryCard() {
+function CardLoader() {
   const [text, setText] = useState('Loading ');
 
   useEffect(() => {
@@ -32,4 +32,4 @@ function EntryCard() {
   return <LoaderCard title={text} />;
 }
 
-export default EntryCard;
+export default CardLoader;

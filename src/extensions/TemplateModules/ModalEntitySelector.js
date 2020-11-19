@@ -12,7 +12,7 @@ import ModalError from './ModalError';
 import ModalLoading from './ModalLoading';
 import CardNothing from './CardNothing';
 
-function EntrySelectorModal() {
+function ModalEntrySelector() {
   const sdk = useContext(SDKContext);
 
   const { selectedEntryIds = [] } = sdk.parameters.invocation;
@@ -42,8 +42,8 @@ function EntrySelectorModal() {
   );
 }
 
-EntrySelectorModal.propTypes = {};
+ModalEntrySelector.propTypes = {};
 
-EntrySelectorModal.defaultProps = {};
+ModalEntrySelector.defaultProps = {};
 
-export default EntrySelectorModal;
+export default ModalEntrySelector;
