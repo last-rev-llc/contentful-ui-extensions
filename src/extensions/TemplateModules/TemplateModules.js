@@ -1,25 +1,18 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {
-  CardDragHandle,
-  DropdownList,
-  DropdownListItem,
-  EntryCard,
-  IconButton
-} from '@contentful/forma-36-react-components';
+import { CardDragHandle, DropdownList, DropdownListItem, IconButton } from '@contentful/forma-36-react-components';
 import { darken } from 'polished';
+
+import EntryCard, { getId } from './EntryCard';
+import ModalEntitySelector from './ModalEntitySelector';
+import ModalTemplateCreator from './ModalTemplateCreator';
+import ModalTemplateSelector from './ModalTemplateSelector';
+import { entriesList } from './mock';
 
 const cardHeight = '100px';
 
-const ModuleCardStyle = styled(EntryCard)`
-  min-width: 200px;
-  height: ${cardHeight};
-  width: 100%;
-
-  margin-bottom: 20px;
-`;
-
 const AddContentStyle = styled.div`
+  margin-top: 20px;
   border: 1px dashed rgb(211, 220, 224);
 
   display: flex;
@@ -31,7 +24,8 @@ const AddContentStyle = styled.div`
 
 const colors = { default: '#2d64b3', hover: darken(0.2, '#2d64b3') };
 
-const AddContentButton = styled.span`
+const ContentButton = styled.span`
+  margin-right: 20px;
   color: ${colors.default};
   font-weight: bold;
 
@@ -57,41 +51,61 @@ const AddContentButton = styled.span`
   justify-content: center;
 `;
 
-const entriesById = {
-  1: {
-    id: 1,
-    status: 'published',
-    contentType: 'module',
-    title: 'Test module',
-    description: 'Test description'
-  },
-  2: {
-    id: 2,
-    status: 'draft',
-    contentType: 'module',
-    title: 'Second module',
-    description: 'Second description'
-  }
-};
+function getModal(sdk) {
+  const { modal } = sdk.parameters.invocation || {};
+  return modal;
+}
 
-function TemplateModules() {
-  const [entries, setEntries] = useState([1, 2]);
+function TemplateModules({ sdk }) {
+  const [entries, setEntries] = useState(entriesList);
 
-  const removeItem = (entryId) => setEntries(entries.filter((id) => entryId !== id));
+  const removeItem = (entryId) => setEntries(entries.filter((item) => entryId !== getId(item)));
+
+  const addItem = ({ item }) => item && setEntries(entries.concat(item));
 
   const moveToPosition = (entryId, position) => {
-    const toUpdate = entries.filter((id) => entryId !== id);
-    toUpdate.splice(position, 0, entryId);
+    const found = entries.find((item) => entryId === getId(item));
+    const toUpdate = entries.filter((item) => entryId !== getId(item));
+    toUpdate.splice(position, 0, found);
     setEntries(toUpdate);
   };
 
+  const showModal = (modalName, parameters) =>
+    sdk.dialogs.openExtension({
+      width: 500,
+      id: sdk.ids.extension,
+      shouldCloseOnOverlayClick: true,
+      shouldCloseOnEscapePress: true,
+      position: 'center',
+      parameters: {
+        modal: modalName,
+        ...parameters
+      }
+    });
+
+  switch (getModal(sdk)) {
+    case 'ModalEntitySelector':
+      return <ModalEntitySelector />;
+
+    case 'ModalTemplateCreator':
+      return <ModalTemplateCreator />;
+
+    case 'ModalTemplateSelector':
+      return <ModalTemplateSelector />;
+
+    default:
+      break;
+  }
+
   return (
     <>
-      {entries
-        .map((entryId) => entriesById[entryId])
-        .map(({ id, ...entryContent }, index) => (
-          <ModuleCardStyle
+      {entries.map((item, index) => {
+        const id = getId(item);
+        console.log(item);
+        return (
+          <EntryCard
             key={id}
+            item={item}
             cardDragHandleComponent={<CardDragHandle>Reorder card</CardDragHandle>}
             dropdownListElements={
               <>
@@ -109,15 +123,22 @@ function TemplateModules() {
                 </DropdownList>
               </>
             }
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...entryContent}
           />
-        ))}
+        );
+      })}
       <AddContentStyle>
-        <AddContentButton>
+        <ContentButton onClick={() => showModal('ModalEntitySelector').then(addItem)}>
           <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
           <span>Add content</span>
-        </AddContentButton>
+        </ContentButton>
+        <ContentButton onClick={() => showModal('ModalTemplateCreator', { entries }).then(addItem)}>
+          <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
+          <span>Save as template</span>
+        </ContentButton>
+        <ContentButton onClick={() => showModal('ModalTemplateSelector').then(addItem)}>
+          <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
+          <span>Load from template</span>
+        </ContentButton>
       </AddContentStyle>
     </>
   );
