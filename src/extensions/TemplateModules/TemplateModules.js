@@ -36,7 +36,7 @@ function TemplateModules({ sdk }) {
   const [entries, setEntries] = useState([]);
 
   const handleSetEntries = (newEntries) => {
-    // sdk.field.setValue(buildEntryStubs(newEntries));
+    sdk.field.setValue(buildEntryStubs(newEntries));
     setEntries(newEntries);
   };
 
