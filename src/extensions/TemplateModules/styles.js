@@ -1,7 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import styled from 'styled-components';
 
-import { Button as ContentfulButton, EntryCard } from '@contentful/forma-36-react-components';
+import { darken } from 'polished';
+import { Button as ContentfulButton, EntryCard as ContentfulCard } from '@contentful/forma-36-react-components';
 
 export const ModalStyle = styled.div`
   min-height: 400px;
@@ -51,7 +52,7 @@ export const ModalStyle = styled.div`
   }
 `;
 
-export const TemplateCard = styled(EntryCard)`
+export const TemplateCard = styled(ContentfulCard)`
   margin-top: 20px;
 `;
 
@@ -80,4 +81,56 @@ export const ColCenter = styled(Col)`
 
 export const Button = styled(ContentfulButton)`
   margin: 20px;
+`;
+
+export const cardHeight = '100px';
+export const colors = { default: '#2d64b3', hover: darken(0.2, '#2d64b3') };
+
+export const AddContentStyle = styled.div`
+  margin-top: 20px;
+  border: 1px dashed rgb(211, 220, 224);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: ${cardHeight};
+`;
+
+export const ContentButton = styled.span`
+  margin-right: 20px;
+  color: ${colors.default};
+  font-weight: bold;
+
+  &:hover {
+    color: ${colors.hover};
+  }
+
+  // icon button
+  svg {
+    fill: ${colors.default};
+    margin-right: 4px;
+
+    &:hover {
+      fill: ${colors.hover} !important; // override the default contentful color
+    }
+  }
+
+  cursor: pointer;
+  user-select: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const CardStyle = styled(ContentfulCard)`
+  margin-top: 20px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border: 1px solid lightblue;
+  }
+
+  width: 100%;
 `;

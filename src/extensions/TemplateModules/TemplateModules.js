@@ -1,57 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { CardDragHandle, DropdownList, DropdownListItem, IconButton } from '@contentful/forma-36-react-components';
-import { darken } from 'polished';
 
 import EntryCard, { getId } from './CardEntry';
 import ModalEntitySelector from './ModalEntitySelector';
 import ModalTemplateCreator from './ModalTemplateCreator';
 import ModalTemplateSelector from './ModalTemplateSelector';
 import CardNothing from './CardNothing';
+import CardLoader from './CardLoader';
 
-const cardHeight = '100px';
-
-const AddContentStyle = styled.div`
-  margin-top: 20px;
-  border: 1px dashed rgb(211, 220, 224);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: ${cardHeight};
-`;
-
-const colors = { default: '#2d64b3', hover: darken(0.2, '#2d64b3') };
-
-const ContentButton = styled.span`
-  margin-right: 20px;
-  color: ${colors.default};
-  font-weight: bold;
-
-  &:hover {
-    color: ${colors.hover};
-  }
-
-  // icon button
-  svg {
-    fill: ${colors.default};
-    margin-right: 4px;
-
-    &:hover {
-      fill: ${colors.hover} !important; // override the default contentful color
-    }
-  }
-
-  cursor: pointer;
-  user-select: none;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+import { AddContentStyle, ContentButton } from './styles';
 
 function getModal(sdk) {
   const { modal } = sdk.parameters.invocation || {};
@@ -59,8 +18,12 @@ function getModal(sdk) {
 }
 
 function TemplateModules({ sdk }) {
+  const [loading, setLoading] = useState(false);
   const [entries, setEntries] = useState([]);
 
+  /**
+   * Loading and saving our entry to & from contentful
+   */
   useEffect(() => {
     if (sdk.field && sdk.field.getValue()) {
       setEntries(sdk.field.getValue());
@@ -74,16 +37,38 @@ function TemplateModules({ sdk }) {
     setEntries(newEntries);
   };
 
-  const removeItem = (entryId) => handleSetEntries(entries.filter((item) => entryId !== getId(item)));
+  /**
+   * Add or remove entries from the current template
+   */
+  const removeEntry = (entryId) => handleSetEntries(entries.filter((item) => entryId !== getId(item)));
+  const addEntry = ({ item } = {}) => item && handleSetEntries(entries.concat(item));
 
-  const addItem = ({ item } = {}) => item && handleSetEntries(entries.concat(item));
-
+  /**
+   * When the user selects a template from the templateSelectorModal
+   * we'll update the current entries to match that of the template
+   */
   const selectTemplate = async ({ entries: templateEntries } = {}) => {
-    if (!entries) return;
-    const resolvedEntries = await Promise.all(templateEntries.map(({ id }) => sdk.space.getEntry(id)));
-    handleSetEntries(resolvedEntries);
+    if (!entries) {
+      setEntries([]);
+      return;
+    }
+
+    setLoading(true);
+    Promise.all(
+      templateEntries.map(
+        ({ id, entry }) =>
+          // If we have an entry the user selected "new" for this entry type
+          // otherwise we'll fetch from the current entry from the server
+          entry || sdk.space.getEntry(id)
+      )
+    )
+      .then(setEntries)
+      .then(() => setLoading(false));
   };
 
+  /**
+   * Move an entry to a specific position in the listing
+   */
   const moveToPosition = (entryId, position) => {
     const found = entries.find((item) => entryId === getId(item));
     const toUpdate = entries.filter((item) => entryId !== getId(item));
@@ -118,6 +103,10 @@ function TemplateModules({ sdk }) {
       break;
   }
 
+  if (loading) {
+    return <CardLoader />;
+  }
+
   return (
     <>
       {isEmpty(entries) && <CardNothing type="entries" />}
@@ -132,7 +121,7 @@ function TemplateModules({ sdk }) {
               <>
                 <DropdownList>
                   <DropdownListItem isTitle>Actions</DropdownListItem>
-                  <DropdownListItem onClick={() => removeItem(id)}>Remove</DropdownListItem>
+                  <DropdownListItem onClick={() => removeEntry(id)}>Remove</DropdownListItem>
                 </DropdownList>
                 <DropdownList>
                   <DropdownListItem onClick={() => moveToPosition(id, index - 1)}>Move up</DropdownListItem>
@@ -149,7 +138,7 @@ function TemplateModules({ sdk }) {
       })}
       <AddContentStyle>
         <ContentButton
-          onClick={() => showModal('ModalEntitySelector', { selectedEntryIds: entries.map(getId) }).then(addItem)}>
+          onClick={() => showModal('ModalEntitySelector', { selectedEntryIds: entries.map(getId) }).then(addEntry)}>
           <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
           <span>Add content</span>
         </ContentButton>
@@ -168,8 +157,11 @@ function TemplateModules({ sdk }) {
 
 TemplateModules.propTypes = {
   sdk: PropTypes.shape({
-    window: PropTypes.shape({
-      updateHeight: PropTypes.func.isRequired
+    space: PropTypes.shape({
+      getEntry: PropTypes.func
+    }),
+    ids: PropTypes.shape({
+      extension: PropTypes.string
     }),
     dialogs: PropTypes.shape({
       openExtension: PropTypes.func.isRequired
