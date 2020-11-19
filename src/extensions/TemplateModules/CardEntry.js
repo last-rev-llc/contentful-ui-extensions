@@ -8,7 +8,7 @@ export const getType = get('sys.contentType.sys.id');
 export const getTitle = get('fields.title.en-US');
 export const isPublished = get('sys.publishedCounter');
 
-function EntryCard({ item, onClick, ...props }) {
+function CardEntry({ item, onClick, ...props }) {
   return (
     <CardStyle
       // eslint-disable-next-line react/jsx-props-no-spreading
@@ -21,14 +21,14 @@ function EntryCard({ item, onClick, ...props }) {
   );
 }
 
-EntryCard.propTypes = {
+CardEntry.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   item: PropTypes.object.isRequired,
   onClick: PropTypes.func
 };
 
-EntryCard.defaultProps = {
+CardEntry.defaultProps = {
   onClick: undefined
 };
 
-export default EntryCard;
+export default CardEntry;

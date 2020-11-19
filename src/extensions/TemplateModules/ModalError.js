@@ -3,7 +3,7 @@ import { Heading } from '@contentful/forma-36-react-components';
 
 import { ModalStyle } from './styles';
 
-function ErrorModal() {
+function ModalError() {
   return (
     <ModalStyle title="Error fetching entries">
       <Heading>Error fetching entries</Heading>
@@ -14,4 +14,4 @@ function ErrorModal() {
   );
 }
 
-export default ErrorModal;
+export default ModalError;

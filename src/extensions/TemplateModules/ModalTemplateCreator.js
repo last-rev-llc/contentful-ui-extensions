@@ -50,7 +50,7 @@ function buildTemplateOptions(entries) {
  * to save each field as-is, or create new fields in contentful
  * when they load the template the next time.
  */
-function TemplateCreatorDialog() {
+function ModalTemplateCreator() {
   const sdk = useContext(SDKContext);
 
   const { entries } = sdk.parameters.invocation;
@@ -171,4 +171,4 @@ function TemplateCreatorDialog() {
   );
 }
 
-export default TemplateCreatorDialog;
+export default ModalTemplateCreator;
