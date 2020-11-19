@@ -1,7 +1,7 @@
 import React from 'react';
 import { Textarea, TextInput, TableCell, TableRow, FormLabel } from '@contentful/forma-36-react-components';
 import { getIconButton } from '../../../shared/helpers';
-import { sortedKeys } from './helpers';
+import { sortedKeys, withoutId } from './utils';
 
 const getTextArea = (textValue, onChange) => {
   return (
@@ -88,11 +88,12 @@ const getTextInputWithLabel = (
 
 const getStepRows = (steps, edit, remove) => {
   return steps
-    .sort((stepA, stepB) => stepA.step - stepB.step)
+    .filter(({ disabled }) => !disabled)
+    .sort((stepA, stepB) => stepA.id - stepB.id)
     .map((step, index) => (
-      <TableRow key={step.step}>
-        {sortedKeys(step).map((key) => (
-          <TableCell key={`${step.step}-${key}`}>{step[key]}</TableCell>
+      <TableRow key={step.id}>
+        {sortedKeys(withoutId(step)).map((key) => (
+          <TableCell key={`${step.id}-${key}`}>{step[key]}</TableCell>
         ))}
         <TableCell className="col-actions">
           {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}

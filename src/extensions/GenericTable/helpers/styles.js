@@ -19,7 +19,8 @@ export const HeaderRowStyle = styled(TableRow)`
 
   input {
     max-height: 21px;
-    min-width: 60px;
+    min-width: 100px;
+    max-width: 100px;
   }
 `;
 

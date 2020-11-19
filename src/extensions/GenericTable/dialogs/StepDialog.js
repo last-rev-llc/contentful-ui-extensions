@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { Form, FieldGroup } from '@contentful/forma-36-react-components';
-import { getTextAreaWithLabel } from '../helpers';
-import { getButton, getTextField } from '../../../shared/helpers';
+import { v4 as uuidv4 } from 'uuid';
+import { Button, Form, FieldGroup } from '@contentful/forma-36-react-components';
+import { getTextAreaWithLabel, withoutId } from '../helpers';
+import { getTextField } from '../../../shared/helpers';
+
+const ButtonGroupStyle = styled.div`
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    margin-left: 20px;
+  }
+`;
 
 function StepDialog({ sdk }) {
   const [title, setTitle] = useState('');
@@ -36,9 +47,15 @@ function StepDialog({ sdk }) {
   };
 
   const saveStep = () => {
+    const { steps = [] } = sdk.parameters.invocation;
     const errorMessage = 'This item is required';
     if (title) {
-      sdk.close({ title, ...fields });
+      sdk.close({
+        // ID will be overriden if we're updating a step
+        id: `${steps.length}-${uuidv4()}`,
+        title,
+        ...fields
+      });
     } else {
       setTitleErrorMessage(!title ? errorMessage : '');
     }
@@ -56,15 +73,24 @@ function StepDialog({ sdk }) {
             required: true
           })}
         </FieldGroup>
-        {Object.entries(fields).map(([key, value]) => (
+        {Object.entries(withoutId(fields)).map(([key, value]) => (
           <FieldGroup key={key}>
             {getTextAreaWithLabel(value, key, (event) => setField(key, event.currentTarget.value))}
           </FieldGroup>
         ))}
-        <FieldGroup row>
-          {getButton('Save', 'positive', saveStep)}
-          {getButton('Cancel', 'muted', closeDialog)}
-        </FieldGroup>
+        <ButtonGroupStyle>
+          <Button buttonType="negative" isFullWidth={false} onClick={closeDialog} type="button">
+            Cancel
+          </Button>
+          <Button
+            buttonType="positive"
+            isFullWidth={false}
+            disabled={title.length < 1}
+            onClick={saveStep}
+            type="button">
+            Save
+          </Button>
+        </ButtonGroupStyle>
       </Form>
     </div>
   );

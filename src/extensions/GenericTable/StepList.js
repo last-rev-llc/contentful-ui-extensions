@@ -33,6 +33,7 @@ function StepList({ sdk }) {
 
       return removeEmptyKeys(toReturn);
     });
+
     sdk.field.setValue(updatedSteps);
     setSteps(updatedSteps);
   };
@@ -45,8 +46,7 @@ function StepList({ sdk }) {
 
   const addStep = (step) => {
     if (step) {
-      const updatedSteps = [...steps];
-      updatedSteps.push(step);
+      const updatedSteps = [...steps].concat(step);
       sdk.field.setValue(updatedSteps);
       setSteps(updatedSteps);
     }
@@ -68,10 +68,7 @@ function StepList({ sdk }) {
 
   const openEditModal = async (stepIndex) => {
     const stepToEdit = steps[stepIndex];
-    const stepNumber = steps[stepIndex] && steps[stepIndex].step;
-    if (stepToEdit) {
-      stepToEdit.step = stepNumber && stepNumber.toString();
-    }
+
     const result = await openDialog(sdk, 'Edit Step', { steps, step: stepToEdit });
     editStep(result, stepIndex);
   };

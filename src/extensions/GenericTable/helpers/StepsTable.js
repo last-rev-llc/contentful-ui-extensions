@@ -7,7 +7,7 @@ import { Table, TableHead, TableBody, TextInput } from '@contentful/forma-36-rea
 
 import { getStepRows } from './formControl';
 import { getIconButton } from '../../../shared/helpers';
-import { sortedKeys } from './helpers';
+import { sortedKeys, withoutId } from './utils';
 
 import { HeaderRowStyle, HeaderCellStyle, HeaderActionsStyle } from './styles';
 
@@ -117,13 +117,13 @@ function StepsTable({ steps, colAdd, colEdit, colRemove, edit, remove }) {
     setFieldNames(merge(fieldNames, { [oldFieldName]: newFieldName }));
   };
 
-  const tableKeys = steps.length > 0 ? sortedKeys(steps[0]) : ['title'];
+  if (steps.length < 1) return null;
 
   return (
     <Table className="steps-table">
       <TableHead isSticky>
         <HeaderRowStyle>
-          {tableKeys.map((title) => (
+          {sortedKeys(withoutId(steps[0])).map((title) => (
             <TableHeaderCell key={title} colRemove={colRemove} isEditing={isEditing} setFieldName={setFieldName}>
               {title}
             </TableHeaderCell>
