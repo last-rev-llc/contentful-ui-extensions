@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { CardDragHandle, DropdownList, DropdownListItem, IconButton } from '@contentful/forma-36-react-components';
 import { darken } from 'polished';
 
-import EntryCard, { getId } from './EntryCard';
+import EntryCard, { getId } from './CardEntry';
 import ModalEntitySelector from './ModalEntitySelector';
 import ModalTemplateCreator from './ModalTemplateCreator';
 import ModalTemplateSelector from './ModalTemplateSelector';

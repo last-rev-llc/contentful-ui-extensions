@@ -1,51 +1,46 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { isEmpty } from 'lodash';
 
-import { DropdownList, DropdownListItem, Heading, Spinner } from '@contentful/forma-36-react-components';
+import { DropdownList, DropdownListItem, Heading } from '@contentful/forma-36-react-components';
 
 import { SDKContext } from '../../context';
 import { useAsync } from '../../utils/hooks';
 
+import ModalError from './ModalError';
+import ModalLoading from './ModalLoading';
+import CardNothing from './CardNothing';
 import { ModalStyle, TemplateCard } from './styles';
-import { getGlobalTemplates } from './utils';
+import { getGlobalTemplates, setGlobalTemplates } from './utils';
 
 function ModalTemplateSelector() {
   const sdk = useContext(SDKContext);
 
-  const { error, response = [], loading } = useAsync(() => getGlobalTemplates(sdk));
+  const { error, response: templates = [], loading, set } = useAsync(() => getGlobalTemplates(sdk));
 
-  if (loading) {
-    return (
-      <ModalStyle title="Loading" className="loader">
-        <Heading>Loading your templates</Heading>
-        <div>
-          <Spinner className="" color="default" customSize={42} size="default" testId="cf-ui-spinner" />
-        </div>
-      </ModalStyle>
-    );
-  }
+  if (error) return <ModalError />;
+  if (loading) return <ModalLoading />;
 
-  if (error) {
-    return (
-      <ModalStyle title="Error fetching entries">
-        <Heading>Error fetching entries</Heading>
-        <div>
-          <p>Unfortunately there was an error fetching your space entries. Please try to reload the page</p>
-        </div>
-      </ModalStyle>
-    );
-  }
-
-  const templates = response || [];
   const handleItemSelect = (item) => () => sdk.close({});
+  const handleItemRemove = (indexToRemove) => {
+    const filteredTemplates = templates.filter((_, index) => index !== indexToRemove);
 
-  console.log(templates);
+    setGlobalTemplates(sdk, filteredTemplates).then(() =>
+      // Update our local state to match the remote state
+      set({
+        response: filteredTemplates,
+        loading: false
+      })
+    );
+  };
+
   return (
     <ModalStyle>
-      <Heading>Insert existing entry</Heading>
+      <Heading>Load entries from template</Heading>
       <div>
-        {templates.map(({ name, refs = [] }) => {
+        {isEmpty(templates) && <CardNothing type="template" />}
+        {templates.map(({ name, refs = [] }, index) => {
           return (
             <TemplateCard
               key={name}
@@ -57,7 +52,7 @@ function ModalTemplateSelector() {
                 <>
                   <DropdownList>
                     <DropdownListItem isTitle>Actions</DropdownListItem>
-                    <DropdownListItem>Remove</DropdownListItem>
+                    <DropdownListItem onClick={() => handleItemRemove(index)}>Remove</DropdownListItem>
                   </DropdownList>
                 </>
               }
