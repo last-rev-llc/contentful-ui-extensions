@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-prop-types */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { get, set, startCase } from 'lodash';
 import {
@@ -12,22 +12,20 @@ import {
   TableRow,
   TableCell
 } from '@contentful/forma-36-react-components';
-import resolveEntries from '../../../global/scripts/resolveEntries';
-import './Templates.scss';
 
-function TemplateCreateDialog({ entries, api }) {
-  const [fullEntries, setFullEntries] = useState([]);
+import { SDKContext } from '../../context';
+import resolveEntries from '../../global/scripts/resolveEntries';
+
+import { getId, getTitle } from './EntryCard';
+import { ModalStyle, RowCenter } from './styles';
+import { GLOBALSETTINGS_ID } from './utils';
+
+function TemplateCreatorDialog() {
+  const sdk = useContext(SDKContext);
+
+  const { entries } = sdk.parameters.invocation;
   const [templateOptions, setTemplateOptions] = useState([]);
   const [templateName, setTemplateName] = useState('');
-  // TODO: Make this an instance variable
-  const GLOBALSETTINGS_ID = '6AODsEr22eGLqXlvSEyJb3';
-
-  useEffect(() => {
-    const getFullEntries = async () => {
-      setFullEntries(await resolveEntries(entries, api));
-    };
-    getFullEntries();
-  }, [api, entries]);
 
   const handleRadioChange = () => {
     const refArray = [];
@@ -43,7 +41,7 @@ function TemplateCreateDialog({ entries, api }) {
   };
 
   const handleTemplateCreate = async () => {
-    const globalSettings = await api.space.getEntry(GLOBALSETTINGS_ID);
+    const globalSettings = await sdk.space.getEntry(GLOBALSETTINGS_ID);
     const templates = get(globalSettings, 'fields.templates.en-US');
 
     templates.push({
@@ -51,8 +49,8 @@ function TemplateCreateDialog({ entries, api }) {
       options: templateOptions
     });
 
-    api.space.updateEntry(set(globalSettings, 'fields.templates.en-US', templates));
-    api.close({ templateName, templates });
+    sdk.space.updateEntry(set(globalSettings, 'fields.templates.en-US', templates));
+    sdk.close({ templateName, templates });
   };
 
   const handleTemplateNameChange = (e) => {
@@ -66,11 +64,12 @@ function TemplateCreateDialog({ entries, api }) {
     }
     return false;
   };
+
   return (
-    <div className="create-new">
+    <ModalStyle>
       <Heading>Create New Template</Heading>
-      <hr />
       <TextField
+        id="template-name"
         type="text"
         placeholder="Enter Template Name"
         name="template-name"
@@ -92,44 +91,47 @@ function TemplateCreateDialog({ entries, api }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {fullEntries.map((entry, index) => (
-            <TableRow key={Math.random()} className="entry">
-              <TableCell>
-                <input
-                  type="radio"
-                  name={entry.sys.id}
-                  data-id={entry.sys.id}
-                  data-reftype="byref"
-                  onChange={handleRadioChange}
-                  checked={isChecked(index, 'byref')}
-                />
-              </TableCell>
-              <TableCell>
-                <input
-                  type="radio"
-                  name={entry.sys.id}
-                  data-id={entry.sys.contentType.sys.id}
-                  data-reftype="new"
-                  onChange={handleRadioChange}
-                  checked={isChecked(index, 'new')}
-                />
-              </TableCell>
-              {/* <TableCell>{startCase(entry.sys.contentType.sys.id)}</TableCell> */}
-              {/* <TableCell>{get(entry, 'fields.internalTitle.en-US')}</TableCell> */}
-            </TableRow>
-          ))}
+          {entries.map((entry, index) => {
+            const id = getId(entry);
+
+            const byNewChecked = isChecked(index, 'new');
+            const byRefChecked = isChecked(index, 'byref');
+            const someChecked = byNewChecked || byRefChecked;
+
+            return (
+              <TableRow key={id} className="entry">
+                <TableCell>
+                  <input
+                    type="radio"
+                    name={id}
+                    data-id={id}
+                    data-reftype="byref"
+                    onChange={handleRadioChange}
+                    checked={byRefChecked}
+                  />
+                </TableCell>
+                <TableCell>
+                  <input
+                    type="radio"
+                    name={id}
+                    data-id={entry.sys.contentType.sys.id}
+                    data-reftype="new"
+                    onChange={handleRadioChange}
+                    checked={someChecked ? byNewChecked : true}
+                  />
+                </TableCell>
+                <TableCell>{getTitle(entry)}</TableCell>
+                <TableCell>{get(entry, 'fields.internalTitle.en-US')}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
       <Button onClick={handleTemplateCreate} buttonType="positive">
         Create Template
       </Button>
-    </div>
+    </ModalStyle>
   );
 }
 
-TemplateCreateDialog.propTypes = {
-  entries: PropTypes.arrayOf(PropTypes.object).isRequired,
-  api: PropTypes.object.isRequired
-};
-
-export default TemplateCreateDialog;
+export default TemplateCreatorDialog;
