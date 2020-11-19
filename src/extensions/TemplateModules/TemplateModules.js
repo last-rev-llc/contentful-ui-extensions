@@ -59,15 +59,15 @@ function TemplateModules({ sdk }) {
   useEffect(() => {
     setLoading(true);
     Promise.all(
-      entries.map((entryId) =>
+      entryStubs.map((entryStub) =>
         // If we have an entry the user selected "new" for this entry type
         // otherwise we'll fetch from the current entry from the server
-        sdk.space.getEntry(entryId)
+        sdk.space.getEntry(entryStub.sys.id)
       )
     )
       .then(setEntries)
       .then(() => setLoading(false));
-  }, [entryStubs]);
+  }, [sdk.space, entryStubs]);
 
   /**
    * Add or remove entries from the current template
@@ -201,14 +201,14 @@ TemplateModules.propTypes = {
     }),
     space: PropTypes.shape({
       getEntry: PropTypes.func,
-      createEntry: PropTypes.func,
-      selectMultipleEntries: PropTypes.func
+      createEntry: PropTypes.func
     }),
     ids: PropTypes.shape({
       extension: PropTypes.string
     }),
     dialogs: PropTypes.shape({
-      openExtension: PropTypes.func.isRequired
+      openExtension: PropTypes.func.isRequired,
+      selectMultipleEntries: PropTypes.func
     }),
     field: PropTypes.shape({
       getValue: PropTypes.func.isRequired,
