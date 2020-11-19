@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
+import { isEmpty, identity } from 'lodash';
 import { CardDragHandle, DropdownList, DropdownListItem, IconButton } from '@contentful/forma-36-react-components';
 
 import EntryCard, { getId, getType } from './CardEntry';
@@ -74,7 +74,7 @@ function TemplateModules({ sdk }) {
    * Add or remove entries from the current template
    */
   const removeEntry = (entryId) => handleSetEntries(entries.filter((item) => entryId !== getId(item)));
-  const addEntry = ({ item } = {}) => item && handleSetEntries(entries.concat(item));
+  const addEntry = (items) => handleSetEntries(entries.concat(items).filter(identity));
 
   /**
    * When the user selects a template from the templateSelectorModal
@@ -131,9 +131,6 @@ function TemplateModules({ sdk }) {
     });
 
   switch (getModal(sdk)) {
-    case 'ModalEntitySelector':
-      return <ModalEntitySelector />;
-
     case 'ModalTemplateCreator':
       return <ModalTemplateCreator />;
 
@@ -157,6 +154,7 @@ function TemplateModules({ sdk }) {
           <EntryCard
             key={id}
             item={item}
+            onClick={() => sdk.navigator.openEntry(id, { slideIn: true })}
             cardDragHandleComponent={<CardDragHandle>Reorder card</CardDragHandle>}
             dropdownListElements={
               <>
@@ -179,7 +177,8 @@ function TemplateModules({ sdk }) {
       })}
       <AddContentStyle>
         <ContentButton
-          onClick={() => showModal('ModalEntitySelector', { selectedEntryIds: entries.map(getId) }).then(addEntry)}>
+          // onClick={() => showModal('ModalEntitySelector', { selectedEntryIds: entries.map(getId) }).then(addEntry)}>
+          onClick={() => sdk.dialogs.selectMultipleEntries().then(addEntry)}>
           <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
           <span>Add content</span>
         </ContentButton>
@@ -198,9 +197,13 @@ function TemplateModules({ sdk }) {
 
 TemplateModules.propTypes = {
   sdk: PropTypes.shape({
+    navigator: PropTypes.shape({
+      openEntry: PropTypes.func
+    }),
     space: PropTypes.shape({
       getEntry: PropTypes.func,
-      createEntry: PropTypes.func
+      createEntry: PropTypes.func,
+      selectMultipleEntries: PropTypes.func
     }),
     ids: PropTypes.shape({
       extension: PropTypes.string
