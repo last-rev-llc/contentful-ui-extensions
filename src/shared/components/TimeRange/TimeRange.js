@@ -43,8 +43,7 @@ function TimeRange({ value, onChange, step, disabled }) {
       endIndex === startIndex && endIndex === 0 ? dayTimes.length - 1 : endIndex
     ];
     setSelectedValue(val);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, dayTimes]);
+  }, [value, dayTimes, onChange]);
 
   useEffect(() => {
     const start = startOfDay(new Date());
@@ -59,8 +58,7 @@ function TimeRange({ value, onChange, step, disabled }) {
     }
 
     setDayTimes(newDayTimes);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step.minutes]);
+  }, [step.minutes, step]);
 
   function handleChange(e, val) {
     const [start, end] = val;
