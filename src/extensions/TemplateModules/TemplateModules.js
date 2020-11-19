@@ -49,7 +49,7 @@ function TemplateModules({ sdk }) {
    */
   const selectTemplate = async ({ entries: templateEntries } = {}) => {
     if (!entries) {
-      setEntries([]);
+      handleSetEntries([]);
       return;
     }
 
@@ -62,7 +62,7 @@ function TemplateModules({ sdk }) {
           entry || sdk.space.getEntry(id)
       )
     )
-      .then(setEntries)
+      .then(handleSetEntries)
       .then(() => setLoading(false));
   };
 
