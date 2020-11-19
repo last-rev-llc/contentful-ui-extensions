@@ -4,18 +4,33 @@ import { Form, FieldGroup } from '@contentful/forma-36-react-components';
 import { getTextAreaWithLabel } from '../helpers';
 import { getButton, getTextField } from '../../../shared/helpers';
 
-const StepDialog = ({ sdk }) => {
+function StepDialog({ sdk }) {
   const [step, setStep] = useState('');
   const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
+  const [fields, setFields] = useState('');
   const [stepErrorMessage, setStepErrorMessage] = useState('');
   const [titleErrorMessage, setTitleErrorMessage] = useState('');
 
+  const setFieldsFromStep = (currentStep, onlyKey = false) => {
+    const toSet = {};
+    Object.keys(currentStep).forEach((key) => {
+      // Our built in keys
+      if (['step', 'title'].includes(key)) return;
+
+      toSet[key] = onlyKey ? '' : currentStep[key] || '';
+    });
+    setFields(toSet);
+  };
+
   useEffect(() => {
-    if (sdk.parameters.invocation.step) {
-      setStep(sdk.parameters.invocation.step.step);
-      setTitle(sdk.parameters.invocation.step.title);
-      setBody(sdk.parameters.invocation.step.body);
+    const { steps, step: currentStep } = sdk.parameters.invocation;
+
+    if (currentStep) {
+      setFieldsFromStep(currentStep);
+      setStep(currentStep.step);
+      setTitle(currentStep.title);
+    } else if (steps) {
+      setFieldsFromStep(steps[0], true);
     }
   }, [sdk]);
 
@@ -26,12 +41,14 @@ const StepDialog = ({ sdk }) => {
   const saveStep = () => {
     const errorMessage = 'This item is required';
     if (step && title) {
-      sdk.close({ step: +step, title, body });
+      sdk.close({ step: +step, title, ...fields });
     } else {
       setStepErrorMessage(!step ? errorMessage : '');
       setTitleErrorMessage(!title ? errorMessage : '');
     }
   };
+
+  const setField = (name, value) => setFields({ ...fields, [name]: value });
 
   return (
     <div id="dialog-step-wrap" data-testid="StepDialog">
@@ -45,13 +62,17 @@ const StepDialog = ({ sdk }) => {
           })}
         </FieldGroup>
         <FieldGroup>
-          {getTextField(step, (event) => setTitle(event.currentTarget.value), titleErrorMessage, {
+          {getTextField(title, (event) => setTitle(event.currentTarget.value), titleErrorMessage, {
             id: 'title',
             labelText: 'Title',
             required: true
           })}
         </FieldGroup>
-        <FieldGroup>{getTextAreaWithLabel(body, 'Body', (event) => setBody(event.currentTarget.value))}</FieldGroup>
+        {Object.entries(fields).map(([key, value]) => (
+          <FieldGroup key={key}>
+            {getTextAreaWithLabel(value, key, (event) => setField(key, event.currentTarget.value))}
+          </FieldGroup>
+        ))}
         <FieldGroup row>
           {getButton('Save', 'positive', saveStep)}
           {getButton('Cancel', 'muted', closeDialog)}
@@ -59,18 +80,15 @@ const StepDialog = ({ sdk }) => {
       </Form>
     </div>
   );
-};
+}
 
 StepDialog.propTypes = {
   sdk: PropTypes.shape({
     close: PropTypes.func.isRequired,
     parameters: PropTypes.shape({
       invocation: PropTypes.shape({
-        step: PropTypes.shape({
-          step: PropTypes.string,
-          title: PropTypes.string,
-          body: PropTypes.string
-        })
+        step: PropTypes.object,
+        steps: PropTypes.arrayOf(PropTypes.object)
       }).isRequired
     }).isRequired
   }).isRequired
