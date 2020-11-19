@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import styled from 'styled-components';
 
-import { Button as ContentfulButton } from '@contentful/forma-36-react-components';
+import { Button as ContentfulButton, EntryCard } from '@contentful/forma-36-react-components';
 
 export const ModalStyle = styled.div`
   min-height: 400px;
@@ -14,7 +14,8 @@ export const ModalStyle = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  p {
+  // Error text
+  > p {
     padding: 20px;
   }
 
@@ -45,9 +46,13 @@ export const ModalStyle = styled.div`
     }
   }
 
-  button {
+  > button {
     margin: 20px;
   }
+`;
+
+export const TemplateCard = styled(EntryCard)`
+  margin-top: 20px;
 `;
 
 export const Flex = styled.div`

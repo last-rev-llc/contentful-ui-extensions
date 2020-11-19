@@ -13,7 +13,14 @@ import { ModalStyle } from './styles';
 function EntrySelectorModal() {
   const sdk = useContext(SDKContext);
 
-  const { error, response, loading } = useAsync(() => sdk.space.getEntries({ content_type: 'blogPost' }));
+  const { selectedEntryIds = [] } = sdk.parameters.invocation;
+  const { error, response, loading } = useAsync(() =>
+    sdk.space
+      .getEntries({ content_type: 'blogPost' })
+
+      // Filter out all items which the user has already selected in the entity list
+      .then(({ items }) => items.filter((entry) => selectedEntryIds.includes(getId(entry)) === false))
+  );
 
   if (loading) {
     return (
@@ -34,15 +41,13 @@ function EntrySelectorModal() {
     );
   }
 
-  const { items: entries } = response;
-
   const handleItemSelect = (item) => () => sdk.close({ item });
 
   return (
     <ModalStyle>
       <Heading>Insert existing entry</Heading>
       <div>
-        {entries.map((item) => (
+        {response.map((item) => (
           <EntryCard key={getId(item)} item={item} onClick={handleItemSelect(item)} />
         ))}
       </div>

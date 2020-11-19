@@ -61,7 +61,7 @@ function TemplateModules({ sdk }) {
 
   const removeItem = (entryId) => setEntries(entries.filter((item) => entryId !== getId(item)));
 
-  const addItem = ({ item }) => item && setEntries(entries.concat(item));
+  const addItem = ({ item } = {}) => item && setEntries(entries.concat(item));
 
   const moveToPosition = (entryId, position) => {
     const found = entries.find((item) => entryId === getId(item));
@@ -70,7 +70,7 @@ function TemplateModules({ sdk }) {
     setEntries(toUpdate);
   };
 
-  const showModal = (modalName, parameters) =>
+  const showModal = (modalName, parameters = {}) =>
     sdk.dialogs.openExtension({
       width: 500,
       id: sdk.ids.extension,
@@ -101,7 +101,6 @@ function TemplateModules({ sdk }) {
     <>
       {entries.map((item, index) => {
         const id = getId(item);
-        console.log(item);
         return (
           <EntryCard
             key={id}
@@ -127,7 +126,8 @@ function TemplateModules({ sdk }) {
         );
       })}
       <AddContentStyle>
-        <ContentButton onClick={() => showModal('ModalEntitySelector').then(addItem)}>
+        <ContentButton
+          onClick={() => showModal('ModalEntitySelector', { selectedEntryIds: entries.map(getId) }).then(addItem)}>
           <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
           <span>Add content</span>
         </ContentButton>

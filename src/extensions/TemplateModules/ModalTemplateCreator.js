@@ -1,7 +1,7 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { get, set, startCase } from 'lodash';
+import { get, set } from 'lodash';
 import {
   Heading,
   Button,
@@ -14,11 +14,10 @@ import {
 } from '@contentful/forma-36-react-components';
 
 import { SDKContext } from '../../context';
-import resolveEntries from '../../global/scripts/resolveEntries';
 
 import { getId, getTitle } from './EntryCard';
-import { ModalStyle, RowCenter } from './styles';
-import { GLOBALSETTINGS_ID } from './utils';
+import { ModalStyle } from './styles';
+import { getGlobalSettings } from './utils';
 
 function TemplateCreatorDialog() {
   const sdk = useContext(SDKContext);
@@ -41,8 +40,8 @@ function TemplateCreatorDialog() {
   };
 
   const handleTemplateCreate = async () => {
-    const globalSettings = await sdk.space.getEntry(GLOBALSETTINGS_ID);
-    const templates = get(globalSettings, 'fields.templates.en-US');
+    const globalSettings = await getGlobalSettings(sdk);
+    const templates = get(globalSettings, 'fields.templates.en-US', []);
 
     templates.push({
       name: templateName,
