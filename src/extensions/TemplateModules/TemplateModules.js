@@ -4,7 +4,6 @@ import { isEmpty, identity } from 'lodash';
 import { CardDragHandle, DropdownList, DropdownListItem, IconButton } from '@contentful/forma-36-react-components';
 
 import EntryCard, { getId, getType } from './CardEntry';
-import ModalEntitySelector from './ModalEntitySelector';
 import ModalTemplateCreator from './ModalTemplateCreator';
 import ModalTemplateSelector from './ModalTemplateSelector';
 import CardNothing from './CardNothing';
