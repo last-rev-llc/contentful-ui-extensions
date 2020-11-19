@@ -1,6 +1,6 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { useContext, useState } from 'react';
-import { get } from 'lodash';
+import { get, cloneDeep } from 'lodash';
 import {
   Heading,
   Button,
@@ -19,6 +19,18 @@ import { getId, getTitle } from './CardEntry';
 import { ModalStyle } from './styles';
 import { getGlobalSettings, setGlobalTemplates } from './utils';
 
+function cleanupEntry(entry) {
+  const toReturn = cloneDeep(entry);
+
+  // We'll use contentful to create an ID for us
+  delete toReturn.sys.id;
+  Object.keys(entry.fields).forEach((fieldName) => {
+    toReturn.fields[fieldName] = '';
+  });
+
+  return entry;
+}
+
 function buildTemplateOptions(entries) {
   const toReturn = {};
 
@@ -32,6 +44,12 @@ function buildTemplateOptions(entries) {
   return toReturn;
 }
 
+/**
+ * Handle the saving of templates
+ * When a user saves a template they have the option
+ * to save each field as-is, or create new fields in contentful
+ * when they load the template the next time.
+ */
 function TemplateCreatorDialog() {
   const sdk = useContext(SDKContext);
 
@@ -46,11 +64,23 @@ function TemplateCreatorDialog() {
   const handleRadioChange = (event) => {
     const input = event.target;
 
+    const id = input.getAttribute('data-id');
+    const reftype = input.getAttribute('data-reftype');
+
     setTemplateOptions({
       ...templateOptions,
       [input.getAttribute('data-id')]: {
-        id: input.getAttribute('data-id'),
-        reftype: input.getAttribute('data-reftype')
+        id,
+        reftype,
+
+        /**
+         * If the user selects "new" we need to create an entry of the same type as
+         * from the current template, but we'll remove values from fields etc.
+         *
+         * This will create a new content model in contentful
+         * If byRef is selected, then we'll simply link to the current entry
+         */
+        entry: reftype === 'new' ? cleanupEntry(entries.find((entry) => id === getId(entry))) : null
       }
     });
   };

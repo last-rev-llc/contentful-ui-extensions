@@ -1,18 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { get } from 'lodash/fp';
-import styled from 'styled-components';
-import { EntryCard as ContentfulCard } from '@contentful/forma-36-react-components';
-
-const CardStyle = styled(ContentfulCard)`
-  margin-top: 20px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border: 1px solid lightblue;
-  }
-
-  width: 100%;
-`;
+import { CardStyle } from './styles';
 
 export const getId = get('sys.id');
 export const getType = get('sys.contentType.sys.id');
@@ -31,5 +20,15 @@ function EntryCard({ item, onClick, ...props }) {
     />
   );
 }
+
+EntryCard.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  item: PropTypes.object.isRequired,
+  onClick: PropTypes.func
+};
+
+EntryCard.defaultProps = {
+  onClick: undefined
+};
 
 export default EntryCard;
