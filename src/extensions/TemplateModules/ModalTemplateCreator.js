@@ -15,9 +15,9 @@ import {
 
 import { SDKContext } from '../../context';
 
-import { getId, getTitle } from './EntryCard';
+import { getId, getTitle } from './CardEntry';
 import { ModalStyle } from './styles';
-import { getGlobalSettings } from './utils';
+import { getGlobalSettings, setGlobalTemplates } from './utils';
 
 function TemplateCreatorDialog() {
   const sdk = useContext(SDKContext);
@@ -48,7 +48,7 @@ function TemplateCreatorDialog() {
       options: templateOptions
     });
 
-    sdk.space.updateEntry(set(globalSettings, 'fields.templates.en-US', templates));
+    await setGlobalTemplates(sdk, templates);
     sdk.close({ templateName, templates });
   };
 
