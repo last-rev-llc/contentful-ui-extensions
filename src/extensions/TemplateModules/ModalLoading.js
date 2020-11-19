@@ -3,7 +3,7 @@ import { Heading, Spinner } from '@contentful/forma-36-react-components';
 
 import { ModalStyle } from './styles';
 
-function ErrorModal() {
+function ModalLoading() {
   return (
     <ModalStyle title="Loading" className="loader">
       <Heading>Loading your entries</Heading>
@@ -14,4 +14,4 @@ function ErrorModal() {
   );
 }
 
-export default ErrorModal;
+export default ModalLoading;
