@@ -63,6 +63,11 @@ function TemplateModules({ sdk }) {
 
   const addItem = ({ item } = {}) => item && setEntries(entries.concat(item));
 
+  const selectTemplate = async ({ id, entries: templateEntries }) => {
+    const resolvedEntries = await Promise.all(templateEntries.map(({ id }) => sdk.space.getEntry(id)));
+    setEntries(resolvedEntries);
+  };
+
   const moveToPosition = (entryId, position) => {
     const found = entries.find((item) => entryId === getId(item));
     const toUpdate = entries.filter((item) => entryId !== getId(item));
@@ -131,11 +136,11 @@ function TemplateModules({ sdk }) {
           <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
           <span>Add content</span>
         </ContentButton>
-        <ContentButton onClick={() => showModal('ModalTemplateCreator', { entries }).then(addItem)}>
+        <ContentButton onClick={() => showModal('ModalTemplateCreator', { entries })}>
           <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
           <span>Save as template</span>
         </ContentButton>
-        <ContentButton onClick={() => showModal('ModalTemplateSelector').then(addItem)}>
+        <ContentButton onClick={() => showModal('ModalTemplateSelector').then(selectTemplate)}>
           <IconButton label="Add content" buttonType="primary" iconProps={{ icon: 'PlusCircle', size: 'small' }} />
           <span>Load from template</span>
         </ContentButton>

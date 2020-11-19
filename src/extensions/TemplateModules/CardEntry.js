@@ -19,10 +19,11 @@ export const getType = get('sys.contentType.sys.id');
 export const getTitle = get('fields.title.en-US');
 export const isPublished = get('sys.publishedCounter');
 
-function EntryCard({ item, onClick }) {
+function EntryCard({ item, onClick, ...props }) {
   return (
     <CardStyle
-      key={getId(item)}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
       onClick={onClick}
       contentType={getType(item)}
       title={getTitle(item)}

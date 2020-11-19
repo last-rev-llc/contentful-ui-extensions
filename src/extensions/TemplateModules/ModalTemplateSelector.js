@@ -22,7 +22,7 @@ function ModalTemplateSelector() {
   if (error) return <ModalError />;
   if (loading) return <ModalLoading />;
 
-  const handleItemSelect = (item) => () => sdk.close({});
+  const handleItemSelect = (item) => () => sdk.close(item);
   const handleItemRemove = (indexToRemove) => {
     const filteredTemplates = templates.filter((_, index) => index !== indexToRemove);
 
@@ -40,21 +40,21 @@ function ModalTemplateSelector() {
       <Heading>Load entries from template</Heading>
       <div>
         {isEmpty(templates) && <CardNothing type="template" />}
-        {templates.map(({ name, refs = [] }, index) => {
+        {templates.map((item, index) => {
+          const { name, entries = [] } = item;
           return (
             <TemplateCard
               key={name}
               contentType="template"
               title={name}
               status="published"
-              description={`${refs.length} content entries`}
+              onClick={handleItemSelect(item)}
+              description={`${entries.length} content entries`}
               dropdownListElements={
-                <>
-                  <DropdownList>
-                    <DropdownListItem isTitle>Actions</DropdownListItem>
-                    <DropdownListItem onClick={() => handleItemRemove(index)}>Remove</DropdownListItem>
-                  </DropdownList>
-                </>
+                <DropdownList>
+                  <DropdownListItem isTitle>Actions</DropdownListItem>
+                  <DropdownListItem onClick={() => handleItemRemove(index)}>Remove</DropdownListItem>
+                </DropdownList>
               }
             />
           );
