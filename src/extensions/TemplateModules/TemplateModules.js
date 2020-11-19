@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { CardDragHandle, DropdownList, DropdownListItem, IconButton } from '@contentful/forma-36-react-components';
 
-import EntryCard, { getId } from './CardEntry';
+import EntryCard, { getId, getType } from './CardEntry';
 import ModalEntitySelector from './ModalEntitySelector';
 import ModalTemplateCreator from './ModalTemplateCreator';
 import ModalTemplateSelector from './ModalTemplateSelector';
@@ -17,25 +17,58 @@ function getModal(sdk) {
   return modal;
 }
 
+function buildEntryStub(id) {
+  return {
+    sys: {
+      id,
+      type: 'Link',
+      linkType: 'Entry'
+    }
+  };
+}
+
+function buildEntryStubs(entries) {
+  return entries.map(getId).map(buildEntryStub);
+}
+
 function TemplateModules({ sdk }) {
   const [loading, setLoading] = useState(false);
+  const [entryStubs, setEntryStubs] = useState([]);
   const [entries, setEntries] = useState([]);
 
+  const handleSetEntries = (newEntries) => {
+    // sdk.field.setValue(buildEntryStubs(newEntries));
+    setEntries(newEntries);
+  };
+
   /**
-   * Loading and saving our entry to & from contentful
+   * Loading and saving our entry references to & from contentful
+   * These should be an array of string Ids
    */
   useEffect(() => {
     if (sdk.field && sdk.field.getValue()) {
-      setEntries(sdk.field.getValue());
+      setEntryStubs(sdk.field.getValue());
     } else {
-      setEntries([]);
+      setEntryStubs([]);
     }
   }, [sdk.field]);
 
-  const handleSetEntries = (newEntries) => {
-    sdk.field.setValue(newEntries);
-    setEntries(newEntries);
-  };
+  /**
+   * Loading the actual entries from contentful so that we
+   * can display them in a list
+   */
+  useEffect(() => {
+    setLoading(true);
+    Promise.all(
+      entries.map((entryId) =>
+        // If we have an entry the user selected "new" for this entry type
+        // otherwise we'll fetch from the current entry from the server
+        sdk.space.getEntry(entryId)
+      )
+    )
+      .then(setEntries)
+      .then(() => setLoading(false));
+  }, [entryStubs]);
 
   /**
    * Add or remove entries from the current template
@@ -47,23 +80,31 @@ function TemplateModules({ sdk }) {
    * When the user selects a template from the templateSelectorModal
    * we'll update the current entries to match that of the template
    */
-  const selectTemplate = async ({ entries: templateEntries } = {}) => {
+  const selectTemplate = async ({ entries: templateEntries = [] } = {}) => {
     if (!entries) {
       handleSetEntries([]);
       return;
     }
 
-    setLoading(true);
-    Promise.all(
-      templateEntries.map(
-        ({ id, entry }) =>
-          // If we have an entry the user selected "new" for this entry type
-          // otherwise we'll fetch from the current entry from the server
-          entry || sdk.space.getEntry(id)
-      )
-    )
-      .then(handleSetEntries)
-      .then(() => setLoading(false));
+    const resolvedEntries = await Promise.all(
+      templateEntries.map(({ entry, id }) => {
+        if (entry) {
+          // Create a new entry in contentful with the data
+          // we extracted from the template (entry)
+          return sdk.space.createEntry(getType(entry), { fields: entry.fields });
+        }
+
+        // We have no entry, which means we're always asking
+        // for the Entry by reference, Resolving to JSON Entry now
+        return sdk.space.getEntry(id);
+      })
+    ).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      sdk.field.setValue([]);
+    });
+
+    handleSetEntries(resolvedEntries);
   };
 
   /**
@@ -158,7 +199,8 @@ function TemplateModules({ sdk }) {
 TemplateModules.propTypes = {
   sdk: PropTypes.shape({
     space: PropTypes.shape({
-      getEntry: PropTypes.func
+      getEntry: PropTypes.func,
+      createEntry: PropTypes.func
     }),
     ids: PropTypes.shape({
       extension: PropTypes.string

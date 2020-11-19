@@ -1,8 +1,5 @@
 import { set, get } from 'lodash';
 
-// TODO: Make this an instance variable
-export const GLOBALSETTINGS_ID = '6AODsEr22eGLqXlvSEyJb3';
-
 export async function getGlobalSettings(sdk) {
   const result = await sdk.space.getEntries({ content_type: 'globalSettings' });
 
@@ -20,8 +17,6 @@ export async function getGlobalTemplates(sdk) {
 
 export async function setGlobalTemplates(sdk, templates) {
   const globalSettings = await getGlobalSettings(sdk);
-  console.log(templates);
   sdk.space.updateEntry(set(globalSettings, 'fields.templates.en-US', templates));
-
   return templates;
 }
