@@ -5,8 +5,8 @@ import { CardStyle } from './styles';
 
 export const getId = get('sys.id');
 export const getType = get('sys.contentType.sys.id');
-export const getTitle = get('fields.title.en-US');
 export const isPublished = get('sys.publishedCounter');
+export const getTitle = (item) => get('fields.internalTitle.en-US', item) || get('fields.title.en-US', item);
 
 function CardEntry({ item, onClick, ...props }) {
   return (

@@ -125,6 +125,7 @@ export const ContentButton = styled.span`
 `;
 
 export const CardStyle = styled(ContentfulCard)`
+  user-select: none;
   margin-top: 20px;
   transition: all 0.2s ease;
 
