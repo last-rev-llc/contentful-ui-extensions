@@ -8,11 +8,11 @@ import { getIconButton } from '../../shared/helpers';
 const removeEmptyKeys = pickBy((value) => [undefined, null, false].includes(value) === false);
 
 function StepList({ sdk }) {
-  const [steps, setSteps] = useState([]);
+  const [steps, setSteps] = useState([{}]);
 
   useEffect(() => {
     if (sdk.field.getValue()) {
-      setSteps(sdk.field.getValue());
+      setSteps(sdk.field.getValue() || [{}]);
     }
   }, [sdk.field]);
 

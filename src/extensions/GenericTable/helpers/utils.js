@@ -6,7 +6,7 @@ export const alphabeticalKeys = flow(Object.keys, alphabetical);
 export const withoutId = omit(['id']);
 
 export function sortedKeys(step) {
-  const toReturn = ['title'];
+  const toReturn = [];
 
   alphabeticalKeys(step)
     .filter((key) => toReturn.includes(key) === false)

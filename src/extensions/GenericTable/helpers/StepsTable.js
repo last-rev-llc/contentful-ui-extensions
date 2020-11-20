@@ -21,7 +21,7 @@ function useEditable(defaultValue = '') {
 }
 
 function TableHeaderCell({ children, colRemove, isEditing, setFieldName }) {
-  const canEdit = ['title'].includes(children) === false;
+  const canEdit = [].includes(children) === false;
 
   if (canEdit && isEditing)
     return (

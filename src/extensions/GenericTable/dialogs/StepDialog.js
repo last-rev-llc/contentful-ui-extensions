@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
-import { Button, Form, FieldGroup } from '@contentful/forma-36-react-components';
-import { getTextAreaWithLabel, withoutId } from '../helpers';
-import { getTextField } from '../../../shared/helpers';
+import { TextField, Button, Form, FieldGroup } from '@contentful/forma-36-react-components';
+import { withoutId, alphabeticalKeys } from '../helpers';
 
 const ButtonGroupStyle = styled.div`
   display: flex;
@@ -16,15 +15,13 @@ const ButtonGroupStyle = styled.div`
 `;
 
 function StepDialog({ sdk }) {
-  const [title, setTitle] = useState('');
   const [fields, setFields] = useState('');
-  const [titleErrorMessage, setTitleErrorMessage] = useState('');
 
   const setFieldsFromStep = (currentStep = {}, onlyKey = false) => {
     const toSet = {};
     Object.keys(currentStep).forEach((key) => {
       // Our built in keys
-      if (['title'].includes(key)) return;
+      if ([].includes(key)) return;
 
       toSet[key] = onlyKey ? '' : currentStep[key] || '';
     });
@@ -36,7 +33,6 @@ function StepDialog({ sdk }) {
 
     if (currentStep) {
       setFieldsFromStep(currentStep);
-      setTitle(currentStep.title);
     } else if (steps) {
       setFieldsFromStep(steps[0], true);
     }
@@ -48,17 +44,11 @@ function StepDialog({ sdk }) {
 
   const saveStep = () => {
     const { steps = [] } = sdk.parameters.invocation;
-    const errorMessage = 'This item is required';
-    if (title) {
-      sdk.close({
-        // ID will be overriden if we're updating a step
-        id: `${steps.length}-${uuidv4()}`,
-        title,
-        ...fields
-      });
-    } else {
-      setTitleErrorMessage(!title ? errorMessage : '');
-    }
+    sdk.close({
+      // ID will be overriden if we're updating a step
+      id: `${steps.length}-${uuidv4()}`,
+      ...fields
+    });
   };
 
   const setField = (name, value) => setFields({ ...fields, [name]: value });
@@ -66,28 +56,26 @@ function StepDialog({ sdk }) {
   return (
     <div id="dialog-step-wrap" data-testid="StepDialog">
       <Form spacing="default" data-testid="StepDialog-Form">
-        <FieldGroup>
-          {getTextField(title, (event) => setTitle(event.currentTarget.value), titleErrorMessage, {
-            id: 'title',
-            labelText: 'Title',
-            required: true
-          })}
-        </FieldGroup>
-        {Object.entries(withoutId(fields)).map(([key, value]) => (
+        {alphabeticalKeys(withoutId(fields)).map((key) => (
           <FieldGroup key={key}>
-            {getTextAreaWithLabel(value, key, (event) => setField(key, event.currentTarget.value))}
+            <TextField
+              className=""
+              id="title"
+              name="title"
+              labelText={key}
+              placeholder="Title"
+              onChange={(event) => setField(key, event.currentTarget.value)}
+              testId="cf-ui-text-input-title"
+              value={fields[key]}
+              width="full"
+            />
           </FieldGroup>
         ))}
         <ButtonGroupStyle>
           <Button buttonType="negative" isFullWidth={false} onClick={closeDialog} type="button">
             Cancel
           </Button>
-          <Button
-            buttonType="positive"
-            isFullWidth={false}
-            disabled={title.length < 1}
-            onClick={saveStep}
-            type="button">
+          <Button buttonType="positive" isFullWidth={false} onClick={saveStep} type="button">
             Save
           </Button>
         </ButtonGroupStyle>
