@@ -1,15 +1,7 @@
 import React from 'react';
-import {
-  Textarea,
-  TextInput,
-  Table,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableRow,
-  FormLabel
-} from '@contentful/forma-36-react-components';
+import { Textarea, TextInput, TableCell, TableRow, FormLabel } from '@contentful/forma-36-react-components';
 import { getIconButton } from '../../../shared/helpers';
+import { sortedKeys, withoutId } from './utils';
 
 const getTextArea = (textValue, onChange) => {
   return (
@@ -96,39 +88,19 @@ const getTextInputWithLabel = (
 
 const getStepRows = (steps, edit, remove) => {
   return steps
-    .sort((stepA, stepB) => stepA.step - stepB.step)
-    .map((step, index) => {
-      const keyId = index;
-      return (
-        <TableRow key={keyId}>
-          <TableCell>{step.step}</TableCell>
-          <TableCell>{step.title}</TableCell>
-          <TableCell>{step.body}</TableCell>
-          <TableCell className="col-actions">
-            {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
-            {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
-          </TableCell>
-        </TableRow>
-      );
-    });
+    .filter(({ disabled }) => !disabled)
+    .sort((stepA, stepB) => stepA.id - stepB.id)
+    .map((step, index) => (
+      <TableRow key={step.id}>
+        {sortedKeys(withoutId(step)).map((key) => (
+          <TableCell key={`${step.id}-${key}`}>{step[key]}</TableCell>
+        ))}
+        <TableCell className="col-actions">
+          {getIconButton('Click to edit this row', 'muted', 'Edit', 'medium', () => edit(index))}
+          {getIconButton('Click to remove this row', 'negative', 'Delete', 'medium', () => remove(index))}
+        </TableCell>
+      </TableRow>
+    ));
 };
 
-const getStepsTable = (steps, edit, remove) => {
-  return steps.length === 0 ? null : (
-    <>
-      <Table className="steps-table">
-        <TableHead isSticky>
-          <TableRow>
-            <TableCell>Step Number</TableCell>
-            <TableCell>Title</TableCell>
-            <TableCell>Body</TableCell>
-            <TableCell className="col-actions" />
-          </TableRow>
-        </TableHead>
-        <TableBody>{getStepRows(steps, edit, remove)}</TableBody>
-      </Table>
-    </>
-  );
-};
-
-export { getTextInput, getTextInputWithLabel, getTextArea, getTextAreaWithLabel, getStepRows, getStepsTable };
+export { getTextInput, getTextInputWithLabel, getTextArea, getTextAreaWithLabel, getStepRows };

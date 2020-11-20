@@ -7,11 +7,4 @@ import {
   getStepsTable
 } from './formControl';
 
-export {
-  getTextInput,
-  getTextInputWithLabel,
-  getTextArea,
-  getTextAreaWithLabel,
-  getStepRows,
-  getStepsTable
-};
+export { getTextInput, getTextInputWithLabel, getTextArea, getTextAreaWithLabel, getStepRows, getStepsTable };

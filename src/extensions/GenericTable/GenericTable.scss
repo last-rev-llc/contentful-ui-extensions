@@ -1,0 +1,46 @@
+#add-table-row-wrap {
+    margin-top: 1rem;
+}
+
+table.steps-table {
+    margin-top: 1rem;
+
+    tr {
+        td {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            vertical-align: middle;
+
+            &.col-actions {
+                width: 1%;
+                white-space: nowrap;
+                
+                * {
+                    visibility: hidden;
+                }
+            }
+        }
+
+        &:hover {
+            td.col-actions {
+                * {
+                    visibility: visible;
+                }
+            }
+        }
+    }
+
+    th {
+        font-weight: bold;
+    }
+}
+
+#dialog-step-wrap {
+  margin: 2rem;
+}
+
+#form-actions-row {
+    * {
+        text-align: center;
+    }
+}
