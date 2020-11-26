@@ -7,14 +7,7 @@ import SetupForm from './SetupForm';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import SetupStep from './SetupStep';
 import './FormBuilder.scss';
-
-function buildStep(title = 'Step title') {
-  return {
-    title,
-    fields: [],
-    id: uuidv4()
-  };
-}
+import { buildStep } from './utils';
 
 function useFormConfig({ title = '', type = 'custom' }) {
   const [values, setValues] = useState({ title: '', type: 'custom' });
