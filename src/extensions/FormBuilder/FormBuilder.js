@@ -33,13 +33,21 @@ function useFormSteps(initialSteps = []) {
     // Filter out old step by ID
     setSteps((oldSteps) => oldSteps.filter(({ id }) => id !== idToRemove));
 
-  const stepEdit = (stepUpdates) =>
+  const stepEdit = (stepId, stepUpdates) =>
     setSteps((oldSteps) =>
-      oldSteps.map((step) =>
+      oldSteps.map((step) => {
         // If matching ID found replace the step, else return old step
         // We should pass the entire new step here to update
-        step.id === stepUpdates.id ? stepUpdates : step
-      )
+        if (step.id !== stepId) return step;
+
+        // Allow the user to specify their own step updater function
+        if (stepUpdates instanceof Function) {
+          return stepUpdates(step);
+        }
+
+        // User has simply passed us an object to replace the step with
+        return stepUpdates;
+      })
     );
 
   return {

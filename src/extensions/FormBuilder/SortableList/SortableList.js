@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { CardDragHandle, Heading, List, Card, Button, Paragraph } from '@contentful/forma-36-react-components';
+import { curry } from 'lodash/fp';
+import { CardDragHandle, List, Card, IconButton, Paragraph } from '@contentful/forma-36-react-components';
 
 import { sortableContainer, sortableElement, sortableHandle } from 'react-sortable-hoc';
 
@@ -31,7 +32,7 @@ const ChildrenStyle = styled(Card)`
   display: flex;
   flex-direction: column;
 
-  display: ${({ shown }) => (shown ? 'block' : 'none')};
+  display: ${({ $shown: isShown }) => (isShown ? 'block' : 'none')};
 `;
 
 function hasSomeChildren(children) {
@@ -40,29 +41,45 @@ function hasSomeChildren(children) {
   return !!children;
 }
 
-const SortableItem = sortableElement(({ title, onRemoveItem, onEditItem, children }) => {
-  const [childrenShown, setChildrenShown] = useState(false);
-
+const SortableItem = sortableElement(({ item, onClickEdit, onRemoveItem, onEditItem, children, renderItem }) => {
+  const [childrenShown, setChildrenShown] = useState(true);
   const toggleChildren = () => setChildrenShown((prev) => !prev);
+
+  const withoutPropagation = curry((func, event) => {
+    event.stopPropagation();
+    func(event);
+  });
+
+  const handleClick = (event) => (onClickEdit ? onEditItem(event) : toggleChildren());
 
   return (
     <>
-      <ItemStyle onClick={toggleChildren}>
+      <ItemStyle onClick={handleClick}>
         <DragHandle />
         <div className="card-item-content">
           <div className="card-item-title">
-            <Paragraph element="p">{title}</Paragraph>
+            {renderItem && renderItem(item)}
+            {!renderItem && <Paragraph element="p">{item.title || item.name}</Paragraph>}
           </div>
-          <Button size="small" className="card-item-button" onClick={onEditItem}>
-            Edit
-          </Button>
-          <Button buttonType="negative" size="small" className="card-item-button" onClick={onRemoveItem}>
-            Delete
-          </Button>
+          {!onClickEdit && (
+            <IconButton
+              size="small"
+              className="card-item-button"
+              iconProps={{ icon: 'Edit' }}
+              onClick={withoutPropagation(onEditItem)}
+            />
+          )}
+          <IconButton
+            buttonType="negative"
+            size="small"
+            className="card-item-button"
+            iconProps={{ icon: 'Delete' }}
+            onClick={withoutPropagation(onRemoveItem)}
+          />
         </div>
       </ItemStyle>
 
-      <ChildrenStyle shown={childrenShown && hasSomeChildren(children)}>{children}</ChildrenStyle>
+      <ChildrenStyle $shown={childrenShown && hasSomeChildren(children)}>{children}</ChildrenStyle>
     </>
   );
 });
@@ -72,15 +89,17 @@ const SortableContainer = sortableContainer(({ children }) => (
   <List className="sortable-list">{children}</List>
 ));
 
-function SortableList({ items, onSortEnd, onRemoveItem, onEditItem, children }) {
+function SortableList({ items, onSortEnd, onClickEdit, onRemoveItem, onEditItem, children, renderItem }) {
   return (
     <div className="sortable-list">
       <SortableContainer onSortEnd={onSortEnd} useDragHandle>
         {items.map((item, index) => (
           <SortableItem
             key={`item-${item.id}`}
+            item={item}
             index={index}
-            title={item.title}
+            renderItem={renderItem}
+            onClickEdit={onClickEdit}
             onEditItem={() => onEditItem(item)}
             onRemoveItem={() => onRemoveItem(item)}>
             {children instanceof Function && children(item)}
@@ -95,17 +114,22 @@ SortableList.propTypes = {
   items: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired
+      title: PropTypes.string, // either title or name
+      name: PropTypes.string
     })
   ).isRequired,
   onSortEnd: PropTypes.func.isRequired,
   onRemoveItem: PropTypes.func.isRequired,
+  onClickEdit: PropTypes.bool,
   onEditItem: PropTypes.func.isRequired,
-  children: PropTypes.func
+  children: PropTypes.func,
+  renderItem: PropTypes.func
 };
 
 SortableList.defaultProps = {
-  children: null
+  children: null,
+  renderItem: null,
+  onClickEdit: false
 };
 
 export default SortableList;

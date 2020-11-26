@@ -42,7 +42,7 @@ import formBuilderMockSdk from './FormBuilder/mockSdk';
 import BynderImage from './BynderImage';
 import { createMockSDK } from './BynderImage/mockSdk';
 
-import { SDKContext } from '../contexts';
+import { SDKContext } from '../context';
 
 import '@contentful/forma-36-react-components/dist/styles.css';
 import '@contentful/forma-36-fcss/dist/styles.css';
