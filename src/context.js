@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 export const SDKContext = React.createContext({});
 
-export default { SDKContext };
+export const useSDK = () => useContext(SDKContext);
+
+export default { SDKContext, useSDK };
