@@ -1,108 +1,90 @@
-import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import arrayMove from "array-move";
-import CreateForm from "./CreateForm";
-import SetupForm from "./SetupForm";
-import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
-import SetupStep from "./SetupStep";
-import "./FormBuilder.scss";
+import React, { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { merge } from 'lodash/fp';
+import arrayMove from 'array-move';
+import CreateForm from './CreateForm';
+import SetupForm from './SetupForm';
+import ConfirmDeleteDialog from './ConfirmDeleteDialog';
+import SetupStep from './SetupStep';
+import './FormBuilder.scss';
 
-const FormBuilder = () => {
-  const [values, setValues] = useState({
-    name: "",
-    type: "custom",
-    steps: [
-      {
-        id: uuidv4(),
-        title: "Step 1",
-        fields: [
-          { id: uuidv4(), title: "Field 1" },
-          { id: uuidv4(), title: "Field 2" },
-        ],
-      },
-      { id: uuidv4(), title: "Step 2", fields: [] },
-    ],
-  });
-  const [removeStep, setRemoveStep] = useState();
-  const [setupStep, setSetupStep] = useState();
-
-  const handleChange = (field) => (event) => {
-    const { value } = event.target;
-    setValues((prev) => ({ ...prev, [field]: value }));
+function buildStep(title = 'Step title') {
+  return {
+    title,
+    fields: [],
+    id: uuidv4()
   };
+}
 
-  const handleAddStep = () => {
-    setValues((prev) => ({
-      ...prev,
-      steps: [
-        ...prev.steps,
-        {
-          id: uuidv4(),
-          title: `New Step ${prev.steps.length + 1}`,
-          fields: [],
-        },
-      ],
-    }));
+function useFormConfig({ title = '', type = 'custom' }) {
+  const [values, setValues] = useState({ title: '', type: 'custom' });
+
+  return {
+    type: values.type,
+    title: values.title,
+    setType: (newTitle) => setValues((oldValues) => merge(oldValues)({ type: newTitle })),
+    setTitle: (newTitle) => setValues((oldValues) => merge(oldValues)({ title: newTitle }))
   };
+}
 
-  const handleOpenConfirmRemoveStep = (step) => () => setRemoveStep(step);
+function useFormSteps(initialSteps = []) {
+  const [steps, setSteps] = useState(initialSteps);
 
-  const handleCancelRemoveStep = () => setRemoveStep();
+  const stepAdd = () =>
+    setSteps((oldSteps) =>
+      // Generate a new empty step
+      oldSteps.concat(buildStep(`New Step ${steps.length + 1}`))
+    );
 
-  const handleRemoveStep = () => {
-    if (removeStep) {
-      setValues((prev) => ({
-        ...prev,
-        steps: prev.steps.filter((o) => o.id !== removeStep.id),
-      }));
-      handleCancelRemoveStep();
-    }
+  const stepRemove = ({ id: idToRemove }) =>
+    // Filter out old step by ID
+    setSteps((oldSteps) => oldSteps.filter(({ id }) => id !== idToRemove));
+
+  const stepEdit = (stepUpdates) =>
+    setSteps((oldSteps) =>
+      oldSteps.map((step) =>
+        // If matching ID found replace the step, else return old step
+        // We should pass the entire new step here to update
+        step.id === stepUpdates.id ? stepUpdates : step
+      )
+    );
+
+  return {
+    steps,
+    stepAdd,
+    stepEdit,
+    stepRemove
   };
+}
 
-  const handleSortEnd = ({ oldIndex, newIndex }) => {
-    setValues((prev) => ({
-      ...prev,
-      steps: arrayMove(prev.steps, oldIndex, newIndex),
-    }));
-  };
+function FormBuilder() {
+  // const handleSortEnd = ({ oldIndex, newIndex }) => {
+  //   setValues((prev) => ({
+  //     ...prev,
+  //     steps: arrayMove(prev.steps, oldIndex, newIndex)
+  //   }));
+  // };
 
-  const handleOpenSetupStep = (step) => () => setSetupStep(step);
-
-  const handleCloseSetupStep = () => setSetupStep();
-
-  const handleStepSubmit = (step) => {
-    console.log(step);
-  };
-
-  const handleSubmit = () => {};
+  const { steps, stepAdd, stepEdit, stepRemove } = useFormSteps([
+    //
+    buildStep('First step'),
+    buildStep('Second step')
+  ]);
 
   return (
     <div>
-      <CreateForm
-        type={values.type}
-        name={values.name}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-      />
+      {/* <CreateForm type={values.type} title={values.title} onChange={handleChange} onSubmit={handleSubmit} /> */}
       <SetupForm
-        steps={values.steps}
-        onAddStep={handleAddStep}
-        onRemoveStep={handleOpenConfirmRemoveStep}
-        onEditStep={handleOpenSetupStep}
-        onSortEnd={handleSortEnd}
+        steps={steps}
+        stepAdd={stepAdd}
+        stepEdit={stepEdit}
+        // stepSort={handleSortEnd}
+        stepRemove={stepRemove}
       />
-      <ConfirmDeleteDialog
-        item={removeStep}
-        onClose={handleCancelRemoveStep}
-        onSubmit={handleRemoveStep}
-      />
-      <SetupStep
-        step={setupStep}
-        onClose={handleCloseSetupStep}
-        onSubmit={handleStepSubmit}
-      />
+      {/* <ConfirmDeleteDialog item={removeStep} onClose={handleCancelRemoveStep} onSubmit={handleRemoveStep} /> */}
+      {/* <SetupStep step={setupStep} onClose={handleCloseSetupStep} onSubmit={handleStepSubmit} /> */}
     </div>
   );
-};
+}
 
 export default FormBuilder;
