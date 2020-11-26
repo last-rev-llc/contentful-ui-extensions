@@ -22,6 +22,7 @@ import FormStack from './FormStack';
 import SeoConfig from './Seo/SeoConfig';
 import ExtensionsList from './ExtensionsList';
 import FormBuilder from './FormBuilder';
+
 import history from '../history';
 
 import addressMockSdk from './Address/mockSdk';
@@ -40,6 +41,8 @@ import formStackMockSdk from './FormStack/mockSdk';
 import formBuilderMockSdk from './FormBuilder/mockSdk';
 import BynderImage from './BynderImage';
 import { createMockSDK } from './BynderImage/mockSdk';
+
+import { SDKContext } from '../contexts';
 
 import '@contentful/forma-36-react-components/dist/styles.css';
 import '@contentful/forma-36-fcss/dist/styles.css';
