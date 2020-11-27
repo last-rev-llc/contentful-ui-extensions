@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export function buildField({ type = 'hidden', value = 'test' } = {}) {
+export function buildField({ name = 'name', type = 'hidden', value = 'test' } = {}) {
   return {
     id: uuidv4(),
     type,
-    value,
-    name: 'name'
+    name,
+    value
   };
 }
 
@@ -15,8 +15,8 @@ export function buildStep(title = 'Step title') {
     id: uuidv4(),
     fields: [
       //
-      buildField(),
-      buildField()
+      buildField({ name: 'First field' }),
+      buildField({ name: 'Second field' })
     ]
   };
 }
