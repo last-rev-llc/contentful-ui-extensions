@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import arrayMove from 'array-move';
 import PropTypes from 'prop-types';
 import { curry } from 'lodash/fp';
 import { Button, IconButton, SectionHeading } from '@contentful/forma-36-react-components';
@@ -36,12 +37,13 @@ function getModal(sdk) {
   return modal;
 }
 
-function SetupForm({ steps, stepAdd, stepRemove, stepEdit, onSortEnd }) {
+function SetupForm({ stepConfig }) {
+  const { steps, stepAdd, stepRemove, stepEdit, stepReorder } = stepConfig;
   const sdk = useSDK();
 
-  const handleFieldRemove = curry((id, field) =>
+  const handleFieldRemove = curry((stepId, field) =>
     stepEdit(
-      id,
+      stepId,
 
       // Filter out the step
       // we're passing a function to stepEdit which will give us
@@ -53,18 +55,23 @@ function SetupForm({ steps, stepAdd, stepRemove, stepEdit, onSortEnd }) {
     )
   );
 
-  const handleFieldAdd = curry((id, _event) =>
-    stepEdit(id, (oldStep) => ({
+  const handleFieldAdd = curry((stepId, _event) =>
+    stepEdit(stepId, (oldStep) => ({
       ...oldStep,
       fields: oldStep.fields.concat(buildField())
     }))
   );
 
-  const handleFieldUpdate = curry((id, newField) =>
-    stepEdit(id, (oldStep) => ({
+  const handleFieldUpdate = curry((stepId, newField) =>
+    stepEdit(stepId, (oldStep) => ({
       ...oldStep,
       fields: oldStep.fields.map((field) => (field.id === newField.id ? newField : field))
     }))
+  );
+
+  const fieldReorder = curry((stepId, { oldIndex, newIndex }) =>
+    // Move the item to position requested
+    stepEdit(stepId, (step) => ({ ...step, fields: arrayMove(step.fields, oldIndex, newIndex) }))
   );
 
   const showModal = curry((modalName, parameters) =>
@@ -93,12 +100,13 @@ function SetupForm({ steps, stepAdd, stepRemove, stepEdit, onSortEnd }) {
     <SectionWrapper title="Setup Form">
       <div className="setup-form">
         <SectionHeading className="title">Steps</SectionHeading>
-        <SortableList items={steps} onSortEnd={onSortEnd} onRemoveItem={stepRemove} onEditItem={stepEdit}>
+        <SortableList items={steps} onSortEnd={stepReorder} onRemoveItem={stepRemove} onEditItem={stepEdit}>
           {(step) => (
             <Col>
               <SortableList
                 onClickEdit
                 items={step.fields}
+                onSortEnd={fieldReorder(step.id)}
                 onEditItem={(field) =>
                   showModal('field-modal', field)
                     // When the user clicks save in the modal we'll get the new field back
@@ -134,16 +142,18 @@ function SetupForm({ steps, stepAdd, stepRemove, stepEdit, onSortEnd }) {
 }
 
 SetupForm.propTypes = {
-  steps: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  stepAdd: PropTypes.func.isRequired,
-  stepRemove: PropTypes.func.isRequired,
-  stepEdit: PropTypes.func.isRequired,
-  onSortEnd: PropTypes.func.isRequired
+  stepConfig: PropTypes.shape({
+    steps: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired
+      })
+    ),
+    stepAdd: PropTypes.func,
+    stepRemove: PropTypes.func,
+    stepEdit: PropTypes.func,
+    stepReorder: PropTypes.func
+  }).isRequired
 };
 
 SetupForm.defaultProps = {};

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { merge } from 'lodash/fp';
+import arrayMove from 'array-move';
+
 import SetupForm from './SetupForm';
 import './FormBuilder.scss';
 import { buildStep } from './utils';
@@ -10,7 +12,7 @@ function useFormConfig({ title = '', type = 'custom' }) {
   return {
     type: values.type,
     title: values.title,
-    setType: (newTitle) => setValues((oldValues) => merge(oldValues)({ type: newTitle })),
+    setType: (newType) => setValues((oldValues) => merge(oldValues)({ type: newType })),
     setTitle: (newTitle) => setValues((oldValues) => merge(oldValues)({ title: newTitle }))
   };
 }
@@ -45,23 +47,21 @@ function useFormSteps(initialSteps = []) {
       })
     );
 
+  const stepReorder = ({ oldIndex, newIndex }) =>
+    // Move the item to position requested
+    setSteps((oldSteps) => arrayMove(oldSteps, oldIndex, newIndex));
+
   return {
     steps,
     stepAdd,
     stepEdit,
-    stepRemove
+    stepRemove,
+    stepReorder
   };
 }
 
 function FormBuilder() {
-  // const handleSortEnd = ({ oldIndex, newIndex }) => {
-  //   setValues((prev) => ({
-  //     ...prev,
-  //     steps: arrayMove(prev.steps, oldIndex, newIndex)
-  //   }));
-  // };
-
-  const { steps, stepAdd, stepEdit, stepRemove } = useFormSteps([
+  const stepConfig = useFormSteps([
     //
     buildStep('First step'),
     buildStep('Second step')
@@ -70,13 +70,7 @@ function FormBuilder() {
   return (
     <div>
       {/* <CreateForm type={values.type} title={values.title} onChange={handleChange} onSubmit={handleSubmit} /> */}
-      <SetupForm
-        steps={steps}
-        stepAdd={stepAdd}
-        stepEdit={stepEdit}
-        // stepSort={handleSortEnd}
-        stepRemove={stepRemove}
-      />
+      <SetupForm stepConfig={stepConfig} />
       {/* <ConfirmDeleteDialog item={removeStep} onClose={handleCancelRemoveStep} onSubmit={handleRemoveStep} /> */}
       {/* <SetupStep step={setupStep} onClose={handleCloseSetupStep} onSubmit={handleStepSubmit} /> */}
     </div>
