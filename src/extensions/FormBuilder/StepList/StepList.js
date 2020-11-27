@@ -37,11 +37,8 @@ function getModal(sdk) {
   return modal;
 }
 
-function SetupForm({ stepConfig }) {
-  const { steps, stepAdd, stepRemove, stepEdit, stepReorder } = stepConfig;
-  const sdk = useSDK();
-
-  const handleFieldRemove = curry((stepId, field) =>
+function useFieldsConfig(stepEdit) {
+  const fieldRemove = curry((stepId, field) =>
     stepEdit(
       stepId,
 
@@ -55,14 +52,14 @@ function SetupForm({ stepConfig }) {
     )
   );
 
-  const handleFieldAdd = curry((stepId, _event) =>
+  const fieldAdd = curry((stepId, _event) =>
     stepEdit(stepId, (oldStep) => ({
       ...oldStep,
       fields: oldStep.fields.concat(buildField())
     }))
   );
 
-  const handleFieldUpdate = curry((stepId, newField) =>
+  const fieldUpdate = curry((stepId, newField) =>
     stepEdit(stepId, (oldStep) => ({
       ...oldStep,
       fields: oldStep.fields.map((field) => (field.id === newField.id ? newField : field))
@@ -73,6 +70,20 @@ function SetupForm({ stepConfig }) {
     // Move the item to position requested
     stepEdit(stepId, (step) => ({ ...step, fields: arrayMove(step.fields, oldIndex, newIndex) }))
   );
+
+  return {
+    fieldAdd,
+    fieldRemove,
+    fieldUpdate,
+    fieldReorder
+  };
+}
+
+function StepList({ stepConfig }) {
+  const sdk = useSDK();
+
+  const { steps, stepAdd, stepRemove, stepEdit, stepReorder } = stepConfig;
+  const { fieldAdd, fieldRemove, fieldUpdate, fieldReorder } = useFieldsConfig(stepEdit);
 
   const showModal = curry((modalName, parameters) =>
     sdk.dialogs.openExtension({
@@ -111,9 +122,9 @@ function SetupForm({ stepConfig }) {
                   showModal('field-modal', field)
                     // When the user clicks save in the modal we'll get the new field back
                     // orr null if the user clicks cancel
-                    .then(({ field: newField } = {}) => newField && handleFieldUpdate(step.id, newField))
+                    .then(({ field: newField } = {}) => newField && fieldUpdate(step.id, newField))
                 }
-                onRemoveItem={handleFieldRemove(step.id)}
+                onRemoveItem={fieldRemove(step.id)}
                 renderItem={(field) => (
                   <FieldDisplay>
                     <span>{field.name}</span>
@@ -125,7 +136,7 @@ function SetupForm({ stepConfig }) {
                 size="small"
                 buttonType="primary"
                 label="Hello"
-                onClick={handleFieldAdd(step.id)}
+                onClick={fieldAdd(step.id)}
                 iconProps={{ icon: 'PlusCircle' }}
               />
             </Col>
@@ -141,7 +152,7 @@ function SetupForm({ stepConfig }) {
   );
 }
 
-SetupForm.propTypes = {
+StepList.propTypes = {
   stepConfig: PropTypes.shape({
     steps: PropTypes.arrayOf(
       PropTypes.shape({
@@ -156,6 +167,6 @@ SetupForm.propTypes = {
   }).isRequired
 };
 
-SetupForm.defaultProps = {};
+StepList.defaultProps = {};
 
-export default SetupForm;
+export default StepList;

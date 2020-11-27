@@ -41,48 +41,50 @@ function hasSomeChildren(children) {
   return !!children;
 }
 
-const SortableItem = sortableElement(({ item, onClickEdit, onRemoveItem, onEditItem, children, renderItem }) => {
-  const [childrenShown, setChildrenShown] = useState(true);
-  const toggleChildren = () => setChildrenShown((prev) => !prev);
+const SortableItem = sortableElement(
+  ({ item, onClickEdit, onRemoveItem, onEditItem, children, renderItem, dragging }) => {
+    const [childrenShown, setChildrenShown] = useState(true);
+    const toggleChildren = () => setChildrenShown((prev) => !prev);
 
-  const withoutPropagation = curry((func, event) => {
-    event.stopPropagation();
-    func(event);
-  });
+    const withoutPropagation = curry((func, event) => {
+      event.stopPropagation();
+      func(event);
+    });
 
-  const handleClick = (event) => (onClickEdit ? onEditItem(event) : toggleChildren());
+    const handleClick = (event) => (onClickEdit ? onEditItem(event) : toggleChildren());
 
-  return (
-    <>
-      <ItemStyle onClick={handleClick}>
-        <DragHandle />
-        <div className="card-item-content">
-          <div className="card-item-title">
-            {renderItem && renderItem(item)}
-            {!renderItem && <Paragraph element="p">{item.title || item.name}</Paragraph>}
-          </div>
-          {!onClickEdit && (
+    return (
+      <>
+        <ItemStyle onClick={handleClick}>
+          <DragHandle />
+          <div className="card-item-content">
+            <div className="card-item-title">
+              {renderItem && renderItem(item)}
+              {!renderItem && <Paragraph element="p">{item.title || item.name}</Paragraph>}
+            </div>
+            {!onClickEdit && (
+              <IconButton
+                size="small"
+                className="card-item-button"
+                iconProps={{ icon: 'Edit' }}
+                onClick={withoutPropagation(onEditItem)}
+              />
+            )}
             <IconButton
+              buttonType="negative"
               size="small"
               className="card-item-button"
-              iconProps={{ icon: 'Edit' }}
-              onClick={withoutPropagation(onEditItem)}
+              iconProps={{ icon: 'Delete' }}
+              onClick={withoutPropagation(onRemoveItem)}
             />
-          )}
-          <IconButton
-            buttonType="negative"
-            size="small"
-            className="card-item-button"
-            iconProps={{ icon: 'Delete' }}
-            onClick={withoutPropagation(onRemoveItem)}
-          />
-        </div>
-      </ItemStyle>
+          </div>
+        </ItemStyle>
 
-      <ChildrenStyle $shown={childrenShown && hasSomeChildren(children)}>{children}</ChildrenStyle>
-    </>
-  );
-});
+        <ChildrenStyle $shown={!dragging && childrenShown && hasSomeChildren(children)}>{children}</ChildrenStyle>
+      </>
+    );
+  }
+);
 
 const SortableContainer = sortableContainer(({ children }) => (
   //
@@ -90,14 +92,23 @@ const SortableContainer = sortableContainer(({ children }) => (
 ));
 
 function SortableList({ items, onSortEnd, onClickEdit, onRemoveItem, onEditItem, children, renderItem }) {
+  const [dragging, setDragging] = useState(false);
+
   return (
     <div className="sortable-list">
-      <SortableContainer onSortEnd={onSortEnd} useDragHandle>
+      <SortableContainer
+        onSortEnd={(sortingData) => {
+          setDragging(false);
+          onSortEnd(sortingData);
+        }}
+        onSortStart={() => setDragging(true)}
+        useDragHandle>
         {items.map((item, index) => (
           <SortableItem
             key={`item-${item.id}`}
             item={item}
             index={index}
+            dragging={dragging}
             renderItem={renderItem}
             onClickEdit={onClickEdit}
             onEditItem={() => onEditItem(item)}
