@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { merge, curry } from 'lodash/fp';
-import { Card, Button, IconButton, SectionHeading } from '@contentful/forma-36-react-components';
+import { curry } from 'lodash/fp';
+import { Button, IconButton, SectionHeading } from '@contentful/forma-36-react-components';
 
 import FieldModal from './FieldModal';
 import SectionWrapper from '../SectionWrapper';
@@ -30,8 +30,6 @@ const FieldDisplay = styled.div`
 const TypeText = styled.span`
   color: #aaaaaa;
 `;
-
-const FieldCard = styled(Card)``;
 
 function getModal(sdk) {
   const { modal } = sdk.parameters.invocation || {};
@@ -105,7 +103,7 @@ function SetupForm({ steps, stepAdd, stepRemove, stepEdit, onSortEnd }) {
                   showModal('field-modal', field)
                     // When the user clicks save in the modal we'll get the new field back
                     // orr null if the user clicks cancel
-                    .then(({ field: newField }) => newField && handleFieldUpdate(step.id, newField))
+                    .then(({ field: newField } = {}) => newField && handleFieldUpdate(step.id, newField))
                 }
                 onRemoveItem={handleFieldRemove(step.id)}
                 renderItem={(field) => (
