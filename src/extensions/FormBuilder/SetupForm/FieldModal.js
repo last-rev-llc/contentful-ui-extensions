@@ -70,29 +70,37 @@ function hasValue(value) {
   return Boolean(value);
 }
 
-function denormalizeValues({ dependsOn, ...field }) {
+function safeParse(maybeJson) {
   let parsed;
   try {
-    parsed = JSON.parse(dependsOn);
+    parsed = JSON.parse(maybeJson);
 
     // We don't need to save empty dependsOn
     if (Object.keys(parsed).length < 1) {
-      parsed = undefined;
+      return undefined;
     }
+
+    return parsed;
   } catch (error) {
     // pass
-  }
 
+    return undefined;
+  }
+}
+
+function denormalizeValues({ dependsOn, dependsOnTest, ...field }) {
   return {
     ...field,
-    dependsOn: parsed
+    dependsOn: safeParse(dependsOn),
+    dependsOnTest: safeParse(dependsOnTest)
   };
 }
 
-function normalizeValues({ dependsOn = {}, ...field }) {
+function normalizeValues({ dependsOnTest = {}, dependsOn = {}, ...field }) {
   return {
     ...field,
-    dependsOn: JSON.stringify(dependsOn, null, 4)
+    dependsOn: JSON.stringify(dependsOn, null, 4),
+    dependsOnTest: JSON.stringify(dependsOnTest, null, 4)
   };
 }
 
@@ -129,7 +137,12 @@ function FieldModal() {
         </Select>
       </FieldGroup>
       <AdditionalFields type={field.type} />
-      <DependsOn onChange={updateField('dependsOn')} value={field.dependsOn} />
+      <DependsOn
+        value={field.dependsOn}
+        test={field.dependsOnTest}
+        onChangeValue={updateField('dependsOn')}
+        onChangeTest={updateField('dependsOnTest')}
+      />
       <FieldGroup>
         <div className="confirm-delete-dialog-actions">
           <Button type="submit" buttonType="negative" size="small" onClick={handleCancel}>

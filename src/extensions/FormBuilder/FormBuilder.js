@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { merge } from 'lodash/fp';
-import arrayMove from 'array-move';
-import CreateForm from './CreateForm';
 import SetupForm from './SetupForm';
-import ConfirmDeleteDialog from './ConfirmDeleteDialog';
-import SetupStep from './SetupStep';
 import './FormBuilder.scss';
 import { buildStep } from './utils';
 
