@@ -31,9 +31,9 @@ function FieldModal() {
       </FieldGroup>
       <DependsOn
         value={step.dependsOn}
-        test={step.dependsOnTest}
+        tests={step.dependsOnTests}
         onChangeValue={updateStep('dependsOn')}
-        onChangeTest={updateStep('dependsOnTest')}
+        onChangeTests={updateStep('dependsOnTests')}
       />
       <FieldGroup>
         <div className="confirm-delete-dialog-actions">

@@ -1,7 +1,13 @@
 import { pickBy, identity } from 'lodash/fp';
+import { safeParse } from '../utils';
 
-export function extractValue(event) {
-  return event.currentTarget.value;
+export function extractValue(maybeEvent) {
+  // Dealing with event
+  if (maybeEvent instanceof Object && maybeEvent.currentTarget) {
+    return maybeEvent.currentTarget.value;
+  }
+
+  return maybeEvent;
 }
 
 export function hasValue(value) {
@@ -17,38 +23,20 @@ export function hasValue(value) {
   return Boolean(value);
 }
 
-export function safeParse(maybeJson) {
-  let parsed;
-  try {
-    parsed = JSON.parse(maybeJson);
-
-    // We don't need to save empty dependsOn
-    if (Object.keys(parsed).length < 1) {
-      return undefined;
-    }
-
-    return parsed;
-  } catch (error) {
-    // pass
-
-    return undefined;
-  }
-}
-
 const cleanup = pickBy(identity);
 
-export function denormalizeValues({ dependsOn, dependsOnTest, ...field }) {
+export function denormalizeValues({ dependsOn, dependsOnTests, ...field }) {
   return cleanup({
     ...field,
     dependsOn: safeParse(dependsOn),
-    dependsOnTest: safeParse(dependsOnTest)
+    dependsOnTests: dependsOnTests.map((test) => safeParse(test))
   });
 }
 
-export function normalizeValues({ dependsOnTest = {}, dependsOn = {}, ...field }) {
+export function normalizeValues({ dependsOnTests = [], dependsOn = {}, ...field }) {
   return cleanup({
     ...field,
     dependsOn: JSON.stringify(dependsOn, null, 4),
-    dependsOnTest: JSON.stringify(dependsOnTest, null, 4)
+    dependsOnTests: dependsOnTests.map((test) => JSON.stringify(test, null, 4))
   });
 }

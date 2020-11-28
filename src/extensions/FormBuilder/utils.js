@@ -1,6 +1,24 @@
 import { v4 as uuidv4 } from 'uuid';
 import { curry } from 'lodash/fp';
 
+export function safeParse(maybeJson) {
+  let parsed;
+  try {
+    parsed = JSON.parse(maybeJson);
+
+    // We don't need to save empty dependsOn
+    if (Object.keys(parsed).length < 1) {
+      return undefined;
+    }
+
+    return parsed;
+  } catch (error) {
+    // pass
+
+    return undefined;
+  }
+}
+
 export const showModal = curry((sdk, modalName, parameters) =>
   sdk.dialogs.openExtension({
     width: 500,
