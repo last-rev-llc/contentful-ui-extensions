@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { merge } from 'lodash/fp';
 import arrayMove from 'array-move';
 
+import FormInfo from './FormInfo';
 import StepList from './StepList';
 import './FormBuilder.scss';
 import { buildStep } from './utils';
 
-function useFormConfig({ title = '', type = 'custom' }) {
+function useFormConfig({ title = '', type = 'custom' } = {}) {
   const [values, setValues] = useState({ title: '', type: 'custom' });
 
   return {
@@ -61,6 +62,8 @@ function useFormSteps(initialSteps = []) {
 }
 
 function FormBuilder() {
+  const formConfig = useFormConfig();
+
   const stepConfig = useFormSteps([
     //
     buildStep('First step'),
@@ -69,7 +72,7 @@ function FormBuilder() {
 
   return (
     <div>
-      {/* <CreateForm type={values.type} title={values.title} onChange={handleChange} onSubmit={handleSubmit} /> */}
+      <FormInfo formConfig={formConfig} />
       <StepList stepConfig={stepConfig} />
       {/* <ConfirmDeleteDialog item={removeStep} onClose={handleCancelRemoveStep} onSubmit={handleRemoveStep} /> */}
       {/* <SetupStep step={setupStep} onClose={handleCloseSetupStep} onSubmit={handleStepSubmit} /> */}
