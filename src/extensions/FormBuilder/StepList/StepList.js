@@ -5,10 +5,9 @@ import PropTypes from 'prop-types';
 import { curry } from 'lodash/fp';
 import { Button, IconButton, SectionHeading } from '@contentful/forma-36-react-components';
 
-import FieldModal from './FieldModal';
 import SectionWrapper from '../SectionWrapper';
 import SortableList from '../SortableList';
-import { buildField } from '../utils';
+import { buildField, showModal } from '../utils';
 import { useSDK } from '../../../context';
 
 const Col = styled.div`
@@ -25,6 +24,7 @@ const LeftIconButton = styled(IconButton)`
 
 const FieldDisplay = styled.div`
   display: flex;
+  align-items: center;
   justify-content: space-between;
 `;
 
@@ -32,11 +32,6 @@ const TypeText = styled.span`
   background-color: #fafafa;
   padding: 8px;
 `;
-
-function getModal(sdk) {
-  const { modal } = sdk.parameters.invocation || {};
-  return modal;
-}
 
 function useFieldsConfig(stepEdit) {
   const fieldRemove = curry((stepId, field) =>
@@ -53,6 +48,9 @@ function useFieldsConfig(stepEdit) {
     )
   );
 
+  // We want to keep this function curried so we
+  // must provide a second argument (for lodash)
+  // eslint-disable-next-line no-unused-vars
   const fieldAdd = curry((stepId, _event) =>
     stepEdit(stepId, (oldStep) => ({
       ...oldStep,
@@ -86,33 +84,20 @@ function StepList({ stepConfig }) {
   const { steps, stepAdd, stepRemove, stepEdit, stepReorder } = stepConfig;
   const { fieldAdd, fieldRemove, fieldUpdate, fieldReorder } = useFieldsConfig(stepEdit);
 
-  const showModal = curry((modalName, parameters) =>
-    sdk.dialogs.openExtension({
-      width: 500,
-      id: sdk.ids.extension,
-      shouldCloseOnOverlayClick: true,
-      shouldCloseOnEscapePress: true,
-      position: 'center',
-      parameters: {
-        modal: modalName,
-        ...parameters
-      }
-    })
-  );
-
-  switch (getModal(sdk)) {
-    case 'field-modal':
-      return <FieldModal />;
-
-    default:
-      break;
-  }
-
   return (
     <SectionWrapper title="Setup Form">
       <div className="setup-form">
         <SectionHeading className="title">Steps</SectionHeading>
-        <SortableList items={steps} onSortEnd={stepReorder} onRemoveItem={stepRemove} onEditItem={stepEdit}>
+        <SortableList
+          items={steps}
+          onSortEnd={stepReorder}
+          onRemoveItem={stepRemove}
+          onEditItem={(step) =>
+            showModal(sdk, 'step-modal', step)
+              // If the modal returned us a new step we'll update the values in our current state
+              // The modal is stateless so it's not changing our step directly
+              .then(({ step: newStep } = {}) => newStep && stepEdit(step.id, newStep))
+          }>
           {(step) => (
             <Col>
               <SortableList
@@ -120,7 +105,7 @@ function StepList({ stepConfig }) {
                 items={step.fields}
                 onSortEnd={fieldReorder(step.id)}
                 onEditItem={(field) =>
-                  showModal('field-modal', field)
+                  showModal(sdk, 'field-modal', field)
                     // When the user clicks save in the modal we'll get the new field back
                     // orr null if the user clicks cancel
                     .then(({ field: newField } = {}) => newField && fieldUpdate(step.id, newField))
