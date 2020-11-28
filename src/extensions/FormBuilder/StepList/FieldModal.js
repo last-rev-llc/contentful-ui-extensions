@@ -96,9 +96,9 @@ function FieldModal() {
       <AdditionalFields type={field.type} />
       <DependsOn
         value={field.dependsOn}
-        test={field.dependsOnTest}
+        test={field.dependsOnTests}
         onChangeValue={updateField('dependsOn')}
-        onChangeTest={updateField('dependsOnTest')}
+        onChangeTests={updateField('dependsOnTests')}
       />
       <FieldGroup>
         <div className="confirm-delete-dialog-actions">
