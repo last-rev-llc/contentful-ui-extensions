@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { curry, omit } from 'lodash/fp';
-import { Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
+import { Heading, Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
 
 import DependsOn from '../DependsOn';
 import { useSDK } from '../../../context';
@@ -24,6 +24,7 @@ function FieldModal() {
 
   return (
     <ModalStyle>
+      <Heading>Edit Step</Heading>
       <FieldGroup>
         <FormLabel htmlFor="title">Step Name</FormLabel>
         <TextInput required defaultValue={step.title} onChange={updateStep('title')} />

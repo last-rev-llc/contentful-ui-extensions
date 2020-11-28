@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { curry, omit } from 'lodash/fp';
-import { Button, FieldGroup, FormLabel, Option, Select, TextInput } from '@contentful/forma-36-react-components';
+import {
+  Button,
+  FieldGroup,
+  FormLabel,
+  Heading,
+  Option,
+  Select,
+  TextInput
+} from '@contentful/forma-36-react-components';
 
 import DependsOn from '../DependsOn';
 import { useSDK } from '../../../context';
 
 import { ModalStyle } from './styles';
-import { normalizeValues, denormalizeValues, hasValue, extractValue } from './utils';
+import { normalizeValues, denormalizeValues, extractValue } from './utils';
 
 const fieldTypes = [
   // prettier-no-wrap
@@ -51,6 +60,8 @@ function AdditionalFields({ type }) {
   }
 }
 
+AdditionalFields.propTypes = { type: PropTypes.string.isRequired };
+
 function FieldModal() {
   const sdk = useSDK();
   const [field, setField] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
@@ -67,6 +78,7 @@ function FieldModal() {
 
   return (
     <ModalStyle>
+      <Heading>Edit Field</Heading>
       <FieldGroup>
         <FormLabel htmlFor="title">Field Name</FormLabel>
         <TextInput required defaultValue={field.name} onChange={updateField('name')} />

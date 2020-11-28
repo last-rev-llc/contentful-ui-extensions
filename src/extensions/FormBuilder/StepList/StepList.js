@@ -101,7 +101,6 @@ function StepList({ stepConfig }) {
           {(step) => (
             <Col>
               <SortableList
-                onClickEdit
                 items={step.fields}
                 onSortEnd={fieldReorder(step.id)}
                 onEditItem={(field) =>
