@@ -42,58 +42,56 @@ function hasSomeChildren(children) {
   return !!children;
 }
 
-const SortableItem = sortableElement(
-  ({ item, onClickEdit, onRemoveItem, onEditItem, children, renderItem, dragging }) => {
-    const [childrenShown, setChildrenShown] = useState(true);
-    const toggleChildren = () => setChildrenShown((prev) => !prev);
+const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children, renderItem, dragging }) => {
+  const [childrenShown, setChildrenShown] = useState(true);
+  const toggleChildren = () => setChildrenShown((prev) => !prev);
 
-    const withoutPropagation = curry((func, event) => {
-      event.stopPropagation();
-      func(event);
-    });
+  const withoutPropagation = curry((func, event) => {
+    event.stopPropagation();
+    func(event);
+  });
 
-    const handleClick = (event) => (onClickEdit ? onEditItem(event) : toggleChildren());
-
-    return (
-      <>
-        <ItemStyle onClick={handleClick}>
-          <DragHandle />
-          <div className="card-item-content">
-            <div className="card-item-title">
-              {renderItem && renderItem(item)}
-              {!renderItem && <Paragraph element="p">{item.title || item.name}</Paragraph>}
-            </div>
-            {!onClickEdit && (
-              <IconButton
-                size="small"
-                className="card-item-button"
-                iconProps={{ icon: 'Edit' }}
-                onClick={withoutPropagation(onEditItem)}
-              />
-            )}
+  return (
+    <>
+      <ItemStyle onClick={withoutPropagation(onEditItem)}>
+        <DragHandle />
+        <div className="card-item-content">
+          <div className="card-item-title">
+            {renderItem && renderItem(item)}
+            {!renderItem && <Paragraph element="p">{item.title || item.name}</Paragraph>}
+          </div>
+          {hasSomeChildren(children) && (
             <IconButton
-              buttonType="negative"
+              buttonType="primary"
               size="small"
               className="card-item-button"
-              iconProps={{ icon: 'Delete' }}
-              onClick={withoutPropagation(onRemoveItem)}>
-              Delete item
+              iconProps={{ icon: 'EmbeddedEntryBlock' }}
+              onClick={withoutPropagation(toggleChildren)}>
+              Expand/Collapse children
             </IconButton>
-          </div>
-        </ItemStyle>
+          )}
+          <IconButton
+            buttonType="negative"
+            size="small"
+            className="card-item-button"
+            iconProps={{ icon: 'Delete' }}
+            onClick={withoutPropagation(onRemoveItem)}>
+            Delete item
+          </IconButton>
+        </div>
+      </ItemStyle>
 
-        <ChildrenStyle $shown={!dragging && childrenShown && hasSomeChildren(children)}>{children}</ChildrenStyle>
-      </>
-    );
-  }
-);
+      <ChildrenStyle $shown={!dragging && childrenShown && hasSomeChildren(children)}>{children}</ChildrenStyle>
+    </>
+  );
+});
 
 const SortableContainer = sortableContainer(({ children }) => (
   //
   <List className="sortable-list">{children}</List>
 ));
 
-function SortableList({ items, onSortEnd, onClickEdit, onRemoveItem, onEditItem, children, renderItem }) {
+function SortableList({ items, onSortEnd, onRemoveItem, onEditItem, children, renderItem }) {
   const [dragging, setDragging] = useState(false);
 
   return (
@@ -112,7 +110,6 @@ function SortableList({ items, onSortEnd, onClickEdit, onRemoveItem, onEditItem,
             index={index}
             dragging={dragging}
             renderItem={renderItem}
-            onClickEdit={onClickEdit}
             onEditItem={() => onEditItem(item)}
             onRemoveItem={() => onRemoveItem(item)}>
             {children instanceof Function && children(item)}
@@ -133,7 +130,6 @@ SortableList.propTypes = {
   ).isRequired,
   onSortEnd: PropTypes.func.isRequired,
   onRemoveItem: PropTypes.func.isRequired,
-  onClickEdit: PropTypes.bool,
   onEditItem: PropTypes.func.isRequired,
   children: PropTypes.func,
   renderItem: PropTypes.func
@@ -141,8 +137,7 @@ SortableList.propTypes = {
 
 SortableList.defaultProps = {
   children: null,
-  renderItem: null,
-  onClickEdit: false
+  renderItem: null
 };
 
 export default SortableList;
