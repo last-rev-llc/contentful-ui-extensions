@@ -29,7 +29,8 @@ const FieldDisplay = styled.div`
 `;
 
 const TypeText = styled.span`
-  color: #aaaaaa;
+  background-color: #fafafa;
+  padding: 8px;
 `;
 
 function getModal(sdk) {
