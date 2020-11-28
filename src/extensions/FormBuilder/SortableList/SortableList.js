@@ -25,6 +25,7 @@ const ItemStyle = styled(Card)`
   }
 
   z-index: 100;
+  margin-bottom: 4px;
 `;
 
 const ChildrenStyle = styled(Card)`
@@ -75,8 +76,9 @@ const SortableItem = sortableElement(
               size="small"
               className="card-item-button"
               iconProps={{ icon: 'Delete' }}
-              onClick={withoutPropagation(onRemoveItem)}
-            />
+              onClick={withoutPropagation(onRemoveItem)}>
+              Delete item
+            </IconButton>
           </div>
         </ItemStyle>
 

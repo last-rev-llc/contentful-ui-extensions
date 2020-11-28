@@ -2,10 +2,21 @@ import React, { useState } from 'react';
 import { merge } from 'lodash/fp';
 import arrayMove from 'array-move';
 
+import { useSDK } from '../../context';
+
 import FormInfo from './FormInfo';
 import StepList from './StepList';
+
+import StepModal from './StepList/StepModal';
+import FieldModal from './StepList/FieldModal';
+
 import './FormBuilder.scss';
 import { buildStep } from './utils';
+
+function getModal(sdk) {
+  const { modal } = sdk.parameters.invocation || {};
+  return modal;
+}
 
 function useFormConfig({ title = '', type = 'custom' } = {}) {
   const [values, setValues] = useState({ title: '', type: 'custom' });
@@ -62,13 +73,25 @@ function useFormSteps(initialSteps = []) {
 }
 
 function FormBuilder() {
-  const formConfig = useFormConfig();
+  const sdk = useSDK();
 
+  const formConfig = useFormConfig();
   const stepConfig = useFormSteps([
     //
     buildStep('First step'),
     buildStep('Second step')
   ]);
+
+  switch (getModal(sdk)) {
+    case 'field-modal':
+      return <FieldModal />;
+
+    case 'step-modal':
+      return <StepModal />;
+
+    default:
+      break;
+  }
 
   return (
     <div>

@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { curry, omit } from 'lodash/fp';
 import { Button, FieldGroup, FormLabel, Option, Select, TextInput } from '@contentful/forma-36-react-components';
 
 import DependsOn from '../DependsOn';
 import { useSDK } from '../../../context';
 
-const ModalStyle = styled.div`
-  padding: 24px;
-`;
+import { ModalStyle } from './styles';
+import { normalizeValues, denormalizeValues, hasValue, extractValue } from './utils';
 
 const fieldTypes = [
   // prettier-no-wrap
@@ -53,69 +51,16 @@ function AdditionalFields({ type }) {
   }
 }
 
-function extractValue(event) {
-  return event.currentTarget.value;
-}
-
-function hasValue(value) {
-  if (value instanceof Object) {
-    // Dealing with an event
-    if (value.currentTarget) {
-      return hasValue(extractValue(value));
-    }
-
-    return Object.keys(value).length > 0;
-  }
-
-  return Boolean(value);
-}
-
-function safeParse(maybeJson) {
-  let parsed;
-  try {
-    parsed = JSON.parse(maybeJson);
-
-    // We don't need to save empty dependsOn
-    if (Object.keys(parsed).length < 1) {
-      return undefined;
-    }
-
-    return parsed;
-  } catch (error) {
-    // pass
-
-    return undefined;
-  }
-}
-
-function denormalizeValues({ dependsOn, dependsOnTest, ...field }) {
-  return {
-    ...field,
-    dependsOn: safeParse(dependsOn),
-    dependsOnTest: safeParse(dependsOnTest)
-  };
-}
-
-function normalizeValues({ dependsOnTest = {}, dependsOn = {}, ...field }) {
-  return {
-    ...field,
-    dependsOn: JSON.stringify(dependsOn, null, 4),
-    dependsOnTest: JSON.stringify(dependsOnTest, null, 4)
-  };
-}
-
 function FieldModal() {
   const sdk = useSDK();
   const [field, setField] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
 
-  const updateField = curry((key, event) => {
-    const currentValue = extractValue(event);
-    if (hasValue(currentValue))
-      setField((prev) => ({
-        ...prev,
-        [key]: currentValue
-      }));
-  });
+  const updateField = curry((key, event) =>
+    setField((prev) => ({
+      ...prev,
+      [key]: extractValue(event)
+    }))
+  );
 
   const handleCancel = () => sdk.close({ field: null });
   const handleSubmit = () => sdk.close({ field: denormalizeValues(field) });
@@ -148,7 +93,12 @@ function FieldModal() {
           <Button type="submit" buttonType="negative" size="small" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button size="small" type="submit" className="confirm-delete-dialog-button" onClick={handleSubmit}>
+          <Button
+            size="small"
+            type="submit"
+            className="confirm-delete-dialog-button"
+            onClick={handleSubmit}
+            disabled={field.name.length < 1}>
             Save
           </Button>
         </div>
