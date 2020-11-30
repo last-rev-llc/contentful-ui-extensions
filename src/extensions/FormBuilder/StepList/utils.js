@@ -26,10 +26,12 @@ export function hasValue(value) {
 const cleanup = pickBy(identity);
 
 export function denormalizeValues({ dependsOn, dependsOnTests, ...field }) {
+  const tests = dependsOnTests.map((test) => safeParse(test)).filter(identity);
+
   return cleanup({
     ...field,
     dependsOn: safeParse(dependsOn),
-    dependsOnTests: dependsOnTests.map((test) => safeParse(test))
+    dependsOnTests: tests.length > 0 ? tests : null
   });
 }
 

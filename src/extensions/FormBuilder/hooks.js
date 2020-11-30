@@ -1,18 +1,26 @@
 import { useState } from 'react';
-import { merge } from 'lodash/fp';
+import { curry, merge } from 'lodash/fp';
 import arrayMove from 'array-move';
 
 import { buildStep, URL_TYPES } from './utils';
 
-export function useFormConfig(handleFieldChange, { title = '', type = 'custom' } = {}) {
-  const [values, setValues] = useState({ title, type });
+export function useProviderConfig(handleFieldChange, { type = 'custom' } = {}) {
+  const [values, setValues] = useState({ type });
+
+  const setContentfulKey = curry((key, newValue) =>
+    // Save to contentful
+    handleFieldChange(`provider.${key}`, newValue)
+  );
 
   return {
     url: values.url,
     type: values.type,
-    title: values.title,
-    setType: (newType) => {
-      handleFieldChange('type', newType);
+    setContentfulKey,
+
+    setType: (key, newType) => {
+      // Save to contentful
+      setContentfulKey('type', newType);
+
       setValues((oldValues) =>
         merge(oldValues)({
           type: newType,
@@ -22,14 +30,14 @@ export function useFormConfig(handleFieldChange, { title = '', type = 'custom' }
         })
       );
     },
+
     setUrl: (newUrl) => {
-      handleFieldChange('url', newUrl);
+      // Save to contentful
+      setContentfulKey('formId', newUrl);
+
       setValues((oldValues) => merge(oldValues)({ url: newUrl }));
     },
-    setTitle: (newTitle) => {
-      handleFieldChange('title', newTitle);
-      setValues((oldValues) => merge(oldValues)({ title: newTitle }));
-    },
+
     update: (updates) => setValues({ ...values, ...updates })
   };
 }
@@ -91,4 +99,4 @@ export function useFormSteps(handleFieldChange, initialSteps = []) {
   };
 }
 
-export default { useFormSteps, useFormConfig };
+export default { useFormSteps, useProviderConfig };

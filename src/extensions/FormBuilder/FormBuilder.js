@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
-import { curry } from 'lodash/fp';
+import React, { useEffect, useState } from 'react';
+import { curry, set, clone, throttle } from 'lodash/fp';
+import styled from 'styled-components';
+import { IconButton, Textarea } from '@contentful/forma-36-react-components';
 
 import { useSDK } from '../../context';
 
@@ -10,29 +12,72 @@ import StepModal from './StepList/StepModal';
 import FieldModal from './StepList/FieldModal';
 
 import './FormBuilder.scss';
-import { buildStep } from './utils';
-import { useFormConfig, useFormSteps } from './hooks';
+import { buildStep, safeParse } from './utils';
+import { useProviderConfig, useFormSteps } from './hooks';
+
+const ToggleJsonButton = styled(IconButton)`
+  position: fixed;
+  top: 0;
+  right: 0;
+`;
+
+const JsonInput = styled(Textarea)`
+  textarea {
+    min-height: 512px;
+  }
+`;
 
 function getModal(sdk) {
   const { modal } = sdk.parameters.invocation || {};
   return modal;
 }
 
-function FormBuilder() {
-  const sdk = useSDK();
+function cleanup(toClean) {
+  const toReturn = {};
 
-  const handleFieldChange = curry((fieldName, newValue) => {
-    sdk.field.setValue({
-      ...sdk.field.getValue(),
-      [fieldName]: newValue
-    });
+  Object.entries(toClean).forEach(([key, value]) => {
+    if (value instanceof Function === false) toReturn[key] = value;
   });
 
-  const formConfig = useFormConfig(handleFieldChange);
+  return toReturn;
+}
+
+function FormBuilder() {
+  const sdk = useSDK();
+  const [jsonMode, setJsonMode] = useState(true);
+
+  const throttledSave = throttle(200, (newValues) => {
+    try {
+      console.log('Saving', newValues);
+      const result = JSON.parse(newValues);
+      sdk.field.setValue(cleanup(result));
+      return result;
+    } catch (error) {
+      return null;
+    }
+  });
+
+  const handleFieldChange = curry((fieldName, newValue) => {
+    console.trace('Got new data', fieldName, newValue);
+    const toSave = clone(sdk.field.getValue());
+    set(toSave, fieldName, newValue);
+    throttledSave(toSave);
+  });
+
+  const formConfig = useProviderConfig(handleFieldChange);
   const stepConfig = useFormSteps(handleFieldChange, [
     //
     buildStep('First step')
   ]);
+
+  const loadState = ({ steps = [], provider = {} }) => {
+    if (steps.length > 0) {
+      stepConfig.update(steps);
+    }
+    if (Object.keys(provider).length > 0) {
+      formConfig.update(provider);
+    }
+  };
 
   /**
    * Load the last saved state from contentful
@@ -42,14 +87,7 @@ function FormBuilder() {
   useEffect(
     () => {
       if (sdk.field?.getValue instanceof Function) {
-        const { steps = [], ...rest } = sdk.field.getValue() || {};
-
-        if (steps.length > 0) {
-          stepConfig.update(steps);
-        }
-        if (Object.keys(rest).length > 0) {
-          formConfig.update(rest);
-        }
+        loadState(sdk.field.getValue() || {});
       }
     },
     // I only actually want to update when the field changes
@@ -69,13 +107,37 @@ function FormBuilder() {
       break;
   }
 
-  return (
-    <div>
-      <FormInfo formConfig={formConfig} />
-      <StepList stepConfig={stepConfig} />
-      {/* <ConfirmDeleteDialog item={removeStep} onClose={handleCancelRemoveStep} onSubmit={handleRemoveStep} /> */}
-    </div>
-  );
+  try {
+    return (
+      <div>
+        <ToggleJsonButton iconProps={{ icon: 'Edit' }} onClick={() => setJsonMode(!jsonMode)} />
+        {!jsonMode && (
+          <>
+            <FormInfo formConfig={formConfig} />
+            <StepList stepConfig={stepConfig} />
+          </>
+        )}
+        {jsonMode && (
+          <JsonInput
+            value={JSON.stringify(sdk.field.getValue(), null, 4)}
+            onChange={(event) => {
+              const newFormState = safeParse(event.currentTarget.value);
+              if (newFormState) {
+                loadState(newFormState);
+                throttledSave(newFormState);
+              }
+            }}
+          />
+        )}
+        {/* <ConfirmDeleteDialog item={removeStep} onClose={handleCancelRemoveStep} onSubmit={handleRemoveStep} /> */}
+      </div>
+    );
+  } catch (error) {
+    // Fallback to json entry on error
+    // eslint-disable-next-line no-console
+    console.error(error);
+    setJsonMode(true);
+  }
 }
 
 export default FormBuilder;
