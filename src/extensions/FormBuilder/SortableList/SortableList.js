@@ -107,7 +107,7 @@ function SortableList({ items, onSortEnd, onRemoveItem, onEditItem, children, re
         useDragHandle>
         {items.map((item, index) => (
           <SortableItem
-            key={`item-${item.id}`}
+            key={`item-${item.id || index}`}
             item={item}
             index={index}
             dragging={dragging}

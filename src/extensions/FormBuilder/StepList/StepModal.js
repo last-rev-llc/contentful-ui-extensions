@@ -12,22 +12,25 @@ function FieldModal() {
   const sdk = useSDK();
   const [step, setStep] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
 
-  const updateStep = curry((key, event) =>
+  const updateStep = curry((key, event) => {
+    const value = event.currentTarget.value;
     setStep((prev) => ({
       ...prev,
-      [key]: extractValue(event)
-    }))
-  );
+      [key]: value
+    }));
+  });
 
   const handleCancel = () => sdk.close({ step: null });
   const handleSubmit = () => sdk.close({ step: denormalizeValues(step) });
+
+  const { title = '' } = step;
 
   return (
     <ModalStyle>
       <Heading>Edit Step</Heading>
       <FieldGroup>
         <FormLabel htmlFor="title">Step Name</FormLabel>
-        <TextInput required defaultValue={step.title} onChange={updateStep('title')} />
+        <TextInput required defaultValue={title} onChange={updateStep('title')} />
       </FieldGroup>
       <DependsOn
         value={step.dependsOn}
@@ -45,7 +48,7 @@ function FieldModal() {
             type="submit"
             className="confirm-delete-dialog-button"
             onClick={handleSubmit}
-            disabled={step.title.length < 1}>
+            disabled={title.length < 1}>
             Save
           </Button>
         </div>
