@@ -48,8 +48,7 @@ export function buildStep(title = 'Step title') {
     id: uuidv4(),
     fields: [
       //
-      buildField({ name: 'First field' }),
-      buildField({ name: 'Second field' })
+      buildField({ name: 'First field' })
     ]
   };
 }

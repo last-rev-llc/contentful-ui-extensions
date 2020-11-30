@@ -43,7 +43,6 @@ function useFormSteps(handleFieldChange, initialSteps = []) {
     if (newValues instanceof Function) {
       return setStepsBase((oldValues) => {
         const toReturn = newValues(oldValues);
-        console.log(toReturn);
         handleFieldChange('steps', toReturn);
         return toReturn;
       });
@@ -98,7 +97,6 @@ function FormBuilder() {
   const sdk = useSDK();
 
   const handleFieldChange = curry((fieldName, newValue) => {
-    console.log(fieldName, newValue);
     sdk.field.setValue({
       ...sdk.field.getValue(),
       [fieldName]: newValue
@@ -108,23 +106,27 @@ function FormBuilder() {
   const formConfig = useFormConfig(handleFieldChange);
   const stepConfig = useFormSteps(handleFieldChange, [
     //
-    buildStep('First step'),
-    buildStep('Second step')
+    buildStep('First step')
   ]);
 
-  useEffect(() => {
-    if (sdk.field?.getValue instanceof Function) {
-      const { steps = [], ...rest } = sdk.field.getValue() || {};
-      console.log('Effect', steps, rest);
+  useEffect(
+    () => {
+      if (sdk.field?.getValue instanceof Function) {
+        const { steps = [], ...rest } = sdk.field.getValue() || {};
 
-      if (steps.length > 0) {
-        stepConfig.update(steps);
+        if (steps.length > 0) {
+          stepConfig.update(steps);
+        }
+        if (Object.keys(rest).length > 0) {
+          formConfig.update(rest);
+        }
       }
-      if (Object.keys(rest).length > 0) {
-        formConfig.update(rest);
-      }
-    }
-  }, [sdk.field]);
+    },
+    // I only actually want to update when the field changes
+    // this is only initial configuration setup
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sdk.field]
+  );
 
   switch (getModal(sdk)) {
     case 'field-modal':
