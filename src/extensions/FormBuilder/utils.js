@@ -53,4 +53,6 @@ export function buildStep(title = 'Step title') {
   };
 }
 
-export default { buildStep };
+export const URL_TYPES = ['hubspot'];
+
+export default { buildStep, URL_TYPES };

@@ -87,7 +87,7 @@ function FieldModal() {
           ))}
         </Select>
       </FieldGroup>
-      <AdditionalFields field={field} />
+      <AdditionalFields updateField={updateField} field={field} />
       <DependsOn
         value={field.dependsOn}
         tests={field.dependsOnTests}
