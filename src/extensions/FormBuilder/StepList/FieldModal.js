@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { curry, omit } from 'lodash/fp';
+import { omit } from 'lodash/fp';
 import {
   Button,
   FieldGroup,
@@ -15,7 +14,8 @@ import DependsOn from '../DependsOn';
 import { useSDK } from '../../../context';
 
 import { ModalStyle } from './styles';
-import { normalizeValues, denormalizeValues, extractValue } from './utils';
+import AdditionalFields from './AdditionalFields';
+import { normalizeValues, denormalizeValues } from './utils';
 
 const fieldTypes = [
   // prettier-no-wrap
@@ -51,27 +51,21 @@ const fieldTypes = [
   { value: 'week', label: 'Week' }
 ];
 
-function AdditionalFields({ type }) {
-  switch (type) {
-    case 'select':
-      return <span>TODO</span>; // TODO: add options
-    default:
-      return null;
-  }
-}
-
-AdditionalFields.propTypes = { type: PropTypes.string.isRequired };
-
 function FieldModal() {
   const sdk = useSDK();
   const [field, setField] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
 
-  const updateField = curry((key, event) =>
+  const updateField = (key) => (newValue) => {
     setField((prev) => ({
       ...prev,
-      [key]: extractValue(event)
-    }))
-  );
+      [key]: newValue
+    }));
+  };
+
+  const updateFieldEvent = (key) => (event) => {
+    const { value } = event.currentTarget;
+    updateField(key)(value);
+  };
 
   const handleCancel = () => sdk.close({ field: null });
   const handleSubmit = () => sdk.close({ field: denormalizeValues(field) });
@@ -81,11 +75,11 @@ function FieldModal() {
       <Heading>Edit Field</Heading>
       <FieldGroup>
         <FormLabel htmlFor="title">Field Name</FormLabel>
-        <TextInput required defaultValue={field.name} onChange={updateField('name')} />
+        <TextInput required defaultValue={field.name} onChange={updateFieldEvent('name')} />
       </FieldGroup>
       <FieldGroup>
         <FormLabel htmlFor="type">Field Type</FormLabel>
-        <Select required id="type" name="type" defaultValue={field.type} onChange={updateField('type')}>
+        <Select required id="type" name="type" defaultValue={field.type} onChange={updateFieldEvent('type')}>
           {fieldTypes.map(({ value: fieldType, label }) => (
             <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
               {label}
@@ -93,10 +87,10 @@ function FieldModal() {
           ))}
         </Select>
       </FieldGroup>
-      <AdditionalFields type={field.type} />
+      <AdditionalFields field={field} />
       <DependsOn
         value={field.dependsOn}
-        test={field.dependsOnTests}
+        tests={field.dependsOnTests}
         onChangeValue={updateField('dependsOn')}
         onChangeTests={updateField('dependsOnTests')}
       />
