@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { curry, set, clone, throttle } from 'lodash/fp';
+import { curry, set, clone } from 'lodash/fp';
 import styled from 'styled-components';
 import { IconButton, Textarea } from '@contentful/forma-36-react-components';
 
@@ -32,36 +32,14 @@ function getModal(sdk) {
   return modal;
 }
 
-function cleanup(toClean) {
-  const toReturn = {};
-
-  Object.entries(toClean).forEach(([key, value]) => {
-    if (value instanceof Function === false) toReturn[key] = value;
-  });
-
-  return toReturn;
-}
-
 function FormBuilder() {
   const sdk = useSDK();
   const [jsonMode, setJsonMode] = useState(true);
 
-  const throttledSave = throttle(200, (newValues) => {
-    try {
-      console.log('Saving', newValues);
-      const result = JSON.parse(newValues);
-      sdk.field.setValue(cleanup(result));
-      return result;
-    } catch (error) {
-      return null;
-    }
-  });
-
   const handleFieldChange = curry((fieldName, newValue) => {
-    console.trace('Got new data', fieldName, newValue);
     const toSave = clone(sdk.field.getValue());
     set(toSave, fieldName, newValue);
-    throttledSave(toSave);
+    sdk.field.setValue(toSave);
   });
 
   const formConfig = useProviderConfig(handleFieldChange);
@@ -123,8 +101,8 @@ function FormBuilder() {
             onChange={(event) => {
               const newFormState = safeParse(event.currentTarget.value);
               if (newFormState) {
+                sdk.field.setValue(newFormState);
                 loadState(newFormState);
-                throttledSave(newFormState);
               }
             }}
           />
