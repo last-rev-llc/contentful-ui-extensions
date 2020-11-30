@@ -64,6 +64,7 @@ const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children
             <IconButton
               buttonType="primary"
               size="small"
+              label="Expand/Collapse children"
               className="card-item-button"
               iconProps={{ icon: 'EmbeddedEntryBlock' }}
               onClick={withoutPropagation(toggleChildren)}>
@@ -73,6 +74,7 @@ const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children
           <IconButton
             buttonType="negative"
             size="small"
+            label="Delete item"
             className="card-item-button"
             iconProps={{ icon: 'Delete' }}
             onClick={withoutPropagation(onRemoveItem)}>

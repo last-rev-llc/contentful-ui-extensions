@@ -35,6 +35,8 @@ const JsonTextArea = styled(Textarea)`
 `;
 
 const ResultArea = styled(Row)`
+  position: relative;
+
   padding: 8px;
   align-items: center;
   justify-content: center;
@@ -50,6 +52,12 @@ const ErrorText = styled.span`
 
 const TestRow = styled(Row)`
   background: whitesmoke;
+`;
+
+const DeleteButton = styled(IconButton)`
+  position: absolute;
+  top: 2px;
+  right: 2px;
 `;
 
 export function isValidJson(json) {
@@ -86,7 +94,11 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
     return (
       <TitleArea>
         <FormLabel htmlFor="title">Depends On</FormLabel>
-        <Checkbox checked={enabled} onClick={() => setEnabled((prev) => !prev)} />
+        <Checkbox
+          labelText="Enable/Disable dependsOn logic"
+          checked={enabled}
+          onClick={() => setEnabled((prev) => !prev)}
+        />
       </TitleArea>
     );
   }
@@ -96,6 +108,7 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
       <TitleArea>
         <FormLabel htmlFor="title">Depends On</FormLabel>
         <Checkbox
+          labelText="Enable/Disable dependsOn logic"
           checked={enabled}
           onClick={() =>
             setEnabled((prev) => {
@@ -126,7 +139,11 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
         const testError = isValidJson(test) === false;
 
         return (
-          <FieldGroup>
+          <FieldGroup
+            // NOTE: Tests do not contain ID so we pretty much require keyed by Idx here
+            //       If you can think of a better way please replace
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}>
             <FormLabel htmlFor="title">Test {index + 1}</FormLabel>
             <TestRow>
               <JsonTextArea
@@ -138,6 +155,12 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
                 defaultValue={test}
               />
               <ResultArea>
+                <DeleteButton
+                  label="Delete test"
+                  buttonType="negative"
+                  iconProps={{ icon: 'Delete' }}
+                  onClick={() => onChangeTests(tests.filter((_, i) => i !== index))}
+                />
                 <pre>{JSON.stringify(runTest(value, test), null, 4)}</pre>
               </ResultArea>
             </TestRow>
@@ -150,8 +173,13 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
           </FieldGroup>
         );
       })}
-      <AddRow onClick={() => onChangeTests(tests.concat(JSON.stringify({}, null, 4)))}>
-        <IconButton buttonType="primary" size="small" className="card-item-button" iconProps={{ icon: 'PlusCircle' }}>
+      <AddRow onClick={() => onChangeTests(tests.concat('{}'))}>
+        <IconButton
+          label="Add new test"
+          buttonType="primary"
+          size="small"
+          className="card-item-button"
+          iconProps={{ icon: 'PlusCircle' }}>
           Add a new dependsOn test
         </IconButton>
         <span>Add test</span>

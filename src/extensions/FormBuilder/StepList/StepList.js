@@ -120,7 +120,7 @@ function StepList({ stepConfig }) {
               <LeftIconButton
                 size="small"
                 buttonType="primary"
-                label="Hello"
+                label="Add new field"
                 onClick={fieldAdd(step.id)}
                 iconProps={{ icon: 'PlusCircle' }}
               />

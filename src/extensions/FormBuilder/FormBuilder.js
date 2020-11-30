@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { merge } from 'lodash/fp';
+import React, { useState, useEffect } from 'react';
+import { curry, merge } from 'lodash/fp';
 import arrayMove from 'array-move';
 
 import { useSDK } from '../../context';
@@ -18,19 +18,40 @@ function getModal(sdk) {
   return modal;
 }
 
-function useFormConfig({ title = '', type = 'custom' } = {}) {
-  const [values, setValues] = useState({ title: '', type: 'custom' });
+function useFormConfig(handleFieldChange, { title = '', type = 'custom' } = {}) {
+  const [values, setValues] = useState({ title, type });
 
   return {
     type: values.type,
     title: values.title,
-    setType: (newType) => setValues((oldValues) => merge(oldValues)({ type: newType })),
-    setTitle: (newTitle) => setValues((oldValues) => merge(oldValues)({ title: newTitle }))
+    setType: (newType) => {
+      handleFieldChange('type', newType);
+      setValues((oldValues) => merge(oldValues)({ type: newType }));
+    },
+    setTitle: (newTitle) => {
+      handleFieldChange('title', newTitle);
+      setValues((oldValues) => merge(oldValues)({ title: newTitle }));
+    },
+    update: (updates) => setValues({ ...values, ...updates })
   };
 }
 
-function useFormSteps(initialSteps = []) {
-  const [steps, setSteps] = useState(initialSteps);
+function useFormSteps(handleFieldChange, initialSteps = []) {
+  const [steps, setStepsBase] = useState(initialSteps);
+
+  const setSteps = (newValues) => {
+    if (newValues instanceof Function) {
+      return setStepsBase((oldValues) => {
+        const toReturn = newValues(oldValues);
+        console.log(toReturn);
+        handleFieldChange('steps', toReturn);
+        return toReturn;
+      });
+    }
+
+    handleFieldChange('steps', newValues);
+    return setStepsBase(newValues);
+  };
 
   const stepAdd = () =>
     setSteps((oldSteps) =>
@@ -68,19 +89,42 @@ function useFormSteps(initialSteps = []) {
     stepAdd,
     stepEdit,
     stepRemove,
-    stepReorder
+    stepReorder,
+    update: setSteps
   };
 }
 
 function FormBuilder() {
   const sdk = useSDK();
 
-  const formConfig = useFormConfig();
-  const stepConfig = useFormSteps([
+  const handleFieldChange = curry((fieldName, newValue) => {
+    console.log(fieldName, newValue);
+    sdk.field.setValue({
+      ...sdk.field.getValue(),
+      [fieldName]: newValue
+    });
+  });
+
+  const formConfig = useFormConfig(handleFieldChange);
+  const stepConfig = useFormSteps(handleFieldChange, [
     //
     buildStep('First step'),
     buildStep('Second step')
   ]);
+
+  useEffect(() => {
+    if (sdk.field?.getValue instanceof Function) {
+      const { steps = [], ...rest } = sdk.field.getValue() || {};
+      console.log('Effect', steps, rest);
+
+      if (steps.length > 0) {
+        stepConfig.update(steps);
+      }
+      if (Object.keys(rest).length > 0) {
+        formConfig.update(rest);
+      }
+    }
+  }, [sdk.field]);
 
   switch (getModal(sdk)) {
     case 'field-modal':
