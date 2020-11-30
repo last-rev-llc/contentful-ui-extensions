@@ -35,7 +35,7 @@ function FieldModal() {
         onChangeValue={updateStep('dependsOn')}
         onChangeTests={updateStep('dependsOnTests')}
       />
-      <FieldGroup>
+      <footer>
         <div className="confirm-delete-dialog-actions">
           <Button type="submit" buttonType="negative" size="small" onClick={handleCancel}>
             Cancel
@@ -49,7 +49,7 @@ function FieldModal() {
             Save
           </Button>
         </div>
-      </FieldGroup>
+      </footer>
     </ModalStyle>
   );
 }

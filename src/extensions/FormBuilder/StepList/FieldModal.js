@@ -78,6 +78,10 @@ function FieldModal() {
         <TextInput required defaultValue={field.name} onChange={updateFieldEvent('name')} />
       </FieldGroup>
       <FieldGroup>
+        <FormLabel htmlFor="label">Field Label</FormLabel>
+        <TextInput required defaultValue={field.label} onChange={updateFieldEvent('label')} />
+      </FieldGroup>
+      <FieldGroup>
         <FormLabel htmlFor="type">Field Type</FormLabel>
         <Select required id="type" name="type" defaultValue={field.type} onChange={updateFieldEvent('type')}>
           {fieldTypes.map(({ value: fieldType, label }) => (
@@ -94,7 +98,7 @@ function FieldModal() {
         onChangeValue={updateField('dependsOn')}
         onChangeTests={updateField('dependsOnTests')}
       />
-      <FieldGroup>
+      <footer>
         <div className="confirm-delete-dialog-actions">
           <Button type="submit" buttonType="negative" size="small" onClick={handleCancel}>
             Cancel
@@ -108,7 +112,7 @@ function FieldModal() {
             Save
           </Button>
         </div>
-      </FieldGroup>
+      </footer>
     </ModalStyle>
   );
 }
