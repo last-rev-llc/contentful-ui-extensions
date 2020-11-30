@@ -16,6 +16,17 @@ export const ModalStyle = styled.div`
     padding-left: 24px;
     padding-right: 24px;
   }
+
+  position: relative;
+  padding-bottom: 80px;
+  footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border-top: 1px solid lightgrey;
+  }
 `;
 
 export default { ModalStyle };
