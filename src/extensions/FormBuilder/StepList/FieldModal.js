@@ -70,12 +70,14 @@ function FieldModal() {
   const handleCancel = () => sdk.close({ field: null });
   const handleSubmit = () => sdk.close({ field: denormalizeValues(field) });
 
+  const { name = '' } = field;
+
   return (
     <ModalStyle>
       <Heading>Edit Field</Heading>
       <FieldGroup>
         <FormLabel htmlFor="title">Field Name</FormLabel>
-        <TextInput required defaultValue={field.name} onChange={updateFieldEvent('name')} />
+        <TextInput required defaultValue={name} onChange={updateFieldEvent('name')} />
       </FieldGroup>
       <FieldGroup>
         <FormLabel htmlFor="label">Field Label</FormLabel>
@@ -108,7 +110,7 @@ function FieldModal() {
             type="submit"
             className="confirm-delete-dialog-button"
             onClick={handleSubmit}
-            disabled={field.name.length < 1}>
+            disabled={name.length < 1}>
             Save
           </Button>
         </div>
