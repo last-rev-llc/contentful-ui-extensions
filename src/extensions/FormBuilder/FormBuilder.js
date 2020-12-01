@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { curry, set, clone } from 'lodash/fp';
+import { v4 as uuidv4 } from 'uuid';
+import { set } from 'lodash';
+import { curry, clone } from 'lodash/fp';
 import styled from 'styled-components';
 import { IconButton, Textarea } from '@contentful/forma-36-react-components';
 
@@ -17,13 +19,14 @@ import { useProviderConfig, useFormSteps } from './hooks';
 
 const ToggleJsonButton = styled(IconButton)`
   position: fixed;
-  top: 0;
-  right: 0;
+  top: 24px;
+  right: 24px;
 `;
 
 const JsonInput = styled(Textarea)`
   textarea {
     min-height: 512px;
+    margin: 16px;
   }
 `;
 
@@ -34,13 +37,14 @@ function getModal(sdk) {
 
 function FormBuilder() {
   const sdk = useSDK();
-  const [jsonMode, setJsonMode] = useState(true);
+  const [jsonMode, setJsonMode] = useState(false);
 
-  const handleFieldChange = curry((fieldName, newValue) => {
-    const toSave = clone(sdk.field.getValue());
-    set(toSave, fieldName, newValue);
-    sdk.field.setValue(toSave);
-  });
+  const handleFieldChange = curry((fieldName, newValue) =>
+    sdk.field.setValue(
+      // Use lodash set to insert items at deep.key.level
+      set(clone(sdk.field.getValue(), fieldName, newValue))
+    )
+  );
 
   const formConfig = useProviderConfig(handleFieldChange);
   const stepConfig = useFormSteps(handleFieldChange, [
@@ -50,7 +54,7 @@ function FormBuilder() {
 
   const loadState = ({ steps = [], provider = {} }) => {
     if (steps.length > 0) {
-      stepConfig.update(steps);
+      stepConfig.update(steps.map((step) => ({ id: uuidv4(), ...step })));
     }
     if (Object.keys(provider).length > 0) {
       formConfig.update(provider);
