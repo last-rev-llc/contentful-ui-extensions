@@ -95,7 +95,7 @@ export function useFormSteps(handleFieldChange, initialSteps = []) {
     stepEdit,
     stepRemove,
     stepReorder,
-    update: setSteps
+    update: setStepsBase
   };
 }
 
