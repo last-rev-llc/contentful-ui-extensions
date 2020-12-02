@@ -5,6 +5,7 @@ import { withLabel, getTextInput, getSelect } from '../helpers';
 import { getButton, getTextField } from '../../../shared/helpers';
 
 const imperialUnits = [
+  '',
   'Teaspoon',
   'Teaspoons',
   'Tablespoon',
@@ -17,6 +18,8 @@ const imperialUnits = [
   'Pounds',
   'Gram',
   'Grams',
+  'Gallon',
+  'Gallons',
   'Pinch',
   'Each',
   'As needed',
@@ -47,6 +50,7 @@ const imperialUnits = [
 ].sort();
 
 const metricUnits = [
+  '',
   'Teaspoon',
   'Teaspoons',
   'Tablespoon',
@@ -59,6 +63,8 @@ const metricUnits = [
   'Ounces',
   'Gram',
   'Grams',
+  'Kilo',
+  'Kilos',
   'Pinch',
   'Each',
   'As needed',
@@ -118,7 +124,7 @@ const IngredientDialog = ({ sdk }) => {
       imperialQuantity: imperialQuantity ? +imperialQuantity : '',
       metricQuantity: metricQuantity ? +metricQuantity : '',
       imperialMeasure: imperialQuantity ? imperialMeasure : '',
-      metricMeasure: metricQuantity ? metricMeasure : '',
+      metricMeasure: metricQuantity ? metricMeasure : ''
     };
     if (ingredient) {
       sdk.close({
@@ -129,35 +135,60 @@ const IngredientDialog = ({ sdk }) => {
         metricMeasure: returned.metricMeasure,
         metricQuantity: returned.metricQuantity
       });
-    }
-    else {
+    } else {
       setErrorMessage('The Ingredient field is required');
     }
   };
 
-  const stepInput = () => getTextInput(step, (event) => setStep(event.currentTarget.value), { id: 'stepNumber', type: 'number', placeholder: 'Step Number' });
+  const stepInput = () =>
+    getTextInput(step, (event) => setStep(event.currentTarget.value), {
+      id: 'stepNumber',
+      type: 'number',
+      placeholder: 'Step Number'
+    });
 
-  const ingredientInput = () => getTextField(ingredient, (event) => setIngredient(event.currentTarget.value), errorMessage, { id: 'ingredient', labelText: 'Ingredient', required: true });
+  const ingredientInput = () =>
+    getTextField(ingredient, (event) => setIngredient(event.currentTarget.value), errorMessage, {
+      id: 'ingredient',
+      labelText: 'Ingredient',
+      required: true
+    });
 
-  const imperialQuantityInput = () => getTextInput(imperialQuantity, (event) => setImperialQuantity(event.currentTarget.value), { id: 'imperialQuantity', type: 'number', placeholder: 'Imperial Quantity' });
+  const imperialQuantityInput = () =>
+    getTextInput(imperialQuantity, (event) => setImperialQuantity(event.currentTarget.value), {
+      id: 'imperialQuantity',
+      type: 'number',
+      placeholder: 'Imperial Quantity'
+    });
 
-  const imperialMeasureSelect = () => getSelect(imperialUnits, (event) => setImperialMeasure(event.currentTarget.value), { id: 'imperialMeasure' }, imperialMeasure);
+  const imperialMeasureSelect = () =>
+    getSelect(
+      imperialUnits,
+      (event) => setImperialMeasure(event.currentTarget.value),
+      { id: 'imperialMeasure' },
+      imperialMeasure
+    );
 
-  const metricQuantityInput = () => getTextInput(metricQuantity, (event) => setMetricQuantity(event.currentTarget.value), { id: 'metricQuantity', type: 'number', placeholder: 'Metric Quantity' });
+  const metricQuantityInput = () =>
+    getTextInput(metricQuantity, (event) => setMetricQuantity(event.currentTarget.value), {
+      id: 'metricQuantity',
+      type: 'number',
+      placeholder: 'Metric Quantity'
+    });
 
-  const metricMeasureSelect = () => getSelect(metricUnits, (event) => setMetricMeasure(event.currentTarget.value), { id: 'metricMeasure' }, metricMeasure);
+  const metricMeasureSelect = () =>
+    getSelect(
+      metricUnits,
+      (event) => setMetricMeasure(event.currentTarget.value),
+      { id: 'metricMeasure' },
+      metricMeasure
+    );
 
   return (
-    <div id='dialog-step-wrap'
-      data-testid="IngredientDialog">
-      <Form spacing="default"
-        data-testid="IngredientDialog-Form">
-        <FieldGroup>
-          {withLabel('stepNumber', 'Step Number', stepInput)}
-        </FieldGroup>
-        <FieldGroup>
-          {ingredientInput()}
-        </FieldGroup>
+    <div id="dialog-step-wrap" data-testid="IngredientDialog">
+      <Form spacing="default" data-testid="IngredientDialog-Form">
+        <FieldGroup>{withLabel('stepNumber', 'Step Number', stepInput)}</FieldGroup>
+        <FieldGroup>{ingredientInput()}</FieldGroup>
         <FieldGroup row>
           {withLabel('imperialQuantity', 'Imperial Quantity', imperialQuantityInput)}
           {withLabel('imperialMeasure', 'Imperial Measure', imperialMeasureSelect)}
@@ -173,7 +204,6 @@ const IngredientDialog = ({ sdk }) => {
       </Form>
     </div>
   );
-
 };
 
 IngredientDialog.propTypes = {
@@ -187,7 +217,7 @@ IngredientDialog.propTypes = {
           metricQuantity: PropTypes.string.isRequired,
           metricMeasure: PropTypes.string.isRequired,
           step: PropTypes.string.isRequired,
-          ingredient: PropTypes.string.isRequired,
+          ingredient: PropTypes.string.isRequired
         })
       }).isRequired
     }).isRequired
@@ -195,4 +225,3 @@ IngredientDialog.propTypes = {
 };
 
 export default IngredientDialog;
-
