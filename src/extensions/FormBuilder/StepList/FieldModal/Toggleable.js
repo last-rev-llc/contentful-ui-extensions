@@ -29,7 +29,7 @@ function Toggleable({ field, updateField }) {
         id="showByDefault"
         name="showByDefault"
         labelText="Show by default?"
-        defaultChecked={field.defaultValue}
+        checked={field.defaultValue}
         onChange={(e) => updateField('defaultValue', e.currentTarget.checked)}
       />
     </FieldGroup>
