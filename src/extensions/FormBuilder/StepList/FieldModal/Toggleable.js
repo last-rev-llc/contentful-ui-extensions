@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { FieldGroup, CheckboxField } from '@contentful/forma-36-react-components';
@@ -15,14 +16,29 @@ const SubfieldStyle = styled.div`
   }
 `;
 
+function makeDefaultField() {
+  return {
+    id: uuidv4(),
+    name: 'name',
+    type: 'hidden'
+  };
+}
+
 function Toggleable({ field, updateField }) {
+  const { field: subfield = makeDefaultField() } = field;
+
   return (
     <FieldGroup>
       <SubfieldStyle>
         <FieldEditor
           title="Subfield Editor"
-          field={field.field}
-          updateField={(newField) => updateField({ field: newField })}
+          field={subfield}
+          updateField={(key, newValue) =>
+            updateField('field', {
+              ...subfield,
+              [key]: newValue
+            })
+          }
         />
       </SubfieldStyle>
       <CheckboxField
