@@ -110,12 +110,14 @@ function StepList({ stepConfig }) {
                     .then(({ field: newField } = {}) => newField && fieldUpdate(step.id, newField))
                 }
                 onRemoveItem={fieldRemove(step.id)}
-                renderItem={(field) => (
-                  <FieldDisplay>
-                    <span>{field.name}</span>
-                    <TypeText>{field.type}</TypeText>
-                  </FieldDisplay>
-                )}
+                renderItem={(field) => {
+                  return (
+                    <FieldDisplay>
+                      <span>{field.name}</span>
+                      <TypeText>{field.type}</TypeText>
+                    </FieldDisplay>
+                  );
+                }}
               />
               <LeftIconButton
                 size="small"
