@@ -13,6 +13,7 @@ const ItemStyle = styled(Card)`
   height: 50px;
   display: flex;
   align-items: center;
+  user-select: none;
 
   button {
     margin: 0;
@@ -31,6 +32,7 @@ const ItemStyle = styled(Card)`
 const ChildrenStyle = styled(Card)`
   margin-bottom: 8px;
   display: flex;
+  user-select: none;
   flex-direction: column;
 
   display: ${({ $shown: isShown }) => (isShown ? 'block' : 'none')};
