@@ -93,7 +93,7 @@ function FormBuilder() {
     return (
       <div>
         <ToggleJsonButton
-          labelText="Toggle JSON mode"
+          label="Toggle JSON mode"
           iconProps={{ icon: 'Edit' }}
           onClick={() => setJsonMode(!jsonMode)}
         />

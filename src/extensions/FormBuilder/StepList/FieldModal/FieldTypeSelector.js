@@ -39,12 +39,17 @@ const fieldTypes = [
   { value: 'week', label: 'Week' }
 ];
 
-function FieldTypeSelector({ field, updateField, updateFieldEvent }) {
+function FieldTypeSelector({ field, updateField }) {
   return (
     <>
       <FieldGroup>
         <FormLabel htmlFor="type">Field Type</FormLabel>
-        <Select required id="type" name="type" defaultValue={field.type} onChange={updateFieldEvent('type')}>
+        <Select
+          required
+          id="type"
+          name="type"
+          defaultValue={field.type}
+          onChange={(e) => updateField('type', e.currentTarget.value)}>
           {fieldTypes.map(({ value: fieldType, label }) => (
             <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
               {label}
@@ -59,7 +64,6 @@ function FieldTypeSelector({ field, updateField, updateFieldEvent }) {
 
 FieldTypeSelector.propTypes = {
   updateField: PropTypes.func.isRequired,
-  updateFieldEvent: PropTypes.func.isRequired,
   field: PropTypes.shape({
     type: PropTypes.string
   }).isRequired
