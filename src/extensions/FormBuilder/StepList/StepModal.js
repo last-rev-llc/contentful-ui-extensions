@@ -8,7 +8,7 @@ import { useSDK } from '../../../context';
 import { ModalStyle } from './styles';
 import { denormalizeValues, normalizeValues } from './utils';
 
-function FieldModal() {
+function StepModal() {
   const sdk = useSDK();
   const [step, setStep] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
 
@@ -58,4 +58,4 @@ function FieldModal() {
   );
 }
 
-export default FieldModal;
+export default StepModal;
