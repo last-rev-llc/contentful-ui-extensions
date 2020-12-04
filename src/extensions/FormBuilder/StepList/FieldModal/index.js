@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { omit } from 'lodash/fp';
-import { Button, FieldGroup, FormLabel, Heading, TextInput } from '@contentful/forma-36-react-components';
+import { Button } from '@contentful/forma-36-react-components';
 
 import DependsOn from '../../DependsOn';
 import { useSDK } from '../../../../context';
 
 import { ModalStyle } from '../styles';
 import { normalizeValues, denormalizeValues } from '../utils';
-import FieldTypeSelector from './FieldTypeSelector';
+
+import FieldEditor from './FieldEditor';
 
 function FieldModal() {
   const sdk = useSDK();
@@ -20,11 +21,6 @@ function FieldModal() {
     }));
   };
 
-  const updateFieldEvent = (key) => (event) => {
-    const { value } = event.currentTarget;
-    updateField(key)(value);
-  };
-
   const handleCancel = () => sdk.close({ field: null });
   const handleSubmit = () => sdk.close({ field: denormalizeValues(field) });
 
@@ -32,16 +28,7 @@ function FieldModal() {
 
   return (
     <ModalStyle>
-      <Heading>Edit Field</Heading>
-      <FieldGroup>
-        <FormLabel htmlFor="label">Field Label</FormLabel>
-        <TextInput required defaultValue={field.label} onChange={updateFieldEvent('label')} />
-      </FieldGroup>
-      <FieldTypeSelector field={field} updateField={updateField} updateFieldEvent={updateFieldEvent} />
-      <FieldGroup>
-        <FormLabel htmlFor="title">Form key</FormLabel>
-        <TextInput required defaultValue={name} onChange={updateFieldEvent('name')} />
-      </FieldGroup>
+      <FieldEditor title="Field Editor" field={field} updateField={updateField} />
       <DependsOn
         value={field.dependsOn}
         tests={field.dependsOnTests}
