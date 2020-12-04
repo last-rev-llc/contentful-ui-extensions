@@ -15,8 +15,9 @@ const Row = styled.div`
 `;
 
 const TitleArea = styled(Row)`
-  input {
-    margin-left: 8px;
+  label {
+    margin-left: 4px;
+    margin-bottom: 0;
   }
 `;
 
@@ -93,12 +94,12 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
   if (!enabled) {
     return (
       <TitleArea>
-        <FormLabel htmlFor="title">Depends On</FormLabel>
         <Checkbox
           labelText="Enable/Disable dependsOn logic"
           checked={enabled}
           onClick={() => setEnabled((prev) => !prev)}
         />
+        <FormLabel htmlFor="title">Has dependency?</FormLabel>
       </TitleArea>
     );
   }
@@ -106,7 +107,6 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
   return (
     <>
       <TitleArea>
-        <FormLabel htmlFor="title">Depends On</FormLabel>
         <Checkbox
           labelText="Enable/Disable dependsOn logic"
           checked={enabled}
@@ -123,9 +123,10 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
             })
           }
         />
+        <FormLabel htmlFor="title">Has dependency?</FormLabel>
       </TitleArea>
       <FieldGroup>
-        <FormLabel htmlFor="title">Depends On</FormLabel>
+        <FormLabel htmlFor="title">Depends On logic</FormLabel>
         <JsonTextArea
           required
           defaultValue={value}
