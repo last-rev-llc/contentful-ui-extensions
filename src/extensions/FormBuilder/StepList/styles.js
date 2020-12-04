@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const ModalStyle = styled.div`
-  h1 {
+  > h1 {
     padding: 24px;
 
     border-bottom: 1px solid lightgrey;
