@@ -5,7 +5,7 @@ import { FieldGroup, FormLabel, TextInput, Select, Option } from '@contentful/fo
 import { URL_TYPES } from '../utils';
 import SectionWrapper from '../SectionWrapper';
 
-const CreateForm = ({ formConfig }) => {
+function FormInfo({ formConfig }) {
   return (
     <SectionWrapper title="General">
       <FieldGroup>
@@ -46,9 +46,9 @@ const CreateForm = ({ formConfig }) => {
       )}
     </SectionWrapper>
   );
-};
+}
 
-CreateForm.propTypes = {
+FormInfo.propTypes = {
   formConfig: PropTypes.shape({
     formId: PropTypes.string,
     portalId: PropTypes.string,
@@ -60,6 +60,6 @@ CreateForm.propTypes = {
   }).isRequired
 };
 
-CreateForm.defaultProps = {};
+FormInfo.defaultProps = {};
 
-export default CreateForm;
+export default FormInfo;

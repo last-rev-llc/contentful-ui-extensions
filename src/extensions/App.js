@@ -47,8 +47,6 @@ import { SDKContext } from '../context';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import '@contentful/forma-36-fcss/dist/styles.css';
 
-import { SDKContext } from '../context';
-
 const App = ({ sdk, locations }) => {
   return (
     <SDKContext.Provider value={sdk}>
