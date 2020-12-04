@@ -43,7 +43,7 @@ function hasSomeChildren(children) {
 }
 
 const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children, renderItem, dragging }) => {
-  const [childrenShown, setChildrenShown] = useState(true);
+  const [childrenShown, setChildrenShown] = useState(false);
   const toggleChildren = () => setChildrenShown((prev) => !prev);
 
   const withoutPropagation = curry((func, event) => {
