@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { omit } from 'lodash/fp';
+import { curry, omit } from 'lodash/fp';
 import { Button } from '@contentful/forma-36-react-components';
 
 import DependsOn from '../../DependsOn';
@@ -14,12 +14,12 @@ function FieldModal() {
   const sdk = useSDK();
   const [field, setField] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
 
-  const updateField = (key) => (newValue) => {
+  const updateField = curry((key, newValue) => {
     setField((prev) => ({
       ...prev,
       [key]: newValue
     }));
-  };
+  });
 
   const handleCancel = () => sdk.close({ field: null });
   const handleSubmit = () => sdk.close({ field: denormalizeValues(field) });
