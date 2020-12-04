@@ -1,44 +1,51 @@
 import { useState } from 'react';
-import { curry, merge } from 'lodash/fp';
+import { merge } from 'lodash/fp';
 import arrayMove from 'array-move';
 
 import { buildStep, URL_TYPES } from './utils';
 
-export function useProviderConfig(handleFieldChange, { type = 'custom' } = {}) {
-  const [values, setValues] = useState({ type });
-
-  const setContentfulKey = curry((key, newValue) =>
-    // Save to contentful
-    handleFieldChange(`provider.${key}`, newValue)
-  );
+export function useProviderConfig(setContentfulKey, { parameters = {}, type = 'custom' } = {}) {
+  const { formId = '', portalId = '' } = parameters;
+  const [values, setValues] = useState({ type, formId, portalId });
 
   return {
-    url: values.url,
-    type: values.type,
-    setContentfulKey,
+    ...values,
 
-    setType: (key, newType) => {
+    setType: (newType) => {
       // Save to contentful
-      setContentfulKey('type', newType);
+      setContentfulKey('provider.type', newType);
 
       setValues((oldValues) =>
         merge(oldValues)({
           type: newType,
 
           // Disable the URL if this type does not support it
-          url: URL_TYPES.includes(newType) ? oldValues.url : undefined
+          formId: URL_TYPES.includes(newType) ? oldValues.portalId : undefined,
+          portalId: URL_TYPES.includes(newType) ? oldValues.portalId : undefined
         })
       );
     },
 
-    setUrl: (newUrl) => {
+    setFormId: (newUrl) => {
       // Save to contentful
-      setContentfulKey('formId', newUrl);
+      setContentfulKey('provider.parameters.formId', newUrl);
 
-      setValues((oldValues) => merge(oldValues)({ url: newUrl }));
+      setValues((oldValues) => merge(oldValues)({ formId: newUrl }));
     },
 
-    update: (updates) => setValues({ ...values, ...updates })
+    setPortalId: (newUrl) => {
+      // Save to contentful
+      setContentfulKey('provider.parameters.portalId', newUrl);
+
+      setValues((oldValues) => merge(oldValues)({ portalId: newUrl }));
+    },
+
+    update: ({ parameters: newParameters, type: newType }) =>
+      setValues({
+        ...values,
+        ...newParameters,
+        type: newType
+      })
   };
 }
 

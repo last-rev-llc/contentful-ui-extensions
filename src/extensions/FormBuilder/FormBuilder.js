@@ -39,12 +39,12 @@ function FormBuilder() {
   const sdk = useSDK();
   const [jsonMode, setJsonMode] = useState(false);
 
-  const handleFieldChange = curry((fieldName, newValue) =>
+  const handleFieldChange = curry((fieldName, newValue) => {
     sdk.field.setValue(
       // Use lodash set to insert items at deep.key.level
-      set(clone(sdk.field.getValue(), fieldName, newValue))
-    )
-  );
+      set(clone(sdk.field.getValue()), fieldName, newValue)
+    );
+  });
 
   const formConfig = useProviderConfig(handleFieldChange);
   const stepConfig = useFormSteps(handleFieldChange, [
@@ -92,7 +92,11 @@ function FormBuilder() {
   try {
     return (
       <div>
-        <ToggleJsonButton iconProps={{ icon: 'Edit' }} onClick={() => setJsonMode(!jsonMode)} />
+        <ToggleJsonButton
+          labelText="Toggle JSON mode"
+          iconProps={{ icon: 'Edit' }}
+          onClick={() => setJsonMode(!jsonMode)}
+        />
         {!jsonMode && (
           <>
             <FormInfo formConfig={formConfig} />

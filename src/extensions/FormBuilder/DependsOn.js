@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import jsonLogic from 'json-logic-js';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { IconButton, FieldGroup, FormLabel, Textarea, Checkbox } from '@contentful/forma-36-react-components';
+import { IconButton, FieldGroup, FormLabel, Textarea, CheckboxField } from '@contentful/forma-36-react-components';
 
 import { safeParse } from './utils';
 
@@ -12,13 +12,6 @@ const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-`;
-
-const TitleArea = styled(Row)`
-  label {
-    margin-left: 4px;
-    margin-bottom: 0;
-  }
 `;
 
 const AddRow = styled(Row)`
@@ -93,38 +86,32 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
 
   if (!enabled) {
     return (
-      <TitleArea>
-        <Checkbox
-          labelText="Enable/Disable dependsOn logic"
-          checked={enabled}
-          onClick={() => setEnabled((prev) => !prev)}
-        />
-        <FormLabel htmlFor="title">Has dependency?</FormLabel>
-      </TitleArea>
+      <CheckboxField
+        checked={enabled}
+        labelText="Enable/Disable dependsOn logic"
+        onClick={() => setEnabled((prev) => !prev)}
+      />
     );
   }
 
   return (
     <>
-      <TitleArea>
-        <Checkbox
-          labelText="Enable/Disable dependsOn logic"
-          checked={enabled}
-          onClick={() =>
-            setEnabled((prev) => {
-              if (!prev) {
-                return true;
-              }
+      <CheckboxField
+        labelText="Enable/Disable dependsOn logic"
+        checked={enabled}
+        onClick={() =>
+          setEnabled((prev) => {
+            if (!prev) {
+              return true;
+            }
 
-              // Disable the dependsOn entirely
-              onChangeValue('{}');
-              onChangeTests([]);
-              return false;
-            })
-          }
-        />
-        <FormLabel htmlFor="title">Has dependency?</FormLabel>
-      </TitleArea>
+            // Disable the dependsOn entirely
+            onChangeValue('{}');
+            onChangeTests([]);
+            return false;
+          })
+        }
+      />
       <FieldGroup>
         <FormLabel htmlFor="title">Depends On logic</FormLabel>
         <JsonTextArea

@@ -111,6 +111,10 @@ function StepList({ stepConfig }) {
                 }
                 onRemoveItem={fieldRemove(step.id)}
                 renderItem={(field) => {
+                  if (field.type === 'toggleable') {
+                    return <span>Hi</span>;
+                  }
+
                   return (
                     <FieldDisplay>
                       <span>{field.name}</span>
@@ -143,9 +147,9 @@ StepList.propTypes = {
   stepConfig: PropTypes.shape({
     steps: PropTypes.arrayOf(
       PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired
-      })
+        id: PropTypes.string,
+        title: PropTypes.string
+      }).isRequired
     ),
     stepAdd: PropTypes.func,
     stepRemove: PropTypes.func,
