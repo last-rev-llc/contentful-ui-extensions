@@ -51,24 +51,24 @@ function useFieldsConfig(stepEdit) {
   // We want to keep this function curried so we
   // must provide a second argument (for lodash)
   // eslint-disable-next-line no-unused-vars
-  const fieldAdd = curry((stepId, _event) =>
+  const fieldAdd = curry((stepId, _event) => {
     stepEdit(stepId, (oldStep) => ({
       ...oldStep,
       fields: oldStep.fields.concat(buildField())
-    }))
-  );
+    }));
+  });
 
-  const fieldUpdate = curry((stepId, newField) =>
+  const fieldUpdate = curry((stepId, newField) => {
     stepEdit(stepId, (oldStep) => ({
       ...oldStep,
       fields: oldStep.fields.map((field) => (field.id === newField.id ? newField : field))
-    }))
-  );
+    }));
+  });
 
-  const fieldReorder = curry((stepId, { oldIndex, newIndex }) =>
+  const fieldReorder = curry((stepId, { oldIndex, newIndex }) => {
     // Move the item to position requested
-    stepEdit(stepId, (step) => ({ ...step, fields: arrayMove(step.fields, oldIndex, newIndex) }))
-  );
+    stepEdit(stepId, (step) => ({ ...step, fields: arrayMove(step.fields, oldIndex, newIndex) }));
+  });
 
   return {
     fieldAdd,

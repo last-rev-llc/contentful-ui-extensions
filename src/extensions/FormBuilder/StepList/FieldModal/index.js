@@ -10,6 +10,24 @@ import { normalizeValues, denormalizeValues } from '../utils';
 
 import FieldEditor from './FieldEditor';
 
+function isValid(field) {
+  const { name } = field;
+  if (name.length < 1) return false;
+
+  const { type } = field;
+  switch (type) {
+    case 'select': {
+      const { options = [] } = field;
+      return options.length > 0 && options.every(({ label, value }) => label.length > 0 && value.length > 0);
+    }
+
+    default:
+      break;
+  }
+
+  return true;
+}
+
 function FieldModal() {
   const sdk = useSDK();
   const [field, setField] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
@@ -23,8 +41,6 @@ function FieldModal() {
 
   const handleCancel = () => sdk.close({ field: null });
   const handleSubmit = () => sdk.close({ field: denormalizeValues(field) });
-
-  const { name = '' } = field;
 
   return (
     <ModalStyle>
@@ -45,7 +61,7 @@ function FieldModal() {
             type="submit"
             className="confirm-delete-dialog-button"
             onClick={handleSubmit}
-            disabled={name.length < 1}>
+            disabled={!isValid(field)}>
             Save
           </Button>
         </div>

@@ -88,6 +88,7 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
     return (
       <CheckboxField
         checked={enabled}
+        id="dependsOnEnabled"
         name="dependsOnEnabled"
         labelText="Enable dependsOn logic"
         onClick={() => setEnabled((prev) => !prev)}
@@ -98,6 +99,7 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
   return (
     <>
       <CheckboxField
+        id="dependsOnEnabled"
         name="dependsOnEnabled"
         labelText="Disable dependsOn logic"
         checked={enabled}
