@@ -34,14 +34,14 @@ function FieldModal() {
     <ModalStyle>
       <Heading>Edit Field</Heading>
       <FieldGroup>
-        <FormLabel htmlFor="title">Field Name</FormLabel>
-        <TextInput required defaultValue={name} onChange={updateFieldEvent('name')} />
-      </FieldGroup>
-      <FieldGroup>
         <FormLabel htmlFor="label">Field Label</FormLabel>
         <TextInput required defaultValue={field.label} onChange={updateFieldEvent('label')} />
       </FieldGroup>
       <FieldTypeSelector field={field} updateField={updateField} updateFieldEvent={updateFieldEvent} />
+      <FieldGroup>
+        <FormLabel htmlFor="title">Form key</FormLabel>
+        <TextInput required defaultValue={name} onChange={updateFieldEvent('name')} />
+      </FieldGroup>
       <DependsOn
         value={field.dependsOn}
         tests={field.dependsOnTests}

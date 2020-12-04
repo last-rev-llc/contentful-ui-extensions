@@ -14,23 +14,35 @@ const CreateForm = ({ formConfig }) => {
           required
           id="type"
           name="type"
-          value={formConfig?.provider?.type}
+          value={formConfig.type}
           onChange={(e) => formConfig.setType(e.currentTarget.value)}>
           <Option value="custom">Custom</Option>
           <Option value="hubspot">Hubspot</Option>
         </Select>
       </FieldGroup>
-      {URL_TYPES.includes(formConfig?.provider?.type) && (
-        <FieldGroup>
-          <FormLabel htmlFor="name">Form URL</FormLabel>
-          <TextInput
-            required
-            name="url"
-            id="url"
-            value={formConfig?.provider?.url}
-            onChange={(e) => formConfig.setUrl(e.currentTarget.value)}
-          />
-        </FieldGroup>
+      {URL_TYPES.includes(formConfig.type) && (
+        <>
+          <FieldGroup>
+            <FormLabel htmlFor="name">Form ID</FormLabel>
+            <TextInput
+              required
+              id="formId"
+              name="formId"
+              value={formConfig.formId}
+              onChange={(e) => formConfig.setFormId(e.currentTarget.value)}
+            />
+          </FieldGroup>
+          <FieldGroup>
+            <FormLabel htmlFor="name">Portal ID</FormLabel>
+            <TextInput
+              required
+              id="portalId"
+              name="portalId"
+              value={formConfig.portalId}
+              onChange={(e) => formConfig.setPortalId(e.currentTarget.value)}
+            />
+          </FieldGroup>
+        </>
       )}
     </SectionWrapper>
   );
@@ -38,13 +50,13 @@ const CreateForm = ({ formConfig }) => {
 
 CreateForm.propTypes = {
   formConfig: PropTypes.shape({
-    url: PropTypes.string,
+    formId: PropTypes.string,
+    portalId: PropTypes.string,
     type: PropTypes.string,
-    title: PropTypes.string,
 
-    setUrl: PropTypes.func,
-    setType: PropTypes.func,
-    setTitle: PropTypes.func
+    setFormId: PropTypes.func,
+    setPortalId: PropTypes.func,
+    setType: PropTypes.func
   }).isRequired
 };
 
