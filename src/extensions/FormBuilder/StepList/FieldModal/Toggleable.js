@@ -1,4 +1,5 @@
 import React from 'react';
+import { curry } from 'lodash/fp';
 import { v4 as uuidv4 } from 'uuid';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
@@ -33,12 +34,12 @@ function Toggleable({ field, updateField }) {
         <FieldEditor
           title="Subfield Editor"
           field={subfield}
-          updateField={(key, newValue) =>
+          updateField={curry((key, newValue) =>
             updateField('field', {
               ...subfield,
               [key]: newValue
             })
-          }
+          )}
         />
       </SubfieldStyle>
       <CheckboxField
