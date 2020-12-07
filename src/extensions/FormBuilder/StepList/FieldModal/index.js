@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { curry, omit } from 'lodash/fp';
-import { Button, TextField } from '@contentful/forma-36-react-components';
+import { Button } from '@contentful/forma-36-react-components';
 
 import DependsOn from '../../DependsOn';
 import { useSDK } from '../../../../context';
@@ -45,24 +45,6 @@ function FieldModal() {
   return (
     <ModalStyle>
       <FieldEditor title="Field Editor" field={field} updateField={updateField} />
-      <TextField
-        labelText="Default value"
-        name="defaultValue"
-        id="defaultValue"
-        onChange={(e) => {
-          let value;
-
-          try {
-            // Try to load JSON types (true/false)
-            value = JSON.parse(e.currentTarget.value);
-          } catch (error) {
-            // Default to loading as text
-            value = e.currentTarget.value;
-          }
-
-          updateField('defaultValue', value);
-        }}
-      />
       <DependsOn
         value={field.dependsOn}
         tests={field.dependsOnTests}

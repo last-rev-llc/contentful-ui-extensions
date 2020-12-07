@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { FieldGroup, CheckboxField } from '@contentful/forma-36-react-components';
 
-import FieldEditor from './FieldEditor';
+import FieldEditor from '../FieldEditor';
 
 const SubfieldStyle = styled.div`
   padding-left: 16px;
