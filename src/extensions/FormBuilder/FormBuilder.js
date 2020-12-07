@@ -35,6 +35,14 @@ function getModal(sdk) {
   return modal;
 }
 
+function ensureIds(steps) {
+  return steps.map((step) => ({
+    id: uuidv4(),
+    ...step,
+    fields: step.fields.map((field) => ({ id: uuidv4(), ...field }))
+  }));
+}
+
 function FormBuilder() {
   const sdk = useSDK();
   const [jsonMode, setJsonMode] = useState(false);
@@ -54,7 +62,7 @@ function FormBuilder() {
 
   const loadState = ({ steps = [], provider = {} }) => {
     if (steps.length > 0) {
-      stepConfig.update(steps.map((step) => ({ id: uuidv4(), ...step })));
+      stepConfig.update(ensureIds(steps));
     }
     if (Object.keys(provider).length > 0) {
       formConfig.update(provider);
