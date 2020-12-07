@@ -23,7 +23,7 @@ export function hasValue(value) {
   return Boolean(value);
 }
 
-const cleanup = pickBy(identity);
+const cleanup = pickBy((item) => [null, undefined].includes(item) === false);
 
 export function denormalizeValues({ dependsOn, dependsOnTests, ...field }) {
   const tests = dependsOnTests.map((test) => safeParse(test)).filter(identity);
