@@ -33,12 +33,12 @@ export const showModal = curry((sdk, modalName, parameters) =>
   })
 );
 
-export function buildField({ name = 'name', type = 'hidden', value = 'test' } = {}) {
+export function buildField({ name = 'no_name', type = 'hidden', defaultValue = '' } = {}) {
   return {
     id: uuidv4(),
     type,
     name,
-    value
+    defaultValue
   };
 }
 
