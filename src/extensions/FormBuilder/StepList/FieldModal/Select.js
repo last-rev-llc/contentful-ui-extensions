@@ -53,8 +53,8 @@ function Select({ field, updateField }) {
     <div>
       {options.length > 0 && (
         <Row>
-          <TypeTitle>Label</TypeTitle>
-          <TypeTitle>Value</TypeTitle>
+          <TypeTitle htmlFor="label-header">Label</TypeTitle>
+          <TypeTitle htmlFor="value-header">Value</TypeTitle>
           <Hidden />
         </Row>
       )}
@@ -64,6 +64,7 @@ function Select({ field, updateField }) {
         // eslint-disable-next-line react/no-array-index-key
         <Row key={index}>
           <TextInput
+            label=""
             value={label}
             onChange={(event) =>
               updateOptions(
