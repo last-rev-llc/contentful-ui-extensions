@@ -45,7 +45,7 @@ function Toggleable({ field, updateField }) {
       <CheckboxField
         id="showByDefault"
         name="showByDefault"
-        labelText="Starts Enabled?"
+        labelText="Starts Disabled?"
         checked={field.defaultValue}
         onChange={(e) => updateField('defaultValue', e.currentTarget.checked)}
       />
