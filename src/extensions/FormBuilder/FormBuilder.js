@@ -20,8 +20,20 @@ import { useProviderConfig, useFormSteps } from './hooks';
 
 const QuickIcons = styled.div`
   position: fixed;
-  top: 24px;
-  right: 24px;
+
+  margin: 1rem;
+  top: 12px;
+  right: 12px;
+
+  background: white;
+  padding: 4px;
+  border-radius: 4px;
+
+  min-width: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const JsonInput = styled(Textarea)`
