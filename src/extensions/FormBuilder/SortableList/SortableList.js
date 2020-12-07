@@ -60,7 +60,7 @@ const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children
         <div className="card-item-content">
           <div className="card-item-title">
             {renderItem && renderItem(item)}
-            {!renderItem && <Paragraph element="p">{item.title || item.name}</Paragraph>}
+            {!renderItem && <Paragraph element="p">{item.title || item.name || 'No Title'}</Paragraph>}
           </div>
           {hasSomeChildren(children) && (
             <IconButton
