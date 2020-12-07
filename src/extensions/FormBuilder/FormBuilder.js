@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import copy from 'copy-to-clipboard';
 import { v4 as uuidv4 } from 'uuid';
 import { set } from 'lodash';
 import { curry, clone } from 'lodash/fp';
@@ -17,7 +18,7 @@ import './FormBuilder.scss';
 import { buildStep, safeParse } from './utils';
 import { useProviderConfig, useFormSteps } from './hooks';
 
-const ToggleJsonButton = styled(IconButton)`
+const QuickIcons = styled.div`
   position: fixed;
   top: 24px;
   right: 24px;
@@ -100,11 +101,14 @@ function FormBuilder() {
   try {
     return (
       <div>
-        <ToggleJsonButton
-          label="Toggle JSON mode"
-          iconProps={{ icon: 'Edit' }}
-          onClick={() => setJsonMode(!jsonMode)}
-        />
+        <QuickIcons>
+          <IconButton
+            label="Copy JSON"
+            iconProps={{ icon: 'Copy' }}
+            onClick={() => copy(JSON.stringify(sdk.field.getValue(), null, 2))}
+          />
+          <IconButton label="Toggle JSON mode" iconProps={{ icon: 'Edit' }} onClick={() => setJsonMode(!jsonMode)} />
+        </QuickIcons>
         {!jsonMode && (
           <>
             <FormInfo formConfig={formConfig} />
@@ -113,7 +117,7 @@ function FormBuilder() {
         )}
         {jsonMode && (
           <JsonInput
-            value={JSON.stringify(sdk.field.getValue(), null, 4)}
+            value={JSON.stringify(sdk.field.getValue(), null, 2)}
             onChange={(event) => {
               const newFormState = safeParse(event.currentTarget.value);
               if (newFormState) {
@@ -123,7 +127,6 @@ function FormBuilder() {
             }}
           />
         )}
-        {/* <ConfirmDeleteDialog item={removeStep} onClose={handleCancelRemoveStep} onSubmit={handleRemoveStep} /> */}
       </div>
     );
   } catch (error) {
