@@ -91,7 +91,11 @@ function StepList({ stepConfig }) {
         <SortableList
           items={steps}
           onSortEnd={stepReorder}
-          onRemoveItem={stepRemove}
+          onRemoveItem={(step) =>
+            showModal(sdk, 'step-remove', { step, type: 'step' }).then(
+              ({ confirmation }) => confirmation && stepRemove(step)
+            )
+          }
           onEditItem={(step) =>
             showModal(sdk, 'step-modal', step)
               // If the modal returned us a new step we'll update the values in our current state
@@ -109,7 +113,11 @@ function StepList({ stepConfig }) {
                     // orr null if the user clicks cancel
                     .then(({ field: newField } = {}) => newField && fieldUpdate(step.id, newField))
                 }
-                onRemoveItem={fieldRemove(step.id)}
+                onRemoveItem={(field) =>
+                  showModal(sdk, 'field-remove', { field, type: 'field' }).then(
+                    ({ confirmation }) => confirmation && fieldRemove(step.id, field)
+                  )
+                }
                 renderItem={(field) => (
                   <FieldDisplay>
                     <span>{field.name}</span>
