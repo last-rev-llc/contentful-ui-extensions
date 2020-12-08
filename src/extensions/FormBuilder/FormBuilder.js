@@ -13,6 +13,7 @@ import StepList from './StepList';
 
 import StepModal from './StepList/StepModal';
 import FieldModal from './StepList/FieldModal';
+import ConfirmModal from './StepList/ConfirmDeleteModal';
 
 import './FormBuilder.scss';
 import { buildStep, safeParse } from './utils';
@@ -105,6 +106,12 @@ function FormBuilder() {
 
     case 'step-modal':
       return <StepModal />;
+
+    case 'step-remove':
+      return <ConfirmModal />;
+
+    case 'field-remove':
+      return <ConfirmModal />;
 
     default:
       break;
