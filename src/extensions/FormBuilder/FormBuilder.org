@@ -24,3 +24,20 @@ The following image gives a breakdown of the components:
 
 [[./images/overview_description.png]]
 
+
+*** Creating a step
+Clicking "Add step" adds a template step which can be edited by clicking anywhere on the main body of the step.
+
+Steps can have ~dependsOn~ logic, please see the appropriate section
+
+*** Creating a field
+Clicking the small plus button below the last field adds a template field which can be edited by clicking anywhere on the main body of the field.
+
+Fields by default have the following attributes:
+ - Label (what will be displayed to the user)
+ - Key (where the value will be saved in the formState)
+ - Type (which type of field to render to the user)
+
+Fields can have ~dependsOn~ logic, please see the appropriate section
+
+** dependsOn
