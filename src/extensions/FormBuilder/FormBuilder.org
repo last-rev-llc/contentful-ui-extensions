@@ -4,7 +4,7 @@
 
 Upon loading the appropriate content model you should be greeted with something which looks similar to the following:
 
-![[./images/overview.png]]
+[[./images/overview.png]]
 
 ** General section
 *** Form type
@@ -22,5 +22,5 @@ The copy button copies the raw JSON from the form to enable ease of pasting to a
 This is the real meat of our form builder software.
 The following image gives a breakdown of the components:
 
-![[./images/overview_description.png]]
+[[./images/overview_description.png]]
 
