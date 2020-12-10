@@ -41,3 +41,39 @@ Fields by default have the following attributes:
 Fields can have ~dependsOn~ logic, please see the appropriate section
 
 ** dependsOn
+Fields & steps can be toggled on and off by using dependsOn logic.
+Currently we use [[http://jsonlogic.com/][jsonLogic]] which is a JSON enabled programming structure. In future we hope to improve this with a more user-friendly approach.
+
+To begin edit any step or field and click "Enable ~dependsOn~"
+
+You will see a few new text fields appear:
+
+- Depends on
+- Tests (if you have added some)
+
+An example of a depends on logic might be the following:
+
+#+BEGIN_SRC json
+{
+    "!!": { "var": "isCustomBusiness" }
+}
+#+END_SRC
+
+Which would enable the step or field when someone has selected ~isCustomBusiness~ (which would be set from another field key).
+
+This offers quite a robust and detailed process as we can toggle other items based on more complex logic such as:
+
+#+BEGIN_SRC json
+{
+  "and": [
+    { ">": [{ "var": "age" }, 20] },
+    { "==": [{ "var": "gender" }, "male"] },
+    { "==": [{ "var": "country" }, "USA"] }
+  ]
+}
+#+END_SRC
+
+Which would only enable the step or field if the following are true
+- User is older than 20 AND
+- User is male AND
+- User is in the USA
