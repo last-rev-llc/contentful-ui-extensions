@@ -64,7 +64,7 @@ function FormBuilder() {
   const handleFieldChange = curry((fieldName, newValue) => {
     sdk.field.setValue(
       // Use lodash set to insert items at deep.key.level
-      set(clone(sdk.field.getValue()), fieldName, newValue)
+      set(clone(sdk.field.getValue() || {}), fieldName, newValue)
     );
   });
 
