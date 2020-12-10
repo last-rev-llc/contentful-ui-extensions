@@ -40,6 +40,10 @@ Fields by default have the following attributes:
 
 Fields can have ~dependsOn~ logic, please see the appropriate section
 
+For some field types, other input fields will appear automatically. For more information on field types please see the documentation here:
+
+[[https://github.com/Impossible-Foods/impossiblefoods.com/blob/master/src/components/ModuleForm/DynamicForm/Fields/Fields.org][Field documentation]]
+
 ** dependsOn
 Fields & steps can be toggled on and off by using dependsOn logic.
 Currently we use [[http://jsonlogic.com/][jsonLogic]] which is a JSON enabled programming structure. In future we hope to improve this with a more user-friendly approach.
