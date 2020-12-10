@@ -31,7 +31,7 @@ const Tag = styled(FormLabel)`
   justify-content: flex-end;
 `;
 
-function ConfirmModal() {
+function ConfirmDeleteModal() {
   const sdk = useSDK();
   const { type = 'field' } = sdk.parameters.invocation;
 
@@ -69,4 +69,4 @@ function ConfirmModal() {
   );
 }
 
-export default ConfirmModal;
+export default ConfirmDeleteModal;
