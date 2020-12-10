@@ -1,0 +1,26 @@
+#+TITLE: Form Builder
+
+* Tutorial
+
+Upon loading the appropriate content model you should be greeted with something which looks similar to the following:
+
+![[./images/overview.png]]
+
+** General section
+*** Form type
+gives us the ability to select the form provider (where will the data get sent)
+Upon selecting specific providers we'll be able to input a formId or portalId (hubspot)
+
+*** Edit & Copy buttons
+The edit button allows to manually edit the JSON, this is an advanced feature as it can be easy
+to make a mistake while manually editing the form data.
+
+The copy button copies the raw JSON from the form to enable ease of pasting to another content model.
+
+** Form Setup section
+
+This is the real meat of our form builder software.
+The following image gives a breakdown of the components:
+
+![[./images/overview_description.png]]
+
