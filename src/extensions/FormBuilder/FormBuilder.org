@@ -28,6 +28,9 @@ The following image gives a breakdown of the components:
 *** Creating a step
 Clicking "Add step" adds a template step which can be edited by clicking anywhere on the main body of the step.
 
+Clicking on the blue collapse children button will hide or show the children of the step, which can be useful when working on a larg form.
+Steps can be re-ordered by dragging the handle on the left side of the step.
+
 Steps can have ~dependsOn~ logic, please see the appropriate section
 
 *** Creating a field
@@ -81,6 +84,10 @@ Which would only enable the step or field if the following are true
 - User is older than 20 AND
 - User is male AND
 - User is in the USA
+
+*** Notes on usability
+
+In future we hope to create a simpler UI interface around the dependsOn system which will include commonly used functionality.
 
 ** Video
 [[https://streamable.com/ufuns4]]

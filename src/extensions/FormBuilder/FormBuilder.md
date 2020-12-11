@@ -1,16 +1,17 @@
 # Table of Contents
 
-1.  [Tutorial](#org734677e)
-    1.  [General section](#org98e306d)
-        1.  [Form type](#org8453f5a)
-        2.  [Edit & Copy buttons](#org5477ede)
-    2.  [Form Setup section](#org0190d44)
-        1.  [Creating a step](#org0036971)
-        2.  [Creating a field](#orgb232846)
-    3.  [dependsOn](#org8f07898)
-    4.  [Video](#org888710d)
+1.  [Tutorial](#org1320b3d)
+    1.  [General section](#orgdf96562)
+        1.  [Form type](#org9db0a23)
+        2.  [Edit & Copy buttons](#org8790fd8)
+    2.  [Form Setup section](#org04f7cc1)
+        1.  [Creating a step](#org3e8fb8f)
+        2.  [Creating a field](#org72629b4)
+    3.  [dependsOn](#org9518bf9)
+        1.  [Notes on usability](#org3dfb831)
+    4.  [Video](#org20427cf)
 
-<a id="org734677e"></a>
+<a id="org1320b3d"></a>
 
 # Tutorial
 
@@ -18,18 +19,18 @@ Upon loading the appropriate content model you should be greeted with something 
 
 ![img](./images/overview.png)
 
-<a id="org98e306d"></a>
+<a id="orgdf96562"></a>
 
 ## General section
 
-<a id="org8453f5a"></a>
+<a id="org9db0a23"></a>
 
 ### Form type
 
 gives us the ability to select the form provider (where will the data get sent)
 Upon selecting specific providers we&rsquo;ll be able to input a formId or portalId (hubspot)
 
-<a id="org5477ede"></a>
+<a id="org8790fd8"></a>
 
 ### Edit & Copy buttons
 
@@ -38,7 +39,7 @@ to make a mistake while manually editing the form data.
 
 The copy button copies the raw JSON from the form to enable ease of pasting to another content model.
 
-<a id="org0190d44"></a>
+<a id="org04f7cc1"></a>
 
 ## Form Setup section
 
@@ -47,15 +48,18 @@ The following image gives a breakdown of the components:
 
 ![img](./images/overview_description.png)
 
-<a id="org0036971"></a>
+<a id="org3e8fb8f"></a>
 
 ### Creating a step
 
 Clicking &ldquo;Add step&rdquo; adds a template step which can be edited by clicking anywhere on the main body of the step.
 
+Clicking on the blue collapse children button will hide or show the children of the step, which can be useful when working on a larg form.
+Steps can be re-ordered by dragging the handle on the left side of the step.
+
 Steps can have `dependsOn` logic, please see the appropriate section
 
-<a id="orgb232846"></a>
+<a id="org72629b4"></a>
 
 ### Creating a field
 
@@ -73,7 +77,7 @@ For some field types, other input fields will appear automatically. For more inf
 
 [Field documentation](https://github.com/Impossible-Foods/impossiblefoods.com/blob/master/src/components/ModuleForm/DynamicForm/Fields/Fields.org)
 
-<a id="org8f07898"></a>
+<a id="org9518bf9"></a>
 
 ## dependsOn
 
@@ -111,7 +115,13 @@ Which would only enable the step or field if the following are true
 - User is male AND
 - User is in the USA
 
-<a id="org888710d"></a>
+<a id="org3dfb831"></a>
+
+### Notes on usability
+
+In future we hope to create a simpler UI interface around the dependsOn system which will include commonly used functionality.
+
+<a id="org20427cf"></a>
 
 ## Video
 
