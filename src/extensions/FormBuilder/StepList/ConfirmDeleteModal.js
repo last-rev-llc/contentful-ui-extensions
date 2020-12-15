@@ -40,6 +40,8 @@ function ConfirmDeleteModal() {
   const handleCancel = () => sdk.close({ confirmation: null });
   const handleSubmit = () => sdk.close({ confirmation: true });
 
+  const title = data.title || data.label || data.name;
+
   return (
     <ModalStyle>
       <Heading>Confirm delete {type}</Heading>
@@ -51,7 +53,10 @@ function ConfirmDeleteModal() {
           </Row>
           <Row>
             <Tag>Label: </Tag>
-            <FormLabel htmlFor="delete-title">{data.title || data.label || data.name}</FormLabel>
+            <FormLabel htmlFor="delete-title">
+              {// Handle object labels
+              title instanceof Object ? data.name : title}
+            </FormLabel>
           </Row>
         </Col>
       )}
