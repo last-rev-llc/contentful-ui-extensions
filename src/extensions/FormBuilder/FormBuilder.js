@@ -117,6 +117,16 @@ function FormBuilder() {
       break;
   }
 
+  /**
+   * Since we have a separate header section where we input
+   * the remote form ID and provider, we'll only allow direct editing
+   * of the form steps section
+   * */
+  const getEditableValue = () => {
+    const { provider, ...rest } = sdk.field.getValue();
+    return rest;
+  };
+
   try {
     return (
       <div>
@@ -136,7 +146,7 @@ function FormBuilder() {
         )}
         {jsonMode && (
           <JsonInput
-            value={JSON.stringify(sdk.field.getValue(), null, 2)}
+            value={JSON.stringify(getEditableValue(), null, 2)}
             onChange={(event) => {
               const newFormState = safeParse(event.currentTarget.value);
               if (newFormState) {
