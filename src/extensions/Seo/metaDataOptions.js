@@ -5,27 +5,36 @@ const metaDataOptions = [
     label: 'Search Engine Visibility',
     cssClass: 'data-default',
     help: 'Should search engines index this content?',
-    options: [{ value: 'index,follow', label: 'Index' }, { value: 'noindex,nofollow', label: 'Don\'t Index' }]
+    options: [
+      { value: 'index,follow', label: 'Index' },
+      { value: 'noindex,nofollow', label: "Don't Index" }
+    ]
   },
   {
     tag: 'input',
     value: 'title',
     label: 'Page Title',
     cssClass: 'data-default',
-    help: 'Browser tab and search engine result display.',
+    help: 'Browser tab and search engine result display.'
   },
   {
     tag: 'textarea',
     value: 'description',
     label: 'Meta Description',
     cssClass: 'data-default',
-    help: 'The short description in search engine result display.',
+    help: 'The short description in search engine result display.'
   },
   {
     tag: 'textarea',
     value: 'keywords',
     label: 'Meta Keywords',
-    help: 'Keywords used for search engine indexing.',
+    help: 'Keywords used for search engine indexing.'
+  },
+  {
+    tag: 'input',
+    value: 'canonical',
+    label: 'Canonical URL',
+    help: 'Canonical specifies to search engines your preferred URL. Default is current page URL.'
   },
   {
     tag: 'input',

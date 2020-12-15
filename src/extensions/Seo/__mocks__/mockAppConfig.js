@@ -10,13 +10,13 @@ const mockAppConfig = {
             defaultNoIndex: false,
             defaultPageTitleField: 'title',
             defaultDescriptionField: 'description',
-            defaultSocialImageField: 'mainImage',
+            defaultCanonicalField: 'canonical',
+            defaultSocialImageField: 'mainImage'
           }
-        },
+        }
       ]
     }
   }
 };
 
 export default mockAppConfig;
-
