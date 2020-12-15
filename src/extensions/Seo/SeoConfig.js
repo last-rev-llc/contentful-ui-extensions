@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { Component } from 'react';
-import { get, set, filter, keys, indexOf, isEmpty, find, head, omit } from 'lodash';
+import { get, set, filter, keys, indexOf, isEmpty, find, head, omit, random } from 'lodash';
 import {
   EmptyState,
   IconButton,
@@ -179,7 +179,7 @@ class SeoConfig extends Component {
     if (!isEmpty(contentTypeConfig) && get(contentTypeConfig, contentType.sys.id)) {
       // TODO: get teh full content type
       return (
-        <TableRow key={Math.random()} testId="SeoConfig-tablerow-contentType">
+        <TableRow key={random(100000)} testId="SeoConfig-tablerow-contentType">
           <TableCell>
             <IconButton
               iconProps={{
