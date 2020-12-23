@@ -97,7 +97,7 @@ function StepList({ stepConfig }) {
             )
           }
           onEditItem={(step) =>
-            showModal(sdk, 'step-modal', step)
+            showModal(sdk, 'step-modal', { steps, step })
               // If the modal returned us a new step we'll update the values in our current state
               // The modal is stateless so it's not changing our step directly
               .then(({ step: newStep } = {}) => newStep && stepEdit(step.id, newStep))
@@ -108,7 +108,7 @@ function StepList({ stepConfig }) {
                 items={step.fields}
                 onSortEnd={fieldReorder(step.id)}
                 onEditItem={(field) =>
-                  showModal(sdk, 'field-modal', field)
+                  showModal(sdk, 'field-modal', { steps, field })
                     // When the user clicks save in the modal we'll get the new field back
                     // orr null if the user clicks cancel
                     .then(({ field: newField } = {}) => newField && fieldUpdate(step.id, newField))
