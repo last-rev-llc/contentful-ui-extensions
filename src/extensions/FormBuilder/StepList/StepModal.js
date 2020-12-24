@@ -10,7 +10,8 @@ import { denormalizeValues, normalizeValues } from './utils';
 
 function StepModal() {
   const sdk = useSDK();
-  const [step, setStep] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
+  const { invocation } = sdk.parameters;
+  const [step, setStep] = useState(omit(['modal'], normalizeValues(invocation.step)));
 
   const updateStep = curry((key, value) => {
     setStep((prev) => ({

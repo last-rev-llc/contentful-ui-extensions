@@ -78,7 +78,7 @@ function useFieldsConfig(stepEdit) {
   };
 }
 
-function StepList({ stepConfig }) {
+function StepList({ stepConfig, readOnly }) {
   const sdk = useSDK();
 
   const { steps, stepAdd, stepRemove, stepEdit, stepReorder } = stepConfig;
@@ -90,14 +90,15 @@ function StepList({ stepConfig }) {
         <SectionHeading className="title">Steps</SectionHeading>
         <SortableList
           items={steps}
+          readOnly={readOnly}
           onSortEnd={stepReorder}
           onRemoveItem={(step) =>
-            showModal(sdk, 'step-remove', { step, type: 'step' }).then(
+            showModal(sdk, { name: 'step-remove' }, { steps, step, type: 'step' }).then(
               ({ confirmation }) => confirmation && stepRemove(step)
             )
           }
           onEditItem={(step) =>
-            showModal(sdk, 'step-modal', step)
+            showModal(sdk, { width: 800, name: 'editor-modal' }, { steps, step })
               // If the modal returned us a new step we'll update the values in our current state
               // The modal is stateless so it's not changing our step directly
               .then(({ step: newStep } = {}) => newStep && stepEdit(step.id, newStep))
@@ -105,16 +106,17 @@ function StepList({ stepConfig }) {
           {(step) => (
             <Col>
               <SortableList
+                readOnly={readOnly}
                 items={step.fields}
                 onSortEnd={fieldReorder(step.id)}
                 onEditItem={(field) =>
-                  showModal(sdk, 'field-modal', field)
+                  showModal(sdk, { name: 'field-modal' }, { steps, field })
                     // When the user clicks save in the modal we'll get the new field back
                     // orr null if the user clicks cancel
                     .then(({ field: newField } = {}) => newField && fieldUpdate(step.id, newField))
                 }
                 onRemoveItem={(field) =>
-                  showModal(sdk, 'field-remove', { field, type: 'field' }).then(
+                  showModal(sdk, { name: 'field-remove' }, { steps, field, type: 'field' }).then(
                     ({ confirmation }) => confirmation && fieldRemove(step.id, field)
                   )
                 }
@@ -125,21 +127,25 @@ function StepList({ stepConfig }) {
                   </FieldDisplay>
                 )}
               />
-              <LeftIconButton
-                size="small"
-                buttonType="primary"
-                label="Add new field"
-                onClick={fieldAdd(step.id)}
-                iconProps={{ icon: 'PlusCircle' }}
-              />
+              {!readOnly && (
+                <LeftIconButton
+                  size="small"
+                  buttonType="primary"
+                  label="Add new field"
+                  onClick={fieldAdd(step.id)}
+                  iconProps={{ icon: 'PlusCircle' }}
+                />
+              )}
             </Col>
           )}
         </SortableList>
-        <div className="actions">
-          <Button onClick={stepAdd} size="small">
-            Add Step
-          </Button>
-        </div>
+        {!readOnly && (
+          <div className="actions">
+            <Button onClick={stepAdd} size="small">
+              Add Step
+            </Button>
+          </div>
+        )}
       </div>
     </SectionWrapper>
   );
@@ -157,9 +163,10 @@ StepList.propTypes = {
     stepRemove: PropTypes.func,
     stepEdit: PropTypes.func,
     stepReorder: PropTypes.func
-  }).isRequired
+  }).isRequired,
+  readOnly: PropTypes.bool
 };
 
-StepList.defaultProps = {};
+StepList.defaultProps = { readOnly: false };
 
 export default StepList;

@@ -30,7 +30,8 @@ function isValid(field) {
 
 function FieldModal() {
   const sdk = useSDK();
-  const [field, setField] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
+  const { invocation } = sdk.parameters;
+  const [field, setField] = useState(omit(['modal'], normalizeValues(invocation.field)));
 
   const updateField = curry((key, newValue) => {
     setField((prev) => ({
