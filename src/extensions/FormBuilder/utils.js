@@ -19,19 +19,21 @@ export function safeParse(maybeJson) {
   }
 }
 
-export const showModal = curry((sdk, modalName, parameters) =>
-  sdk.dialogs.openExtension({
-    width: 500,
+export const showModal = curry((sdk, modalProps = {}, parameters) => {
+  const { width = 800, name } = modalProps;
+
+  return sdk.dialogs.openExtension({
+    width,
     id: sdk.ids.extension,
     shouldCloseOnOverlayClick: true,
     shouldCloseOnEscapePress: true,
     position: 'center',
     parameters: {
-      modal: modalName,
+      modal: name,
       ...parameters
     }
-  })
-);
+  });
+});
 
 export function buildField({ name = 'no_name', type = 'hidden' } = {}) {
   return {

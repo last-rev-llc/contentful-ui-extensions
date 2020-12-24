@@ -13,6 +13,7 @@ import StepList from './StepList';
 
 import StepModal from './StepList/StepModal';
 import FieldModal from './StepList/FieldModal';
+import EditorModal from './StepList/EditorModal';
 import ConfirmModal from './StepList/ConfirmDeleteModal';
 
 import './FormBuilder.scss';
@@ -101,6 +102,9 @@ function FormBuilder() {
   );
 
   switch (getModal(sdk)) {
+    case 'editor-modal':
+      return <EditorModal />;
+
     case 'field-modal':
       return <FieldModal />;
 
@@ -141,7 +145,7 @@ function FormBuilder() {
         {!jsonMode && (
           <>
             <FormInfo formConfig={formConfig} />
-            <StepList stepConfig={stepConfig} />
+            <StepList readOnly stepConfig={stepConfig} />
           </>
         )}
         {jsonMode && (

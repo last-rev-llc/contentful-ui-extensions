@@ -44,7 +44,7 @@ function hasSomeChildren(children) {
   return !!children;
 }
 
-const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children, renderItem, dragging }) => {
+const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children, renderItem, dragging, readOnly }) => {
   const [childrenShown, setChildrenShown] = useState(true);
   const toggleChildren = () => setChildrenShown((prev) => !prev);
 
@@ -55,8 +55,11 @@ const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children
 
   return (
     <>
-      <ItemStyle onClick={withoutPropagation(onEditItem)}>
-        <DragHandle />
+      <ItemStyle
+        onClick={(event) =>
+          readOnly ? withoutPropagation(toggleChildren, event) : withoutPropagation(onEditItem, event)
+        }>
+        {!readOnly && <DragHandle />}
         <div className="card-item-content">
           <div className="card-item-title">
             {renderItem && renderItem(item)}
@@ -73,15 +76,17 @@ const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children
               Expand/Collapse children
             </IconButton>
           )}
-          <IconButton
-            buttonType="negative"
-            size="small"
-            label="Delete item"
-            className="card-item-button"
-            iconProps={{ icon: 'Delete' }}
-            onClick={withoutPropagation(onRemoveItem)}>
-            Delete item
-          </IconButton>
+          {!readOnly && (
+            <IconButton
+              buttonType="negative"
+              size="small"
+              label="Delete item"
+              className="card-item-button"
+              iconProps={{ icon: 'Delete' }}
+              onClick={withoutPropagation(onRemoveItem)}>
+              Delete item
+            </IconButton>
+          )}
         </div>
       </ItemStyle>
 
@@ -95,27 +100,29 @@ const SortableContainer = sortableContainer(({ children }) => (
   <List className="sortable-list">{children}</List>
 ));
 
-function SortableList({ items, onSortEnd, onRemoveItem, onEditItem, children, renderItem }) {
+function SortableList({ items, onSortEnd, onRemoveItem, onEditItem, children, readOnly, renderItem }) {
   const [dragging, setDragging] = useState(false);
 
   return (
     <div className="sortable-list">
       <SortableContainer
         onSortEnd={(sortingData) => {
+          if (readOnly) return;
           setDragging(false);
           onSortEnd(sortingData);
         }}
-        onSortStart={() => setDragging(true)}
+        onSortStart={() => !readOnly && setDragging(true)}
         useDragHandle>
         {items.map((item, index) => (
           <SortableItem
             key={`item-${item.id || index}`}
             item={item}
             index={index}
+            readOnly={readOnly}
             dragging={dragging}
             renderItem={renderItem}
-            onEditItem={() => onEditItem(item)}
-            onRemoveItem={() => onRemoveItem(item)}>
+            onEditItem={() => !readOnly && onEditItem(item)}
+            onRemoveItem={() => !readOnly && onRemoveItem(item)}>
             {children instanceof Function && children(item)}
           </SortableItem>
         ))}
@@ -125,6 +132,7 @@ function SortableList({ items, onSortEnd, onRemoveItem, onEditItem, children, re
 }
 
 SortableList.propTypes = {
+  readOnly: PropTypes.bool,
   items: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -140,6 +148,7 @@ SortableList.propTypes = {
 };
 
 SortableList.defaultProps = {
+  readOnly: false,
   children: null,
   renderItem: null
 };
