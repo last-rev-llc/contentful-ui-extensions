@@ -47,7 +47,7 @@ function FieldModal() {
   return (
     <ModalStyle>
       <FieldEditor title="Field Editor" field={field} updateField={updateField} />
-      <DependsOn value={field.dependsOn} steps={invocation.steps} onChange={updateField('dependsOn')} />
+      <DependsOn dependsOn={field.dependsOn} steps={invocation.steps} onChange={updateField('dependsOn')} />
       <footer>
         <div className="confirm-delete-dialog-actions">
           <Button type="submit" buttonType="negative" size="small" onClick={handleCancel}>

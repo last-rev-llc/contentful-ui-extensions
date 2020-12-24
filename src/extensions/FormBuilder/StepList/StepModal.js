@@ -35,7 +35,7 @@ function StepModal() {
         <FormLabel htmlFor="title">Step Name</FormLabel>
         <TextInput required defaultValue={title} onChange={updateStepEvent('title')} />
       </FieldGroup>
-      <DependsOn value={step.dependsOn} steps={invocation.steps} onChange={updateStep('dependsOn')} />
+      <DependsOn dependsOn={step.dependsOn} steps={invocation.steps} onChange={updateStep('dependsOn')} />
       <footer>
         <div className="confirm-delete-dialog-actions">
           <Button type="submit" buttonType="negative" size="small" onClick={handleCancel}>
