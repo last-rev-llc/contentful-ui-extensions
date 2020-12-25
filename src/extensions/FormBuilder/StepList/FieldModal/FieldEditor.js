@@ -8,7 +8,7 @@
 
   function FieldEditor({ field, updateField }) {
     return (
-      <div key={field.id}>
+      <>
         <FieldGroup>
           <FormLabel htmlFor="label">Label</FormLabel>
           <TextInput required defaultValue={field.label} onChange={(e) => updateField('label', e.currentTarget.value)} />
@@ -24,7 +24,7 @@
           onChangeValue={updateField('dependsOn')}
           onChangeTests={updateField('dependsOnTests')}
         />
-      </div>
+      </>
     );
   }
 
