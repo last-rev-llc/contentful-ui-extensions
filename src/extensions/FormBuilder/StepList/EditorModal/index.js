@@ -16,28 +16,24 @@ function RightContent({ selected, updateStep, updateField }) {
   switch (selected.type) {
     case 'step':
       return (
-        <RightSection>
-          <div key="step-editor">
-            <Heading>Step editor</Heading>
-            <StepEditor step={selected.step} updateStep={updateStep} />
-          </div>
+        <RightSection key={selected.step.id}>
+          <Heading>Step editor</Heading>
+          <StepEditor step={selected.step} updateStep={updateStep} />
         </RightSection>
       );
 
     case 'field':
       return (
-        <RightSection>
-          <div key="field-editor">
-            <Heading>Field editor</Heading>
-            <FieldEditor field={selected.field} updateField={updateField} />
-          </div>
+        <RightSection key={selected.field.id}>
+          <Heading>Field editor</Heading>
+          <FieldEditor field={selected.field} updateField={updateField} />
         </RightSection>
       );
 
     default:
       return (
-        <RightSection>
-          <NothingHere key="nothing-here">Nothing selected</NothingHere>
+        <RightSection key="nothing-here">
+          <NothingHere>Nothing selected</NothingHere>
         </RightSection>
       );
   }
