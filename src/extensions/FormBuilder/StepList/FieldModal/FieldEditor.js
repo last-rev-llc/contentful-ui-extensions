@@ -7,16 +7,15 @@
   import FieldTypeSelector from './FieldTypeSelector';
 
   function FieldEditor({ field, updateField }) {
-    const { name, label } = field;
     return (
-      <>
+      <div key={field.id}>
         <FieldGroup>
           <FormLabel htmlFor="label">Label</FormLabel>
-          <TextInput required defaultValue={label} onChange={(e) => updateField('label', e.currentTarget.value)} />
+          <TextInput required defaultValue={field.label} onChange={(e) => updateField('label', e.currentTarget.value)} />
         </FieldGroup>
         <FieldGroup>
           <FormLabel htmlFor="title">Form key</FormLabel>
-          <TextInput required defaultValue={name} onChange={(e) => updateField('name', e.currentTarget.value)} />
+          <TextInput required defaultValue={field.name} onChange={(e) => updateField('name', e.currentTarget.value)} />
         </FieldGroup>
         <FieldTypeSelector field={field} updateField={updateField} />
         <DependsOn
@@ -25,23 +24,26 @@
           onChangeValue={updateField('dependsOn')}
           onChangeTests={updateField('dependsOnTests')}
         />
-      </>
+      </div>
     );
   }
 
   FieldEditor.propTypes = {
     field: PropTypes.shape({
+      id: PropTypes.string,
       label: PropTypes.string,
-      name: PropTypes.string
+      name: PropTypes.string,
+      dependsOn: PropTypes.string,
+      dependsOnTests: PropTypes.arrayOf(PropTypes.string)
     }).isRequired,
     updateField: PropTypes.func.isRequired,
 
-    dependsOn: PropTypes.object,
+    dependsOn: PropTypes.string,
     dependsOnTests: PropTypes.arrayOf(PropTypes.object)
   };
 
   FieldEditor.defaultProps = {
-    dependsOn: {},
+    dependsOn: '',
     dependsOnTests: []
   };
 

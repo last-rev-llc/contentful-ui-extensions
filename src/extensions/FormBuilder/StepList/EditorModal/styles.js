@@ -56,6 +56,7 @@ export const LeftSection = styled(Col)`
 
   padding-left: 1rem;
   padding-right: 0.5rem;
+  padding-bottom: 2rem;
 `;
 
 export const RightSection = styled(Col)`
@@ -68,6 +69,7 @@ export const RightSection = styled(Col)`
 
   padding-left: 0.5rem;
   padding-right: 1rem;
+  padding-bottom: 2rem;
 
   > div {
     width: 100%;
