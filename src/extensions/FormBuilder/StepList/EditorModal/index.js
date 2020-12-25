@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import styled from 'styled-components';
-import { Card, Heading } from '@contentful/forma-36-react-components';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { curry } from 'lodash';
+import { Button, Heading } from '@contentful/forma-36-react-components';
 
 import { useFormSteps, useFieldConfig } from '../../hooks';
 import { useSDK } from '../../../../context';
@@ -8,40 +9,40 @@ import { useSDK } from '../../../../context';
 import StepList from '../StepList';
 import StepEditor from '../StepModal/StepEditor';
 import FieldEditor from '../FieldModal/FieldEditor';
-import { ModalStyle } from '../styles';
 
-const Col = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
+import { EditorStyle, SectionWrapper, NothingHere, LeftSection, RightSection, ActionSection } from './styles';
 
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
+function RightContent({ selected, updateStep, updateField }) {
+  const isSelected = (type) => selected && selected.type === type;
 
-const EditorStyle = styled(ModalStyle)`
-  padding-bottom: 0;
-  overflow: hidden;
-`;
+  return (
+    <RightSection>
+      {!selected && <NothingHere key="nothing-here">Nothing selected</NothingHere>}
+      {isSelected('step') && (
+        <div key="step-editor">
+          <Heading>Step editor</Heading>
+          <StepEditor step={selected.step} updateStep={updateStep} />
+        </div>
+      )}
+      {isSelected('field') && (
+        <div key="field-editor">
+          <Heading>Field editor</Heading>
+          <FieldEditor field={selected.field} updateField={updateField} />
+        </div>
+      )}
+    </RightSection>
+  );
+}
 
-const SectionWrapper = styled(Row)`
-  position: relative;
-`;
-
-const LeftSection = styled(Col)`
-  overflow-y: scroll;
-  width: 50%;
-  max-height: 80vh;
-  overflow-y: scroll;
-`;
-
-const RightSection = styled(Col)`
-  width: 50%;
-  bottom: 0;
-
-  align-items: center;
-`;
+RightContent.propTypes = {
+  updateStep: PropTypes.func.isRequired,
+  updateField: PropTypes.func.isRequired,
+  selected: PropTypes.shape({
+    step: PropTypes.object,
+    field: PropTypes.object,
+    type: PropTypes.oneOf(['step', ''])
+  }).isRequired
+};
 
 function EditorModal() {
   const sdk = useSDK();
@@ -49,29 +50,48 @@ function EditorModal() {
   const stepConfig = useFormSteps(sdk.parameters.invocation.steps);
   const fieldConfig = useFieldConfig(stepConfig.stepEdit);
 
-  const [selection, setSelection] = useState(null);
+  const [selected, setSelection] = useState({ type: null, step: null, field: null });
 
-  const isSelected = (type) => selection && selection.type === type;
+  const updateStep = curry((key, value) =>
+    stepConfig.stepEdit(selected.step.id, {
+      ...selected.step,
+      [key]: value
+    })
+  );
+  const updateField = curry((key, value) =>
+    fieldConfig.fieldEdit(selected.step.id, {
+      ...selected.field,
+      [key]: value
+    })
+  );
+
+  const handleCancel = () => sdk.close({ steps: null });
+  const handleConfirm = () => sdk.close({ steps: stepConfig.steps });
 
   return (
     <EditorStyle>
       <Heading>Edit Form</Heading>
       <SectionWrapper>
         <LeftSection>
+          <Heading>Steps</Heading>
           <StepList
             minimal
             stepConfig={stepConfig}
             fieldConfig={fieldConfig}
-            onStepClick={(step) => setSelection({ type: 'step', step })}
+            onStepClick={(step) => setSelection({ type: 'step', step, field: null })}
             onFieldClick={(field, step) => setSelection({ type: 'field', step, field })}
           />
         </LeftSection>
-        <RightSection>
-          {!selection && <Card>Nothing selected</Card>}
-          {isSelected('step') && <StepEditor step={selection.step} />}
-          {isSelected('field') && <FieldEditor field={selection.field} />}
-        </RightSection>
+        <RightContent selected={selected} updateStep={updateStep} updateField={updateField} />
       </SectionWrapper>
+      <ActionSection>
+        <Button buttonType="negative" onClick={handleCancel}>
+          Cancel
+        </Button>
+        <Button buttonType="primary" onClick={handleConfirm}>
+          Confirm
+        </Button>
+      </ActionSection>
     </EditorStyle>
   );
 }

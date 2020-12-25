@@ -113,7 +113,8 @@ export function useFormSteps(initialSteps = [], onChange) {
     stepEdit,
     stepRemove,
     stepReorder,
-    update: setStepsBase
+    stepsUpdate: (newSteps, saveToContentful = false) =>
+      saveToContentful ? setSteps(newSteps) : setStepsBase(newSteps)
   };
 }
 
@@ -180,10 +181,10 @@ export function useFormConfig(handleFieldChange) {
   const stepConfig = useFormSteps([buildStep('First step')], handleFieldChange);
 
   const loadState = ({ steps = [], provider = {} }) => {
-    if (steps.length > 0) {
-      stepConfig.update(ensureIds(steps));
+    if (steps && steps.length > 0) {
+      stepConfig.stepsUpdate(ensureIds(steps), false);
     }
-    if (Object.keys(provider).length > 0) {
+    if (provider && Object.keys(provider).length > 0) {
       formConfig.update(provider);
     }
   };

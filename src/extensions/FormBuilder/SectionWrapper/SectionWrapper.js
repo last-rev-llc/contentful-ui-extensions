@@ -1,10 +1,15 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Card, Heading } from "@contentful/forma-36-react-components";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Card, Heading } from '@contentful/forma-36-react-components';
 
 const SectionWrapperPropTypes = {
-  title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  title: PropTypes.oneOfType([
+    //
+    PropTypes.func,
+    PropTypes.node,
+    PropTypes.string
+  ]).isRequired
 };
 
 const SectionWrapper = ({ title, children }) => {
