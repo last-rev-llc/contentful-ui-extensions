@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { curry, omit } from 'lodash/fp';
 
+import { Heading } from '@contentful/forma-36-react-components';
 import { useSDK } from '../../../../context';
 
 import { ModalStyle } from '../styles';
@@ -21,6 +22,7 @@ function StepModal() {
 
   return (
     <ModalStyle>
+      <Heading>Edit Step</Heading>
       <StepEditor step={step} updateStep={updateStep} />
     </ModalStyle>
   );

@@ -7,16 +7,6 @@ export const ModalStyle = styled.div`
     border-bottom: 1px solid lightgrey;
   }
 
-  > div {
-    &:first-of-type {
-      padding-top: 12px;
-    }
-
-    padding-bottom: 12px;
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-
   position: relative;
   padding-bottom: 80px;
   footer {

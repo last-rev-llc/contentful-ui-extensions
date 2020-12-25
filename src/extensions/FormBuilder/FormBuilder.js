@@ -20,6 +20,11 @@ import './FormBuilder.scss';
 import { safeParse, showModal } from './utils';
 import { useFormConfig, useFieldConfig } from './hooks';
 
+const SectionHeaderWithButton = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
 const QuickIcons = styled.div`
   position: fixed;
 
@@ -138,11 +143,24 @@ function FormBuilder() {
         {!jsonMode && (
           <>
             <FormInfo formConfig={formConfig} />
-            <SectionWrapper title="Setup Form">
-              <SectionHeading className="title">Steps</SectionHeading>
-              <Button onClick={() => showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps })}>
-                Edit Form
-              </Button>
+            <SectionWrapper
+              title={
+                <SectionHeaderWithButton>
+                  Form Content
+                  <Button
+                    onClick={() =>
+                      showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(({ steps }) =>
+                        stepConfig.stepsUpdate(
+                          steps,
+                          // & also save to contentful
+                          true
+                        )
+                      )
+                    }>
+                    Edit Form
+                  </Button>
+                </SectionHeaderWithButton>
+              }>
               <StepList
                 readOnly
                 stepConfig={stepConfig}

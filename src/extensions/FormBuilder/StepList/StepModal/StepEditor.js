@@ -1,6 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { curry } from 'lodash/fp';
-import { Heading, Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
+import { Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
 
 import DependsOn from '../../DependsOn';
 import { useSDK } from '../../../../context';
@@ -18,9 +19,8 @@ function StepEditor({ step, updateStep }) {
 
   return (
     <>
-      <Heading>Edit Step</Heading>
       <FieldGroup>
-        <FormLabel htmlFor="title">Step Name</FormLabel>
+        <FormLabel htmlFor="title">Label</FormLabel>
         <TextInput required defaultValue={title} onChange={updateStepEvent('title')} />
       </FieldGroup>
       <DependsOn
@@ -47,5 +47,16 @@ function StepEditor({ step, updateStep }) {
     </>
   );
 }
+
+StepEditor.propTypes = {
+  step: PropTypes.shape({
+    title: PropTypes.string,
+    dependsOn: PropTypes.string,
+    dependsOnTests: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired,
+  updateStep: PropTypes.func.isRequired
+};
+
+StepEditor.defaultProps = {};
 
 export default StepEditor;
