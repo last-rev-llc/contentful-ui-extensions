@@ -149,13 +149,15 @@ function FormBuilder() {
                   Form Content
                   <Button
                     onClick={() =>
-                      showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(({ steps }) =>
-                        stepConfig.stepsUpdate(
-                          steps,
-                          // & also save to contentful
-                          true
-                        )
-                      )
+                      showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(({ steps }) => {
+                        console.log(steps);
+                        steps &&
+                          stepConfig.stepsUpdate(
+                            steps,
+                            // & also save to contentful
+                            true
+                          );
+                      })
                     }>
                     Edit Form
                   </Button>
@@ -163,6 +165,7 @@ function FormBuilder() {
               }>
               <StepList
                 readOnly
+                autoexpand={false}
                 stepConfig={stepConfig}
                 fieldConfig={fieldConfig}
                 onStepClick={onStepClick}

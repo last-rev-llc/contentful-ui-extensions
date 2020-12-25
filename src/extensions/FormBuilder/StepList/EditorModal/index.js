@@ -49,7 +49,7 @@ RightContent.propTypes = {
   selected: PropTypes.shape({
     step: PropTypes.object,
     field: PropTypes.object,
-    type: PropTypes.oneOf(['step', ''])
+    type: PropTypes.oneOf(['step', 'field', null])
   }).isRequired
 };
 
@@ -84,7 +84,6 @@ function EditorModal() {
         <LeftSection>
           <Heading>Steps</Heading>
           <StepList
-            minimal
             stepConfig={stepConfig}
             fieldConfig={fieldConfig}
             onStepClick={(step) => setSelection({ type: 'step', step, field: null })}

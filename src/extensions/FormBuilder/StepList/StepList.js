@@ -33,7 +33,7 @@ const TypeText = styled.span`
   padding: 8px;
 `;
 
-function StepList({ stepConfig, fieldConfig, readOnly, onStepClick, onFieldClick }) {
+function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, onFieldClick }) {
   const sdk = useSDK();
 
   const { steps, stepAdd, stepRemove, stepReorder } = stepConfig;
@@ -46,6 +46,7 @@ function StepList({ stepConfig, fieldConfig, readOnly, onStepClick, onFieldClick
         readOnly={readOnly}
         onSortEnd={stepReorder}
         onEditItem={onStepClick}
+        autoexpand={autoexpand}
         onRemoveItem={(step) =>
           showModal(sdk, { name: 'step-remove' }, { steps, step, type: 'step' }, { steps }).then(
             ({ confirmation }) => confirmation && stepRemove(step)
@@ -120,9 +121,11 @@ StepList.propTypes = {
 
   onStepClick: PropTypes.func.isRequired,
   onFieldClick: PropTypes.func.isRequired,
+
+  autoexpand: PropTypes.bool, // Show the fields by defult
   readOnly: PropTypes.bool // Don't allow editing of fields or steps
 };
 
-StepList.defaultProps = { readOnly: false };
+StepList.defaultProps = { autoexpand: true, readOnly: false };
 
 export default StepList;
