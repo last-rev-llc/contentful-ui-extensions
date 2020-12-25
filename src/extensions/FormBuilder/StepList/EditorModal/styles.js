@@ -29,6 +29,7 @@ export const EditorStyle = styled(ModalStyle)`
   overflow: hidden;
 
   h1 {
+    min-height: 2rem; // Keep styles aligned
     margin-bottom: 1rem;
   }
 `;
