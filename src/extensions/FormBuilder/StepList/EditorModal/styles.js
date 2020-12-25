@@ -16,6 +16,8 @@ export const ActionSection = styled(Row)`
   padding: 0.5rem;
   justify-content: flex-end;
   border-top: 5px solid whitesmoke;
+  position: relative;
+  z-index: 100;
 
   button {
     margin-left: 1rem;
@@ -32,12 +34,11 @@ export const EditorStyle = styled(ModalStyle)`
 `;
 
 export const SectionWrapper = styled(Row)`
-  position: relative;
   padding: 0;
 `;
 
 export const NothingHere = styled(Card)`
-  margin-top: 2rem;
+  margin-top: 3rem;
   min-height: 8rem;
 
   display: flex;
