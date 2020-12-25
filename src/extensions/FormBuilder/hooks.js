@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { merge } from 'lodash/fp';
+import { merge, curry } from 'lodash/fp';
+import { v4 as uuidv4 } from 'uuid';
 import arrayMove from 'array-move';
 
-import { buildStep, URL_TYPES } from './utils';
+import { buildStep, buildField, URL_TYPES } from './utils';
 
 export function useProviderConfig(setContentfulKey, { parameters = {}, type = 'custom' } = {}) {
   const { formId = '', portalId = '' } = parameters;
@@ -49,19 +50,29 @@ export function useProviderConfig(setContentfulKey, { parameters = {}, type = 'c
   };
 }
 
-export function useFormSteps(handleFieldChange, initialSteps = []) {
+export function useFormSteps(initialSteps = [], onChange) {
   const [steps, setStepsBase] = useState(initialSteps);
 
   const setSteps = (newValues) => {
     if (newValues instanceof Function) {
       return setStepsBase((oldValues) => {
         const toReturn = newValues(oldValues);
-        handleFieldChange('steps', toReturn);
+
+        // Allow us to pass in a callback function
+        // Helps when we want to automatically update the steps
+        if (onChange instanceof Function) {
+          onChange('steps', toReturn);
+        }
         return toReturn;
       });
     }
 
-    handleFieldChange('steps', newValues);
+    // Allow us to pass in a callback function
+    // Helps when we want to automatically update the steps
+    if (onChange instanceof Function) {
+      onChange('steps', newValues);
+    }
+
     return setStepsBase(newValues);
   };
 
@@ -106,4 +117,78 @@ export function useFormSteps(handleFieldChange, initialSteps = []) {
   };
 }
 
-export default { useFormSteps, useProviderConfig };
+/**
+ * We can pass in a single function (edit a step)
+ * And use that function to generate a set of utility functions
+ * for editing individual fields inside of that step
+ * */
+export function useFieldConfig(stepEdit) {
+  const fieldRemove = curry((stepId, field) =>
+    stepEdit(
+      stepId,
+
+      // Filter out the step
+      // we're passing a function to stepEdit which will give us
+      // the latest version of the step (actomic update)
+      (oldStep) => ({
+        ...oldStep,
+        fields: oldStep.fields.filter(({ id: fieldId }) => fieldId !== field.id)
+      })
+    )
+  );
+
+  // We want to keep this function curried so we
+  // must provide a second argument (for lodash)
+  // eslint-disable-next-line no-unused-vars
+  const fieldAdd = curry((stepId, _event) => {
+    stepEdit(stepId, (oldStep) => ({
+      ...oldStep,
+      fields: oldStep.fields.concat(buildField())
+    }));
+  });
+
+  const fieldEdit = curry((stepId, newField) => {
+    stepEdit(stepId, (oldStep) => ({
+      ...oldStep,
+      fields: oldStep.fields.map((field) => (field.id === newField.id ? newField : field))
+    }));
+  });
+
+  const fieldReorder = curry((stepId, { oldIndex, newIndex }) => {
+    // Move the item to position requested
+    stepEdit(stepId, (step) => ({ ...step, fields: arrayMove(step.fields, oldIndex, newIndex) }));
+  });
+
+  return {
+    fieldAdd,
+    fieldRemove,
+    fieldEdit,
+    fieldReorder
+  };
+}
+
+function ensureIds(steps) {
+  return steps.map((step) => ({
+    id: uuidv4(),
+    ...step,
+    fields: step.fields.map((field) => ({ id: uuidv4(), ...field }))
+  }));
+}
+
+export function useFormConfig(handleFieldChange) {
+  const formConfig = useProviderConfig(handleFieldChange);
+  const stepConfig = useFormSteps([buildStep('First step')], handleFieldChange);
+
+  const loadState = ({ steps = [], provider = {} }) => {
+    if (steps.length > 0) {
+      stepConfig.update(ensureIds(steps));
+    }
+    if (Object.keys(provider).length > 0) {
+      formConfig.update(provider);
+    }
+  };
+
+  return { formConfig, stepConfig, loadState };
+}
+
+export default { useFormSteps, useProviderConfig, useFormConfig };

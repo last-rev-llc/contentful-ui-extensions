@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import copy from 'copy-to-clipboard';
-import { v4 as uuidv4 } from 'uuid';
 import { set } from 'lodash';
 import { curry, clone } from 'lodash/fp';
 import styled from 'styled-components';
-import { IconButton, Textarea } from '@contentful/forma-36-react-components';
+import { Button, IconButton, Textarea, SectionHeading } from '@contentful/forma-36-react-components';
 
 import { useSDK } from '../../context';
 
 import FormInfo from './FormInfo';
 import StepList from './StepList';
 
+import SectionWrapper from './SectionWrapper';
 import StepModal from './StepList/StepModal';
 import FieldModal from './StepList/FieldModal';
 import EditorModal from './StepList/EditorModal';
 import ConfirmModal from './StepList/ConfirmDeleteModal';
 
 import './FormBuilder.scss';
-import { buildStep, safeParse } from './utils';
-import { useProviderConfig, useFormSteps } from './hooks';
+import { safeParse, showModal } from './utils';
+import { useFormConfig, useFieldConfig } from './hooks';
 
 const QuickIcons = styled.div`
   position: fixed;
@@ -50,39 +50,20 @@ function getModal(sdk) {
   return modal;
 }
 
-function ensureIds(steps) {
-  return steps.map((step) => ({
-    id: uuidv4(),
-    ...step,
-    fields: step.fields.map((field) => ({ id: uuidv4(), ...field }))
-  }));
-}
-
 function FormBuilder() {
   const sdk = useSDK();
   const [jsonMode, setJsonMode] = useState(false);
 
-  const handleFieldChange = curry((fieldName, newValue) => {
-    sdk.field.setValue(
-      // Use lodash set to insert items at deep.key.level
-      set(clone(sdk.field.getValue() || {}), fieldName, newValue)
-    );
-  });
+  const { formConfig, stepConfig, loadState } = useFormConfig(
+    curry((fieldName, newValue) => {
+      sdk.field.setValue(
+        // Use lodash set to insert items at deep.key.level
+        set(clone(sdk.field.getValue() || {}), fieldName, newValue)
+      );
+    })
+  );
 
-  const formConfig = useProviderConfig(handleFieldChange);
-  const stepConfig = useFormSteps(handleFieldChange, [
-    //
-    buildStep('First step')
-  ]);
-
-  const loadState = ({ steps = [], provider = {} }) => {
-    if (steps.length > 0) {
-      stepConfig.update(ensureIds(steps));
-    }
-    if (Object.keys(provider).length > 0) {
-      formConfig.update(provider);
-    }
-  };
+  const fieldConfig = useFieldConfig(stepConfig.stepEdit);
 
   /**
    * Load the last saved state from contentful
@@ -131,6 +112,18 @@ function FormBuilder() {
     return rest;
   };
 
+  const onStepClick = (step) =>
+    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps, step })
+      // If the modal returned us a new step we'll update the values in our current state
+      // The modal  stateless so it's not changing our step directly
+      .then(({ step: newStep } = {}) => newStep && stepConfig.stepEdit(step.id, newStep));
+
+  const onFieldClick = (field, step) =>
+    showModal(sdk, { name: 'field-modal' }, { steps: stepConfig.steps, field })
+      // When the user clicks save in the modal we'll get the new field back
+      // orr null if the user clicks cancel
+      .then(({ field: newField } = {}) => newField && fieldConfig.fieldEdit(step.id, newField));
+
   try {
     return (
       <div>
@@ -145,7 +138,19 @@ function FormBuilder() {
         {!jsonMode && (
           <>
             <FormInfo formConfig={formConfig} />
-            <StepList readOnly stepConfig={stepConfig} />
+            <SectionWrapper title="Setup Form">
+              <SectionHeading className="title">Steps</SectionHeading>
+              <Button onClick={() => showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps })}>
+                Edit Form
+              </Button>
+              <StepList
+                readOnly
+                stepConfig={stepConfig}
+                fieldConfig={fieldConfig}
+                onStepClick={onStepClick}
+                onFieldClick={onFieldClick}
+              />
+            </SectionWrapper>
           </>
         )}
         {jsonMode && (

@@ -1,25 +1,14 @@
-import React, { useState } from 'react';
-import { curry, omit } from 'lodash/fp';
+import React from 'react';
+import { curry } from 'lodash/fp';
 import { Heading, Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
 
-import DependsOn from '../DependsOn';
-import { useSDK } from '../../../context';
+import DependsOn from '../../DependsOn';
+import { useSDK } from '../../../../context';
 
-import { ModalStyle } from './styles';
-import { denormalizeValues, normalizeValues } from './utils';
+import { denormalizeValues } from '../utils';
 
-function StepModal() {
+function StepEditor({ step, updateStep }) {
   const sdk = useSDK();
-  const { invocation } = sdk.parameters;
-  const [step, setStep] = useState(omit(['modal'], normalizeValues(invocation.step)));
-
-  const updateStep = curry((key, value) => {
-    setStep((prev) => ({
-      ...prev,
-      [key]: value
-    }));
-  });
-
   const updateStepEvent = curry((key, event) => updateStep(key, event.currentTarget.value));
 
   const handleCancel = () => sdk.close({ step: null });
@@ -28,7 +17,7 @@ function StepModal() {
   const { title = '' } = step;
 
   return (
-    <ModalStyle>
+    <>
       <Heading>Edit Step</Heading>
       <FieldGroup>
         <FormLabel htmlFor="title">Step Name</FormLabel>
@@ -55,8 +44,8 @@ function StepModal() {
           </Button>
         </div>
       </footer>
-    </ModalStyle>
+    </>
   );
 }
 
-export default StepModal;
+export default StepEditor;

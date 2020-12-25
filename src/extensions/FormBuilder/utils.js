@@ -20,11 +20,12 @@ export function safeParse(maybeJson) {
 }
 
 export const showModal = curry((sdk, modalProps = {}, parameters) => {
-  const { width = 800, name } = modalProps;
+  const { width = 'fullWidth', name } = modalProps;
 
   return sdk.dialogs.openExtension({
     width,
     id: sdk.ids.extension,
+    allowHeightOverflow: false,
     shouldCloseOnOverlayClick: true,
     shouldCloseOnEscapePress: true,
     position: 'center',
