@@ -149,15 +149,17 @@ function FormBuilder() {
                   Form Content
                   <Button
                     onClick={() =>
-                      showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(({ steps }) => {
-                        console.log(steps);
-                        steps &&
+                      showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(
+                        ({ steps }) =>
+                          // If new steps are returned from the modal
+                          // the user clicked the confirm button, if null it's cancel
+                          steps &&
                           stepConfig.stepsUpdate(
                             steps,
                             // & also save to contentful
                             true
-                          );
-                      })
+                          )
+                      )
                     }>
                     Edit Form
                   </Button>
