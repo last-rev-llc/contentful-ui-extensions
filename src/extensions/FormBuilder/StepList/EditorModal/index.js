@@ -13,25 +13,34 @@ import FieldEditor from '../FieldModal/FieldEditor';
 import { EditorStyle, SectionWrapper, NothingHere, LeftSection, RightSection, ActionSection } from './styles';
 
 function RightContent({ selected, updateStep, updateField }) {
-  const isSelected = (type) => selected && selected.type === type;
+  switch (selected.type) {
+    case 'step':
+      return (
+        <RightSection>
+          <div key="step-editor">
+            <Heading>Step editor</Heading>
+            <StepEditor step={selected.step} updateStep={updateStep} />
+          </div>
+        </RightSection>
+      );
 
-  return (
-    <RightSection>
-      {!selected && <NothingHere key="nothing-here">Nothing selected</NothingHere>}
-      {isSelected('step') && (
-        <div key="step-editor">
-          <Heading>Step editor</Heading>
-          <StepEditor step={selected.step} updateStep={updateStep} />
-        </div>
-      )}
-      {isSelected('field') && (
-        <div key="field-editor">
-          <Heading>Field editor</Heading>
-          <FieldEditor field={selected.field} updateField={updateField} />
-        </div>
-      )}
-    </RightSection>
-  );
+    case 'field':
+      return (
+        <RightSection>
+          <div key="field-editor">
+            <Heading>Field editor</Heading>
+            <FieldEditor field={selected.field} updateField={updateField} />
+          </div>
+        </RightSection>
+      );
+
+    default:
+      return (
+        <RightSection>
+          <NothingHere key="nothing-here">Nothing selected</NothingHere>
+        </RightSection>
+      );
+  }
 }
 
 RightContent.propTypes = {
