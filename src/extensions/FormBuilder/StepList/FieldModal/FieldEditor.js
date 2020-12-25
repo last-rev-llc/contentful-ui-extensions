@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Heading, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
+import DependsOn from '../../DependsOn';
 import FieldTypeSelector from './FieldTypeSelector';
 
 function FieldEditor({ title, field, updateField }) {
   const { name, label } = field;
   return (
     <>
-      {title && <Heading>{title}</Heading>}
       <FieldGroup>
         <FormLabel htmlFor="label">Field Label</FormLabel>
         <TextInput required defaultValue={label} onChange={(e) => updateField('label', e.currentTarget.value)} />
@@ -17,6 +17,12 @@ function FieldEditor({ title, field, updateField }) {
         <TextInput required defaultValue={name} onChange={(e) => updateField('name', e.currentTarget.value)} />
       </FieldGroup>
       <FieldTypeSelector field={field} updateField={updateField} />
+      <DependsOn
+        value={field.dependsOn}
+        tests={field.dependsOnTests}
+        onChangeValue={updateField('dependsOn')}
+        onChangeTests={updateField('dependsOnTests')}
+      />
     </>
   );
 }
