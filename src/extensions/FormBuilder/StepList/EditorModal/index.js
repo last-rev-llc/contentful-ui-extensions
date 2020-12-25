@@ -56,6 +56,12 @@ RightContent.propTypes = {
 function EditorModal() {
   const sdk = useSDK();
 
+  // We can't pass in functionality from the SDK parameters
+  // so here we receive the steps as JSON from the parent window frame.
+  //
+  // We can then build out our state management system as normal.
+  // When we close the modal window the parent will handle updating the steps there
+  // The parent will also handle updating the state in contentful
   const stepConfig = useFormSteps(sdk.parameters.invocation.steps);
   const fieldConfig = useFieldConfig(stepConfig.stepEdit);
 
