@@ -17,6 +17,7 @@ import EditorModal from './StepList/EditorModal';
 import ConfirmModal from './StepList/ConfirmDeleteModal';
 
 import './FormBuilder.scss';
+import { validateSteps, onlyErrors } from './validate';
 import { safeParse, showModal } from './utils';
 import { useFormConfig, useFieldConfig } from './hooks';
 
@@ -61,10 +62,21 @@ function FormBuilder() {
 
   const { formConfig, stepConfig, loadState } = useFormConfig(
     curry((fieldName, newValue) => {
-      sdk.field.setValue(
-        // Use lodash set to insert items at deep.key.level
-        set(clone(sdk.field.getValue() || {}), fieldName, newValue)
-      );
+      // Use lodash set to insert items at deep.key.level
+      const newFieldValue = set(clone(sdk.field.getValue() || {}), fieldName, newValue);
+
+      const { steps = [] } = newFieldValue;
+
+      const errors = onlyErrors(validateSteps(steps));
+      const hasErrors = Object.keys(errors).length > 0;
+
+      // If we have some errors, disable publishing
+      sdk.field.setInvalid(hasErrors);
+
+      // We should be able to publish without issue
+      if (!hasErrors) {
+        sdk.field.setValue(newFieldValue);
+      }
     })
   );
 

@@ -7,7 +7,7 @@ import { Button, IconButton } from '@contentful/forma-36-react-components';
 import SortableList from '../SortableList';
 import { showModal } from '../utils';
 import { useSDK } from '../../../context';
-import { validateSteps, errorLevels } from './validate';
+import { validateSteps, errorLevels } from '../validate';
 
 const Col = styled.div`
   display: flex;
