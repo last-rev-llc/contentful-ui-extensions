@@ -3,7 +3,7 @@ import copy from 'copy-to-clipboard';
 import { set } from 'lodash';
 import { curry, clone } from 'lodash/fp';
 import styled from 'styled-components';
-import { Button, IconButton, Textarea, SectionHeading } from '@contentful/forma-36-react-components';
+import { Button, IconButton, Textarea } from '@contentful/forma-36-react-components';
 
 import { useSDK } from '../../context';
 
