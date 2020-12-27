@@ -71,10 +71,13 @@ function FormBuilder() {
       const hasErrors = Object.keys(errors).length > 0;
 
       // If we have some errors, disable publishing
-      sdk.field.setInvalid(hasErrors);
+      if (hasErrors) {
+        console.log('Removing value');
+        sdk.field.removeValue();
+      }
 
       // We should be able to publish without issue
-      if (!hasErrors) {
+      else {
         sdk.field.setValue(newFieldValue);
       }
     })
@@ -125,7 +128,7 @@ function FormBuilder() {
    * of the form steps section
    * */
   const getEditableValue = () => {
-    const { provider, ...rest } = sdk.field.getValue();
+    const { provider, ...rest } = sdk.field.getValue() || {};
     return rest;
   };
 
