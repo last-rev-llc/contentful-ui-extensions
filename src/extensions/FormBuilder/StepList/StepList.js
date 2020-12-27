@@ -1,14 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import arrayMove from 'array-move';
 import PropTypes from 'prop-types';
-import { curry } from 'lodash/fp';
 import { Button, IconButton } from '@contentful/forma-36-react-components';
 
-import SectionWrapper from '../SectionWrapper';
 import SortableList from '../SortableList';
 import { showModal } from '../utils';
 import { useSDK } from '../../../context';
+import { validateSteps } from './validate';
 
 const Col = styled.div`
   display: flex;
@@ -26,6 +24,8 @@ const FieldDisplay = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  ${({ hasError }) => hasError && 'border-bottom: 2px solid red;'}
 `;
 
 const TypeText = styled.span`
@@ -38,6 +38,11 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
 
   const { steps, stepAdd, stepRemove, stepReorder } = stepConfig;
   const { fieldAdd, fieldRemove, fieldReorder } = fieldConfig;
+
+  // Validate fields for errors such as missing or duplicate names
+  const errors = validateSteps(steps);
+  console.log(errors);
+  console.log(steps);
 
   return (
     <div className="setup-form">
@@ -65,7 +70,7 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
                 )
               }
               renderItem={(field) => (
-                <FieldDisplay>
+                <FieldDisplay hasError={errors[field.id]}>
                   <span>{field.name}</span>
                   <TypeText>{field.type}</TypeText>
                 </FieldDisplay>
