@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { pickBy } from 'lodash';
 import { Button, IconButton } from '@contentful/forma-36-react-components';
 
 import SortableList from '../SortableList';
 import { showModal } from '../utils';
 import { useSDK } from '../../../context';
-import { validateSteps } from './validate';
+import { validateSteps, errorLevels } from './validate';
 
 const Col = styled.div`
   display: flex;
@@ -26,6 +27,7 @@ const FieldDisplay = styled.div`
   justify-content: space-between;
 
   ${({ hasError }) => hasError && 'border-bottom: 2px solid red;'}
+  ${({ hasWarning }) => hasWarning && 'border-bottom: 2px solid orange;'}
 `;
 
 const TypeText = styled.span`
@@ -40,9 +42,10 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
   const { fieldAdd, fieldRemove, fieldReorder } = fieldConfig;
 
   // Validate fields for errors such as missing or duplicate names
-  const errors = validateSteps(steps);
-  console.log(errors);
-  console.log(steps);
+  const allErrors = validateSteps(steps);
+
+  const errors = pickBy(allErrors, ({ level }) => level === errorLevels.ERROR);
+  const warnings = pickBy(allErrors, ({ level }) => level === errorLevels.WARN);
 
   return (
     <div className="setup-form">
@@ -70,7 +73,7 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
                 )
               }
               renderItem={(field) => (
-                <FieldDisplay hasError={errors[field.id]}>
+                <FieldDisplay hasError={errors[field.id]} hasWarning={warnings[field.id]}>
                   <span>{field.name}</span>
                   <TypeText>{field.type}</TypeText>
                 </FieldDisplay>
