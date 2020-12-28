@@ -1,12 +1,27 @@
   /* eslint-disable react/forbid-prop-types */
 
   import React from 'react';
+  import styled from 'styled-components';
   import PropTypes from 'prop-types';
-  import { FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
+  import { FieldGroup, FormLabel, TextInput, ValidationMessage } from '@contentful/forma-36-react-components';
   import DependsOn from '../../DependsOn';
   import FieldTypeSelector from './FieldTypeSelector';
 
-  function FieldEditor({ field, updateField }) {
+  import { errorOfType, errorTypes } from '../../validate';
+
+  const WarningStyle = styled(ValidationMessage)`
+    svg {
+      fill: #ff8c00;
+    }
+
+    p {
+      color: #ff8c00;
+    }
+  `;
+
+  function FieldEditor({ errors, field, updateField }) {
+    const errorsForField = errors[field.id];
+
     return (
       <>
         <FieldGroup>
@@ -16,6 +31,9 @@
         <FieldGroup>
           <FormLabel htmlFor="title">Form key</FormLabel>
           <TextInput required defaultValue={field.name} onChange={(e) => updateField('name', e.currentTarget.value)} />
+          {errorOfType(errorTypes.CONFLICT_NAME, errorsForField) && (
+            <WarningStyle>This name is a conflict with another</WarningStyle>
+          )}
         </FieldGroup>
         <FieldTypeSelector field={field} updateField={updateField} />
         <DependsOn
@@ -38,6 +56,8 @@
     }).isRequired,
     updateField: PropTypes.func.isRequired,
 
+    // eslint-disable-next-line
+    errors: PropTypes.object, // containing { [id]: error<Object> }
     dependsOn: PropTypes.string,
     dependsOnTests: PropTypes.arrayOf(PropTypes.object)
   };

@@ -10,15 +10,18 @@ import StepList from '../StepList';
 import StepEditor from '../StepModal/StepEditor';
 import FieldEditor from '../FieldModal/FieldEditor';
 
+import { validateSteps } from '../../validate';
 import { EditorStyle, SectionWrapper, NothingHere, LeftSection, RightSection, ActionSection } from './styles';
 
-function RightContent({ selected, updateStep, updateField }) {
+function RightContent({ steps, selected, updateStep, updateField }) {
+  const errors = validateSteps(steps);
+
   switch (selected.type) {
     case 'step':
       return (
         <RightSection key={selected.step.id}>
           <Heading>Step editor</Heading>
-          <StepEditor step={selected.step} updateStep={updateStep} />
+          <StepEditor errors={errors} step={selected.step} updateStep={updateStep} />
         </RightSection>
       );
 
@@ -26,7 +29,7 @@ function RightContent({ selected, updateStep, updateField }) {
       return (
         <RightSection key={selected.field.id}>
           <Heading>Field editor</Heading>
-          <FieldEditor field={selected.field} updateField={updateField} />
+          <FieldEditor errors={errors} field={selected.field} updateField={updateField} />
         </RightSection>
       );
 
@@ -46,7 +49,8 @@ RightContent.propTypes = {
     step: PropTypes.object,
     field: PropTypes.object,
     type: PropTypes.oneOf(['step', 'field', null])
-  }).isRequired
+  }).isRequired,
+  steps: PropTypes.arrayOf(PropTypes.object)
 };
 
 function EditorModal() {
@@ -92,7 +96,7 @@ function EditorModal() {
             onFieldClick={(field, step) => setSelection({ type: 'field', step, field })}
           />
         </LeftSection>
-        <RightContent selected={selected} updateStep={updateStep} updateField={updateField} />
+        <RightContent steps={stepConfig.steps} selected={selected} updateStep={updateStep} updateField={updateField} />
       </SectionWrapper>
       <ActionSection>
         <Button buttonType="negative" onClick={handleCancel}>

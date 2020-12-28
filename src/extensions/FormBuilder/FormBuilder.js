@@ -72,8 +72,13 @@ function FormBuilder() {
 
       // If we have some errors, disable publishing
       if (hasErrors) {
-        console.log('Removing value');
-        sdk.field.removeValue();
+        // Save the result as single key in the JSON
+        // We do this to present invalid JSON and prevent
+        // contentful from allowing publishing of the field
+        //
+        // Check the content model validation in Contentful
+        // we have specified at least 2 properties in the JSON
+        sdk.field.setValue({ error: newFieldValue });
       }
 
       // We should be able to publish without issue
@@ -93,8 +98,19 @@ function FormBuilder() {
   useEffect(
     () => {
       if (sdk.field?.getValue instanceof Function) {
-        loadState(sdk.field.getValue() || {});
+        const value = sdk.field.getValue() || {};
+
+        // Handle parsing of a blocked field
+        // We do this to prevent contentful from publishing
+        if (value.error) {
+          return loadState(value.error);
+        }
+
+        return loadState(value);
       }
+
+      // explicit for eslint
+      return undefined;
     },
     // I only actually want to update when the field changes
     // this is only initial configuration setup
@@ -144,73 +160,66 @@ function FormBuilder() {
       // orr null if the user clicks cancel
       .then(({ field: newField } = {}) => newField && fieldConfig.fieldEdit(step.id, newField));
 
-  try {
-    return (
-      <div>
-        <QuickIcons>
-          <IconButton
-            label="Copy JSON"
-            iconProps={{ icon: 'Copy' }}
-            onClick={() => copy(JSON.stringify(sdk.field.getValue(), null, 2))}
-          />
-          <IconButton label="Toggle JSON mode" iconProps={{ icon: 'Edit' }} onClick={() => setJsonMode(!jsonMode)} />
-        </QuickIcons>
-        {!jsonMode && (
-          <>
-            <FormInfo formConfig={formConfig} />
-            <SectionWrapper
-              title={
-                <SectionHeaderWithButton>
-                  Form Content
-                  <Button
-                    onClick={() =>
-                      showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(
-                        ({ steps }) =>
-                          // If new steps are returned from the modal
-                          // the user clicked the confirm button, if null it's cancel
-                          steps &&
-                          stepConfig.stepsUpdate(
-                            steps,
-                            // & also save to contentful
-                            true
-                          )
-                      )
-                    }>
-                    Edit Form
-                  </Button>
-                </SectionHeaderWithButton>
-              }>
-              <StepList
-                readOnly
-                autoexpand={false}
-                stepConfig={stepConfig}
-                fieldConfig={fieldConfig}
-                onStepClick={onStepClick}
-                onFieldClick={onFieldClick}
-              />
-            </SectionWrapper>
-          </>
-        )}
-        {jsonMode && (
-          <JsonInput
-            value={JSON.stringify(getEditableValue(), null, 2)}
-            onChange={(event) => {
-              const newFormState = safeParse(event.currentTarget.value);
-              if (newFormState) {
-                sdk.field.setValue(newFormState);
-                loadState(newFormState);
-              }
-            }}
-          />
-        )}
-      </div>
-    );
-  } catch (error) {
-    // Fallback to json entry on error
-    // eslint-disable-next-line no-console
-    console.error(error);
-    setJsonMode(true);
-  }
+  return (
+    <div>
+      <QuickIcons>
+        <IconButton
+          label="Copy JSON"
+          iconProps={{ icon: 'Copy' }}
+          onClick={() => copy(JSON.stringify(sdk.field.getValue(), null, 2))}
+        />
+        <IconButton label="Toggle JSON mode" iconProps={{ icon: 'Edit' }} onClick={() => setJsonMode(!jsonMode)} />
+      </QuickIcons>
+      {!jsonMode && (
+        <>
+          <FormInfo formConfig={formConfig} />
+          <SectionWrapper
+            title={
+              <SectionHeaderWithButton>
+                Form Content
+                <Button
+                  onClick={() =>
+                    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(
+                      ({ steps }) =>
+                        // If new steps are returned from the modal
+                        // the user clicked the confirm button, if null it's cancel
+                        steps &&
+                        stepConfig.stepsUpdate(
+                          steps,
+                          // & also save to contentful
+                          true
+                        )
+                    )
+                  }>
+                  Edit Form
+                </Button>
+              </SectionHeaderWithButton>
+            }>
+            <StepList
+              readOnly
+              autoexpand={false}
+              stepConfig={stepConfig}
+              fieldConfig={fieldConfig}
+              onStepClick={onStepClick}
+              onFieldClick={onFieldClick}
+            />
+          </SectionWrapper>
+        </>
+      )}
+      {jsonMode && (
+        <JsonInput
+          value={JSON.stringify(getEditableValue(), null, 2)}
+          onChange={(event) => {
+            const newFormState = safeParse(event.currentTarget.value);
+            if (newFormState) {
+              sdk.field.setValue(newFormState);
+              loadState(newFormState);
+            }
+          }}
+        />
+      )}
+    </div>
+  );
 }
 
 export default FormBuilder;

@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { pickBy } from 'lodash';
 import { Button, IconButton } from '@contentful/forma-36-react-components';
 
 import SortableList from '../SortableList';
 import { showModal } from '../utils';
 import { useSDK } from '../../../context';
-import { validateSteps, errorLevels } from '../validate';
+import { validateSteps, onlyErrors, onlyWarnings } from '../validate';
 
 const Col = styled.div`
   display: flex;
@@ -44,8 +43,8 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
   // Validate fields for errors such as missing or duplicate names
   const allErrors = validateSteps(steps);
 
-  const errors = pickBy(allErrors, ({ level }) => level === errorLevels.ERROR);
-  const warnings = pickBy(allErrors, ({ level }) => level === errorLevels.WARN);
+  const errors = onlyErrors(allErrors);
+  const warnings = onlyWarnings(allErrors);
 
   return (
     <div className="setup-form">
