@@ -7,7 +7,8 @@ export const errorTypes = {
   CONFLICT_NAME: 'NAME_CONFLICT',
   UNDEFINED_NAME: 'NAME_UNDEFINED',
   UNDEFINED_TYPE: 'UNDEFINED_TYPE',
-  UNDEFINED_ID: 'UNDEFINED_ID'
+  UNDEFINED_ID: 'UNDEFINED_ID',
+  INVALID_VALUE: 'INVALID_VALUE'
 };
 
 export const errorLevels = {
@@ -18,10 +19,19 @@ export const errorLevels = {
 /** Levels for each type of error above, allows later filtering of levels */
 const errorLevelsMapping = {
   [errorTypes.CONFLICT_NAME]: errorLevels.WARN,
+  [errorTypes.INVALID_VALUE]: errorLevels.ERROR,
   [errorTypes.UNDEFINED_NAME]: errorLevels.ERROR,
   [errorTypes.UNDEFINED_TYPE]: errorLevels.ERROR,
   [errorTypes.UNDEFINED_ID]: errorLevels.ERROR
 };
+
+function stepError(extra = {}) {
+  return { itemType: 'step', ...extra };
+}
+
+function fieldError(extra = {}) {
+  return { itemType: 'field', ...extra };
+}
 
 /**
  * Validate a single field by missing or incorrect properties
@@ -32,17 +42,28 @@ function validateField(field) {
 
   // All fields must have a name
   if (!id) {
-    toReturn.push({ type: errorTypes.UNDEFINED_ID, id: null, name });
+    toReturn.push(fieldError({ type: errorTypes.UNDEFINED_ID, id: null, name }));
   }
 
   // All fields must have a name
   if (!field.name) {
-    toReturn.push({ type: errorTypes.UNDEFINED_NAME, id });
+    toReturn.push(fieldError({ type: errorTypes.UNDEFINED_NAME, id }));
   }
 
   // All fields must have a type
   if (!field.type) {
-    toReturn.push({ type: errorTypes.UNDEFINED_TYPE, id });
+    toReturn.push(fieldError({ type: errorTypes.UNDEFINED_TYPE, id }));
+  }
+
+  switch (field.type) {
+    case 'hidden':
+      if (!field.value) {
+        toReturn.push(fieldError({ type: errorTypes.INVALID_VALUE, id }));
+      }
+      break;
+
+    default:
+      break;
   }
 
   return toReturn.filter(identity);
@@ -92,12 +113,13 @@ function validateFieldNames(steps) {
   return Object.entries(fieldNameCounts)
     .filter(([name, { count }]) => count > 1)
     .map(([name, { ids }]) =>
-      ids.map((id) => ({
-        itemType: 'field',
-        type: errorTypes.CONFLICT_NAME,
-        id,
-        name
-      }))
+      ids.map((id) =>
+        fieldError({
+          type: errorTypes.CONFLICT_NAME,
+          id,
+          name
+        })
+      )
     );
 }
 
@@ -144,6 +166,7 @@ export function validateSteps(steps) {
   )(toReturn);
 }
 
+/** Helpers for filtering out errors and warnings */
 export const onlyErrors = pickBy((items) => items.filter(({ level }) => level === errorLevels.ERROR));
 
 export const onlyWarnings = pickBy((items) => items.filter(({ level }) => level === errorLevels.WARN));
