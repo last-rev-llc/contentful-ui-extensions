@@ -73,7 +73,7 @@ FieldTypeSelector.propTypes = {
 };
 
 FieldTypeSelector.defaultProps = {
-  errors: {}
+  errors: []
 };
 
 export default FieldTypeSelector;

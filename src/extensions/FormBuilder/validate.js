@@ -58,7 +58,7 @@ function validateField(field) {
   switch (field.type) {
     case 'hidden':
       if (!field.value) {
-        toReturn.push(fieldError({ type: errorTypes.INVALID_VALUE, id }));
+        toReturn.push(fieldError({ type: errorTypes.INVALID_VALUE, id, name }));
       }
       break;
 
@@ -74,7 +74,7 @@ function validateField(field) {
  * criteria such as missing or incorrect fields
  * */
 function validateFields(fields) {
-  return fields.map((field) => validateField(field));
+  return flatten(fields.map((field) => validateField(field)));
 }
 
 /**
