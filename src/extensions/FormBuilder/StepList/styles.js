@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { ValidationMessage } from '@contentful/forma-36-react-components';
 
 export const ModalStyle = styled.div`
   > h1 {
@@ -18,5 +19,17 @@ export const ModalStyle = styled.div`
     border-top: 1px solid lightgrey;
   }
 `;
+
+export const WarningStyle = styled(ValidationMessage)`
+  svg {
+    fill: #ff8c00;
+  }
+
+  p {
+    color: #ff8c00;
+  }
+`;
+
+export const ErrorStyle = styled(ValidationMessage)``;
 
 export default { ModalStyle };
