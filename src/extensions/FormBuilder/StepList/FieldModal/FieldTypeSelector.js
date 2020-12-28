@@ -39,7 +39,7 @@ const fieldTypes = [
   { value: 'week', label: 'Week' }
 ];
 
-function FieldTypeSelector({ field, updateField }) {
+function FieldTypeSelector({ errors, field, updateField }) {
   return (
     <>
       <FieldGroup>
@@ -57,7 +57,7 @@ function FieldTypeSelector({ field, updateField }) {
           ))}
         </Select>
       </FieldGroup>
-      <AdditionalFields updateField={updateField} field={field} />
+      <AdditionalFields updateField={updateField} field={field} errors={errors} />
     </>
   );
 }
@@ -66,7 +66,14 @@ FieldTypeSelector.propTypes = {
   updateField: PropTypes.func.isRequired,
   field: PropTypes.shape({
     type: PropTypes.string
-  }).isRequired
+  }).isRequired,
+
+  // eslint-disable-next-line react/forbid-prop-types
+  errors: PropTypes.object
+};
+
+FieldTypeSelector.defaultProps = {
+  errors: {}
 };
 
 export default FieldTypeSelector;

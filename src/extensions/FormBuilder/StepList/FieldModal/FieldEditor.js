@@ -32,10 +32,10 @@
           <FormLabel htmlFor="title">Form key</FormLabel>
           <TextInput required defaultValue={field.name} onChange={(e) => updateField('name', e.currentTarget.value)} />
           {errorOfType(errorTypes.CONFLICT_NAME, errorsForField) && (
-            <WarningStyle>This name is a conflict with another</WarningStyle>
+            <WarningStyle>This name is in conflict with another</WarningStyle>
           )}
         </FieldGroup>
-        <FieldTypeSelector field={field} updateField={updateField} />
+        <FieldTypeSelector field={field} updateField={updateField} errors={errors} />
         <DependsOn
           value={field.dependsOn}
           tests={field.dependsOnTests}
