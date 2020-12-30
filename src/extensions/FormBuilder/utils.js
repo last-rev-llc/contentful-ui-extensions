@@ -35,11 +35,12 @@ export const showModal = (sdk, modalProps = {}, parameters = {}) => {
   });
 };
 
-export function buildField({ name = 'no_name', type = 'hidden' } = {}) {
+export function buildField({ name = 'no_name', type = 'hidden', value = false } = {}) {
   return {
     id: uuidv4(),
     type,
-    name
+    name,
+    value
   };
 }
 
@@ -49,7 +50,7 @@ export function buildStep(title = 'Step title') {
     id: uuidv4(),
     fields: [
       //
-      buildField({ name: 'First field' })
+      buildField({ name: 'first_field' })
     ]
   };
 }
