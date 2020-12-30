@@ -11,6 +11,7 @@
 
   function FieldEditor({ errors, field, updateField }) {
     const errorsForField = errors[field.id];
+    const nameError = errorOfType(errorTypes.CONFLICT_NAME, errorsForField);
 
     return (
       <>
@@ -21,9 +22,7 @@
         <FieldGroup>
           <FormLabel htmlFor="title">Form key</FormLabel>
           <TextInput required defaultValue={field.name} onChange={(e) => updateField('name', e.currentTarget.value)} />
-          {errorOfType(errorTypes.CONFLICT_NAME, errorsForField) && (
-            <WarningStyle>This name is in conflict with another</WarningStyle>
-          )}
+          {nameError && <WarningStyle>{nameError.message}</WarningStyle>}
         </FieldGroup>
         <FieldTypeSelector field={field} updateField={updateField} errors={errors} />
         <DependsOn
