@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { IconButton, FieldGroup, FormLabel, Textarea, CheckboxField } from '@contentful/forma-36-react-components';
 
-import { safeParse } from './utils';
+import { safeParse } from '../utils';
 
 const Row = styled.div`
   display: flex;

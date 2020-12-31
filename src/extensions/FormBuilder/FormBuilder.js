@@ -148,17 +148,13 @@ function FormBuilder() {
     return rest;
   };
 
-  const onStepClick = (step) =>
-    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps, step })
-      // If the modal returned us a new step we'll update the values in our current state
-      // The modal  stateless so it's not changing our step directly
-      .then(({ step: newStep } = {}) => newStep && stepConfig.stepEdit(step.id, newStep));
-
-  const onFieldClick = (field, step) =>
-    showModal(sdk, { name: 'field-modal' }, { steps: stepConfig.steps, field })
+  const onFieldClick = (field, step) => {
+    console.log('Field click');
+    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps, field })
       // When the user clicks save in the modal we'll get the new field back
       // orr null if the user clicks cancel
       .then(({ field: newField } = {}) => newField && fieldConfig.fieldEdit(step.id, newField));
+  };
 
   return (
     <div>
@@ -200,7 +196,6 @@ function FormBuilder() {
               autoexpand={false}
               stepConfig={stepConfig}
               fieldConfig={fieldConfig}
-              onStepClick={onStepClick}
               onFieldClick={onFieldClick}
             />
           </SectionWrapper>

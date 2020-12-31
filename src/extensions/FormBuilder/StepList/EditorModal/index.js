@@ -50,8 +50,27 @@ RightContent.propTypes = {
     field: PropTypes.object,
     type: PropTypes.oneOf(['step', 'field', null])
   }).isRequired,
+
   steps: PropTypes.arrayOf(PropTypes.object)
 };
+
+RightContent.defaultProps = {
+  steps: []
+};
+
+function getInitiallySelectedType({ step, field }) {
+  if (field) return 'field';
+  if (step) return 'step';
+
+  return null;
+}
+
+function getActiveId({ step, field }) {
+  if (field) return field.id;
+  if (step) return step.id;
+
+  return null;
+}
 
 function EditorModal() {
   const sdk = useSDK();
@@ -65,7 +84,12 @@ function EditorModal() {
   const stepConfig = useFormSteps(sdk.parameters.invocation.steps);
   const fieldConfig = useFieldConfig(stepConfig.stepEdit);
 
-  const [selected, setSelection] = useState({ type: null, step: null, field: null });
+  const { step = null, field = null } = sdk.parameters.invocation;
+  const [selected, setSelection] = useState({
+    step,
+    field,
+    type: getInitiallySelectedType({ step, field })
+  });
 
   const updateStep = curry((key, value) =>
     stepConfig.stepEdit(selected.step.id, {
@@ -90,10 +114,23 @@ function EditorModal() {
         <LeftSection>
           <Heading>Steps</Heading>
           <StepList
+            activeId={getActiveId(selected)}
             stepConfig={stepConfig}
             fieldConfig={fieldConfig}
-            onStepClick={(step) => setSelection({ type: 'step', step, field: null })}
-            onFieldClick={(field, step) => setSelection({ type: 'field', step, field })}
+            onStepClick={(currentStep) =>
+              setSelection({
+                type: 'step',
+                field: null,
+                step: currentStep
+              })
+            }
+            onFieldClick={(currentField, currentStep) =>
+              setSelection({
+                type: 'field',
+                step: currentStep,
+                field: currentField
+              })
+            }
           />
         </LeftSection>
         <RightContent steps={stepConfig.steps} selected={selected} updateStep={updateStep} updateField={updateField} />
