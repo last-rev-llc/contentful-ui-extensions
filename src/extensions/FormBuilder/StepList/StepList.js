@@ -52,8 +52,8 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
         items={steps}
         readOnly={readOnly}
         onSortEnd={stepReorder}
-        onEditItem={onStepClick}
         autoexpand={autoexpand}
+        onEditItem={onStepClick}
         onRemoveItem={(step) =>
           showModal(sdk, { name: 'step-remove' }, { steps, step, type: 'step' }, { steps }).then(
             ({ confirmation }) => confirmation && stepRemove(step)
