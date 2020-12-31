@@ -32,9 +32,11 @@ const FieldDisplay = styled.div`
 const TypeText = styled.span`
   background-color: #fafafa;
   padding: 8px;
+
+  ${({ active }) => active && `background: #7dafff; color: black;`}
 `;
 
-function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, onFieldClick }) {
+function StepList({ activeId, autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, onFieldClick }) {
   const sdk = useSDK();
 
   const { steps, stepAdd, stepRemove, stepReorder } = stepConfig;
@@ -50,10 +52,11 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
     <div className="setup-form">
       <SortableList
         items={steps}
+        activeId={activeId}
         readOnly={readOnly}
         onSortEnd={stepReorder}
         autoexpand={autoexpand}
-        onEditItem={onStepClick}
+        onClickItem={onStepClick}
         onRemoveItem={(step) =>
           showModal(sdk, { name: 'step-remove' }, { steps, step, type: 'step' }, { steps }).then(
             ({ confirmation }) => confirmation && stepRemove(step)
@@ -62,9 +65,10 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
         {(step) => (
           <Col>
             <SortableList
+              activeId={activeId}
               readOnly={readOnly}
               items={step.fields}
-              onEditItem={(field) => onFieldClick(field, step)}
+              onClickItem={(field) => onFieldClick(field, step)}
               onSortEnd={fieldReorder(step.id)}
               onRemoveItem={(field) =>
                 showModal(sdk, { name: 'field-remove' }, { steps, field, type: 'field' }).then(
@@ -74,7 +78,7 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
               renderItem={(field) => (
                 <FieldDisplay hasError={errors[field.id]} hasWarning={warnings[field.id]}>
                   <span>{field.name}</span>
-                  <TypeText>{field.type}</TypeText>
+                  <TypeText active={field.active}>{field.type}</TypeText>
                 </FieldDisplay>
               )}
             />
@@ -126,13 +130,20 @@ StepList.propTypes = {
     fieldReorder: PropTypes.func
   }).isRequired,
 
-  onStepClick: PropTypes.func.isRequired,
-  onFieldClick: PropTypes.func.isRequired,
+  onStepClick: PropTypes.func,
+  onFieldClick: PropTypes.func,
 
+  activeId: PropTypes.string,
   autoexpand: PropTypes.bool, // Show the fields by defult
   readOnly: PropTypes.bool // Don't allow editing of fields or steps
 };
 
-StepList.defaultProps = { autoexpand: true, readOnly: false };
+StepList.defaultProps = {
+  autoexpand: true,
+  readOnly: false,
+  activeId: undefined,
+  onStepClick: undefined,
+  onFieldClick: undefined
+};
 
 export default StepList;
