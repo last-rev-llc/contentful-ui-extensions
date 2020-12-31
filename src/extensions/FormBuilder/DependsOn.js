@@ -54,15 +54,6 @@ const DeleteButton = styled(IconButton)`
   right: 2px;
 `;
 
-export function isValidJson(json) {
-  try {
-    JSON.parse(json);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
 function runTest(value, test) {
   try {
     return jsonLogic.apply(safeParse(value), safeParse(test));
@@ -80,9 +71,21 @@ function testPasses(value, test) {
   }
 }
 
-function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
+export function isValidJson(json) {
+  try {
+    JSON.parse(json);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function DependsOn({ value: initialValue, tests: initialTests, onChangeValue, onChangeTests }) {
+  const [value, setValue] = useState(JSON.stringify(initialValue, null, 4));
+  const [tests, setTests] = useState(initialTests.map((test) => JSON.stringify(test, null, 4)));
+
   const dependsOnError = isValidJson(value) === false;
-  const [enabled, setEnabled] = useState(value.length > 2);
+  const [enabled, setEnabled] = useState(Object.keys(initialValue).length > 0);
 
   if (!enabled) {
     return (
@@ -110,7 +113,7 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
             }
 
             // Disable the dependsOn entirely
-            onChangeValue('{}');
+            onChangeValue({});
             onChangeTests([]);
             return false;
           })
@@ -121,7 +124,14 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
         <JsonTextArea
           required
           defaultValue={value}
-          onChange={(e) => onChangeValue(e.currentTarget.value)}
+          onChange={(e) => {
+            const { value: newValue } = e.currentTarget;
+            setValue(newValue);
+
+            if (isValidJson(newValue)) {
+              onChangeValue(JSON.parse(newValue));
+            }
+          }}
           $hasError={dependsOnError}
         />
         {dependsOnError && <ErrorText>Invalid JSON</ErrorText>}
@@ -141,8 +151,14 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
               <JsonTextArea
                 $hasError={testError}
                 onChange={(e) => {
-                  tests.splice(index, 1, e.currentTarget.value);
-                  onChangeTests(tests);
+                  const newValue = e.currentTarget.value;
+                  const newTests = tests.map((oldTest, currentIndex) => (currentIndex === index ? newValue : oldTest));
+
+                  setTests(newTests);
+
+                  if (newTests.every(isValidJson)) {
+                    onChangeTests(newTests.map(JSON.parse));
+                  }
                 }}
                 defaultValue={test}
               />
@@ -151,7 +167,11 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
                   label="Delete test"
                   buttonType="negative"
                   iconProps={{ icon: 'Delete' }}
-                  onClick={() => onChangeTests(tests.filter((_, i) => i !== index))}
+                  onClick={() => {
+                    const newTests = tests.filter((_, i) => i !== index);
+                    setTests(newTests);
+                    onChangeTests(newTests.map(JSON.parse));
+                  }}
                 />
                 <pre>{JSON.stringify(runTest(value, test), null, 4)}</pre>
               </ResultArea>
@@ -165,7 +185,7 @@ function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
           </FieldGroup>
         );
       })}
-      <AddRow onClick={() => onChangeTests(tests.concat('{}'))}>
+      <AddRow onClick={() => setTests(tests.concat('{}'))}>
         <IconButton
           label="Add new test"
           buttonType="primary"
@@ -185,13 +205,13 @@ DependsOn.propTypes = {
   onChangeTests: PropTypes.func.isRequired,
 
   // our dependsOn object (jsonLogic)
-  tests: PropTypes.arrayOf(PropTypes.string),
-  value: PropTypes.string
+  tests: PropTypes.arrayOf(PropTypes.object),
+  value: PropTypes.object
 };
 
 DependsOn.defaultProps = {
   tests: [],
-  value: '{}'
+  value: {}
 };
 
 export default DependsOn;
