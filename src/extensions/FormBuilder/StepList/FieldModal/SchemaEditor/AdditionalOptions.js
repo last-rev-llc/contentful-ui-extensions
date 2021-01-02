@@ -26,6 +26,7 @@ const AdjustableTextField = styled(TextField)`
   ${addDynamicWidth}
 `;
 
+/** An input field on the left, with an error message input on the right */
 function buildTypeWithError(type, label, id, messageType) {
   return [
     {
@@ -36,23 +37,14 @@ function buildTypeWithError(type, label, id, messageType) {
     },
     {
       grow: '0.6',
-      type: 'text',
+      type: 'string',
       label: 'Error message',
       id: `messages.${type}${messageType}`
     }
   ];
 }
 
-function buildRegexp() {
-  return [
-    {
-      type: 'text',
-      id: 'pattern',
-      label: 'Custom Regexp'
-    }
-  ];
-}
-
+/** Build a set of min-max input fields with error label input  */
 function buildStraddle(type, labelMin, labelMax) {
   return (
     []
@@ -62,13 +54,15 @@ function buildStraddle(type, labelMin, labelMax) {
   );
 }
 
+/** Which schema types have additional fields */
 const FieldsForTypes = {
   number: buildStraddle('number', 'Minimum', 'Maximum'),
-  string: buildStraddle('string', 'Minimum Length', 'Maximum Length').concat(buildRegexp())
+  string: buildStraddle('string', 'Minimum Length', 'Maximum Length')
+    /** A regular expression field */
+    .concat(buildTypeWithError('string', 'Custom Regexp', 'pattern', 'Pattern'))
 };
 
-console.log(FieldsForTypes);
-
+/** Allow extraction of numbered or boolean results */
 function resolveValue(value, type) {
   switch (type) {
     case 'number':
@@ -80,10 +74,21 @@ function resolveValue(value, type) {
   }
 }
 
+/** Field validation type transformed to a F36 TextField type */
+function inputTypeForFieldType(type) {
+  switch (type) {
+    case 'number':
+      return type;
+
+    case 'string':
+    default:
+      return 'text';
+  }
+}
+
 function AdditionalOptions({ field, updateField }) {
   const { schema = {} } = field;
 
-  console.log(schema);
   const optionsForType = FieldsForTypes[schema.type];
   if (!optionsForType) return null;
 
@@ -94,7 +99,7 @@ function AdditionalOptions({ field, updateField }) {
           key={id}
           id={id}
           name={id}
-          type={type}
+          type={inputTypeForFieldType(type)}
           grow={grow}
           value={get(schema, id, '')}
           labelText={label}
