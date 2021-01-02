@@ -17,32 +17,39 @@ function getSelectedItem(array, idToFind) {
   return array.find(({ id }) => id === idToFind);
 }
 
-function getSelectedField({ fields = [] }, idToFind) {
-  return getSelectedItem(fields, idToFind);
+function getSelectedStep(steps, { step }) {
+  return getSelectedItem(steps, step);
+}
+
+function getSelectedField(steps, { step, field }) {
+  const selectedStep = getSelectedStep(steps, step) || {};
+  const { fields = [] } = selectedStep;
+  return getSelectedItem(fields, field);
 }
 
 function RightContent({ steps, selected, updateStep, updateField }) {
   const errors = validateSteps(steps);
 
-  const currentStep = getSelectedItem(steps, selected.step);
-  const currentField = getSelectedField(currentStep, selected.field);
-
   switch (selected.type) {
-    case 'step':
+    case 'step': {
+      const currentStep = getSelectedStep(steps, selected);
       return (
         <RightSection key={selected.step}>
           <Heading>Step editor</Heading>
           <StepEditor errors={errors} step={currentStep} updateStep={updateStep} />
         </RightSection>
       );
+    }
 
-    case 'field':
+    case 'field': {
+      const currentField = getSelectedField(steps, selected);
       return (
         <RightSection key={selected.field}>
           <Heading>Field editor</Heading>
           <FieldEditor errors={errors} field={currentField} updateField={updateField} />
         </RightSection>
       );
+    }
 
     default:
       return (
@@ -103,7 +110,7 @@ function EditorModal() {
   });
 
   const updateStep = curry((key, value) => {
-    const currentStep = getSelectedItem(stepConfig.steps, selected.step);
+    const currentStep = getSelectedStep(stepConfig.steps, selected);
     stepConfig.stepEdit(selected.step, {
       ...currentStep,
       [key]: value
@@ -111,8 +118,7 @@ function EditorModal() {
   });
 
   const updateField = curry((key, value) => {
-    const currentStep = getSelectedItem(stepConfig.steps, selected.step);
-    const currentField = getSelectedField(currentStep, selected.field);
+    const currentField = getSelectedField(stepConfig.steps, selected);
     fieldConfig.fieldEdit(selected.step, {
       ...currentField,
       [key]: value
