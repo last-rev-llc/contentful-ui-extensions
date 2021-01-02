@@ -62,6 +62,7 @@ function StepList({ activeId, autoexpand, stepConfig, fieldConfig, readOnly, onS
             ({ confirmation }) => confirmation && stepRemove(step)
           )
         }>
+        {/* Uses a functional child, we get passed the parent item and can render children */}
         {(step) => (
           <Col>
             <SortableList

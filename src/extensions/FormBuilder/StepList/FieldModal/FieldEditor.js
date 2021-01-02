@@ -15,6 +15,8 @@ function FieldEditor({ errors, field, updateField }) {
   const errorsForField = errors[field.id];
   const nameError = errorOfType(errorTypes.CONFLICT_NAME, errorsForField);
 
+  console.log(field);
+
   return (
     <>
       <FieldGroup>
@@ -48,16 +50,17 @@ FieldEditor.propTypes = {
   }).isRequired,
   updateField: PropTypes.func.isRequired,
 
-  // eslint-disable-next-line
+  /* eslint-disable react/forbid-prop-types */
   errors: PropTypes.object, // containing { [id]: error<Object> }
-  dependsOn: PropTypes.string,
+  dependsOn: PropTypes.object,
   dependsOnTests: PropTypes.arrayOf(PropTypes.object)
+  /* eslint-enable react/forbid-prop-types */
 };
 
 FieldEditor.defaultProps = {
-  dependsOn: '',
-  dependsOnTests: [],
-  errors: {}
+  errors: {},
+  dependsOn: {},
+  dependsOnTests: []
 };
 
 export default FieldEditor;

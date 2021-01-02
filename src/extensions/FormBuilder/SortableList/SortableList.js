@@ -137,8 +137,6 @@ function SortableList({
 }) {
   const [dragging, setDragging] = useState(false);
 
-  console.log(activeId);
-
   return (
     <div className="sortable-list">
       <SortableContainer
@@ -159,8 +157,8 @@ function SortableList({
             autoexpand={autoexpand}
             renderItem={renderItem}
             active={item.id === activeId}
-            onClickItem={() => onClickItem(item)}
-            onRemoveItem={() => !readOnly && onRemoveItem(item)}>
+            onRemoveItem={() => !readOnly && onRemoveItem(item)}
+            onClickItem={() => onClickItem instanceof Function && onClickItem(item)}>
             {children instanceof Function && children(item)}
           </SortableItem>
         ))}
@@ -180,7 +178,7 @@ SortableList.propTypes = {
   ).isRequired,
   onSortEnd: PropTypes.func.isRequired,
   onRemoveItem: PropTypes.func.isRequired,
-  onClickItem: PropTypes.func.isRequired,
+  onClickItem: PropTypes.func,
   children: PropTypes.func,
   renderItem: PropTypes.func,
 
@@ -193,7 +191,8 @@ SortableList.defaultProps = {
   autoexpand: true,
   children: null,
   renderItem: null,
-  activeId: undefined
+  activeId: undefined,
+  onClickItem: undefined
 };
 
 export default SortableList;

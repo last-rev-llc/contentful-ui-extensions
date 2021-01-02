@@ -148,13 +148,18 @@ function FormBuilder() {
     return rest;
   };
 
-  const onFieldClick = (field, step) => {
-    console.log('Field click');
-    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps, field })
-      // When the user clicks save in the modal we'll get the new field back
-      // orr null if the user clicks cancel
-      .then(({ field: newField } = {}) => newField && fieldConfig.fieldEdit(step.id, newField));
-  };
+  const handleUpdate = ({ steps: newSteps }) =>
+    // If new steps are returned from the modal
+    // the user clicked the confirm button, if null it's cancel
+    newSteps &&
+    stepConfig.stepsUpdate(
+      newSteps,
+      // & also save to contentful
+      true
+    );
+
+  const onFieldClick = (field, step) =>
+    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps, step, field }).then(handleUpdate);
 
   return (
     <div>
@@ -175,17 +180,7 @@ function FormBuilder() {
                 Form Content
                 <Button
                   onClick={() =>
-                    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(
-                      ({ steps }) =>
-                        // If new steps are returned from the modal
-                        // the user clicked the confirm button, if null it's cancel
-                        steps &&
-                        stepConfig.stepsUpdate(
-                          steps,
-                          // & also save to contentful
-                          true
-                        )
-                    )
+                    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(handleUpdate)
                   }>
                   Edit Form
                 </Button>
