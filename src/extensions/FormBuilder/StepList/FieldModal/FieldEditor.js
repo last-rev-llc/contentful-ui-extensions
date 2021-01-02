@@ -39,11 +39,13 @@ function FieldEditor({ errors, field, updateField }) {
         />
         {nameError && <WarningStyle>{nameError.message}</WarningStyle>}
       </FieldGroup>
-      <TextField
-        labelText="Placeholder"
-        defaultValue={field.placeholder}
-        onChange={(e) => updateField('placeholder', e.currentTarget.value)}
-      />
+      {field.type !== 'hidden' && (
+        <TextField
+          labelText="Placeholder"
+          defaultValue={field.placeholder}
+          onChange={(e) => updateField('placeholder', e.currentTarget.value)}
+        />
+      )}
       <FieldTypeSelector field={field} updateField={updateField} errors={errors} />
       <SchemaEditor field={field} updateField={updateField} />
       <DependsOn
