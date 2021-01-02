@@ -10,10 +10,6 @@ const SchemaWrapper = styled(FieldGroup)`
   margin-bottom: 1rem;
 `;
 
-function getDefaultType({ type }) {
-  return 'any';
-}
-
 const FastestValidatorTypes = [
   // prettier-no-wrap
   { label: 'Any', value: 'any' },
@@ -27,6 +23,13 @@ const FastestValidatorTypes = [
   { label: 'UUID', value: 'uuid' }
 ];
 
+// eslint-disable-next-line no-unused-vars
+function validatorTypesForField({ type }) {
+  // TODO: Which types for which fields
+  //       think about NPM module
+  return FastestValidatorTypes;
+}
+
 function SchemaEditor({ field, updateField }) {
   const { schema = {} } = field;
 
@@ -36,9 +39,13 @@ function SchemaEditor({ field, updateField }) {
         labelText="Field Schema"
         id="schema.type"
         name="schema.type"
-        value={schema.type || getDefaultType(field)}
-        onChange={(event) => updateField('schema', { type: event.currentTarget.value })}>
-        {FastestValidatorTypes.map(({ label, value }) => (
+        value={schema.type || 'any'}
+        onChange={(event) =>
+          updateField('schema', {
+            type: event.currentTarget.value
+          })
+        }>
+        {validatorTypesForField(field).map(({ label, value }) => (
           <Option key={value} value={value}>
             {label}
           </Option>
