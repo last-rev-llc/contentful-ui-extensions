@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FieldGroup, FormLabel, Option, Select } from '@contentful/forma-36-react-components';
+import { Option, SelectField } from '@contentful/forma-36-react-components';
 
 import AdditionalFields from './AdditionalFields';
 
@@ -42,21 +42,19 @@ const fieldTypes = [
 function FieldTypeSelector({ errors, field, updateField }) {
   return (
     <>
-      <FieldGroup>
-        <FormLabel htmlFor="type">Field Type</FormLabel>
-        <Select
-          required
-          id="type"
-          name="type"
-          defaultValue={field.type}
-          onChange={(e) => updateField('type', e.currentTarget.value)}>
-          {fieldTypes.map(({ value: fieldType, label }) => (
-            <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
-              {label}
-            </Option>
-          ))}
-        </Select>
-      </FieldGroup>
+      <SelectField
+        required
+        id="type"
+        name="type"
+        labelText="Field Type"
+        defaultValue={field.type}
+        onChange={(e) => updateField('type', e.currentTarget.value)}>
+        {fieldTypes.map(({ value: fieldType, label }) => (
+          <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
+            {label}
+          </Option>
+        ))}
+      </SelectField>
       <AdditionalFields updateField={updateField} field={field} errors={errors} />
     </>
   );
