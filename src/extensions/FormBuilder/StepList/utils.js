@@ -1,5 +1,4 @@
-import { pickBy, identity } from 'lodash/fp';
-import { safeParse } from '../utils';
+import { pickBy } from 'lodash/fp';
 
 export function extractValue(maybeEvent) {
   // Dealing with event
