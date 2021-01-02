@@ -13,23 +13,34 @@ import FieldEditor from '../FieldModal/FieldEditor';
 import { validateSteps } from '../../validate';
 import { EditorStyle, SectionWrapper, NothingHere, LeftSection, RightSection, ActionSection } from './styles';
 
+function getSelectedItem(array, idToFind) {
+  return array.find(({ id }) => id === idToFind);
+}
+
+function getSelectedField({ fields = [] }, idToFind) {
+  return getSelectedItem(fields, idToFind);
+}
+
 function RightContent({ steps, selected, updateStep, updateField }) {
   const errors = validateSteps(steps);
+
+  const currentStep = getSelectedItem(steps, selected.step);
+  const currentField = getSelectedField(currentStep, selected.field);
 
   switch (selected.type) {
     case 'step':
       return (
-        <RightSection key={selected.step.id}>
+        <RightSection key={selected.step}>
           <Heading>Step editor</Heading>
-          <StepEditor errors={errors} step={selected.step} updateStep={updateStep} />
+          <StepEditor errors={errors} step={currentStep} updateStep={updateStep} />
         </RightSection>
       );
 
     case 'field':
       return (
-        <RightSection key={selected.field.id}>
+        <RightSection key={selected.field}>
           <Heading>Field editor</Heading>
-          <FieldEditor errors={errors} field={selected.field} updateField={updateField} />
+          <FieldEditor errors={errors} field={currentField} updateField={updateField} />
         </RightSection>
       );
 
@@ -46,8 +57,8 @@ RightContent.propTypes = {
   updateStep: PropTypes.func.isRequired,
   updateField: PropTypes.func.isRequired,
   selected: PropTypes.shape({
-    step: PropTypes.object,
-    field: PropTypes.object,
+    step: PropTypes.string,
+    field: PropTypes.string,
     type: PropTypes.oneOf(['step', 'field', null])
   }).isRequired,
 
@@ -86,23 +97,27 @@ function EditorModal() {
 
   const { step = null, field = null } = sdk.parameters.invocation;
   const [selected, setSelection] = useState({
-    step,
-    field,
+    step: step && step.id,
+    field: field && field.id,
     type: getInitiallySelectedType({ step, field })
   });
 
-  const updateStep = curry((key, value) =>
-    stepConfig.stepEdit(selected.step.id, {
-      ...selected.step,
+  const updateStep = curry((key, value) => {
+    const currentStep = getSelectedItem(stepConfig.steps, selected.step);
+    stepConfig.stepEdit(selected.step, {
+      ...currentStep,
       [key]: value
-    })
-  );
-  const updateField = curry((key, value) =>
-    fieldConfig.fieldEdit(selected.step.id, {
-      ...selected.field,
+    });
+  });
+
+  const updateField = curry((key, value) => {
+    const currentStep = getSelectedItem(stepConfig.steps, selected.step);
+    const currentField = getSelectedField(currentStep, selected.field);
+    fieldConfig.fieldEdit(selected.step, {
+      ...currentField,
       [key]: value
-    })
-  );
+    });
+  });
 
   const handleCancel = () => sdk.close({ steps: null });
   const handleConfirm = () => sdk.close({ steps: stepConfig.steps });

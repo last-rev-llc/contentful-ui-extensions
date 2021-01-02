@@ -99,10 +99,10 @@ function AdditionalOptions({ field, updateField }) {
           key={id}
           id={id}
           name={id}
-          type={inputTypeForFieldType(type)}
           grow={grow}
-          value={get(schema, id, '')}
           labelText={label}
+          value={get(schema, id, '')}
+          type={inputTypeForFieldType(type)}
           onChange={(event) => {
             const { value } = event.currentTarget;
 
