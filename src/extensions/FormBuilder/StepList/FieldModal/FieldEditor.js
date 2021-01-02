@@ -15,8 +15,6 @@ function FieldEditor({ errors, field, updateField }) {
   const errorsForField = errors[field.id];
   const nameError = errorOfType(errorTypes.CONFLICT_NAME, errorsForField);
 
-  console.log(field);
-
   return (
     <>
       <FieldGroup>
