@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { FieldGroup, SelectField, Option } from '@contentful/forma-36-react-components';
 
+import { schemaPropType } from './prop-types';
 import AdditionalOptions from './AdditionalOptions';
 
 const SchemaWrapper = styled(FieldGroup)`
@@ -59,9 +60,7 @@ function SchemaEditor({ field, updateField }) {
 SchemaEditor.propTypes = {
   updateField: PropTypes.func.isRequired,
   field: PropTypes.shape({
-    schema: PropTypes.shape({
-      type: PropTypes.string
-    })
+    schema: schemaPropType
   })
 };
 

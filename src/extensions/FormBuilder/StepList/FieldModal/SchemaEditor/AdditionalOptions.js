@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { get, set } from 'lodash';
 import { TextField } from '@contentful/forma-36-react-components';
 
+import { schemaPropType } from './prop-types';
+
 const SchemaOptionsStyle = styled.div`
   display: flex;
   flex-direction: row;
@@ -120,11 +122,7 @@ function AdditionalOptions({ field, updateField }) {
 
 AdditionalOptions.propTypes = {
   updateField: PropTypes.func.isRequired,
-  field: PropTypes.shape({
-    schema: PropTypes.shape({
-      type: PropTypes.string
-    })
-  })
+  field: PropTypes.shape({ schema: schemaPropType })
 };
 
 AdditionalOptions.defaultProps = {

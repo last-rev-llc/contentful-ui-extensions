@@ -21,35 +21,31 @@ function getSelectedStep(steps, { step }) {
   return getSelectedItem(steps, step);
 }
 
-function getSelectedField(steps, { step, field }) {
-  const selectedStep = getSelectedStep(steps, step) || {};
+function getSelectedField(steps, selected) {
+  const selectedStep = getSelectedStep(steps, selected) || {};
   const { fields = [] } = selectedStep;
-  return getSelectedItem(fields, field);
+  return getSelectedItem(fields, selected.field);
 }
 
 function RightContent({ steps, selected, updateStep, updateField }) {
   const errors = validateSteps(steps);
 
   switch (selected.type) {
-    case 'step': {
-      const currentStep = getSelectedStep(steps, selected);
+    case 'step':
       return (
         <RightSection key={selected.step}>
           <Heading>Step editor</Heading>
-          <StepEditor errors={errors} step={currentStep} updateStep={updateStep} />
+          <StepEditor errors={errors} step={getSelectedStep(steps, selected)} updateStep={updateStep} />
         </RightSection>
       );
-    }
 
-    case 'field': {
-      const currentField = getSelectedField(steps, selected);
+    case 'field':
       return (
         <RightSection key={selected.field}>
           <Heading>Field editor</Heading>
-          <FieldEditor errors={errors} field={currentField} updateField={updateField} />
+          <FieldEditor errors={errors} field={getSelectedField(steps, selected)} updateField={updateField} />
         </RightSection>
       );
-    }
 
     default:
       return (
@@ -109,21 +105,19 @@ function EditorModal() {
     type: getInitiallySelectedType({ step, field })
   });
 
-  const updateStep = curry((key, value) => {
-    const currentStep = getSelectedStep(stepConfig.steps, selected);
+  const updateStep = curry((key, value) =>
     stepConfig.stepEdit(selected.step, {
-      ...currentStep,
+      ...getSelectedStep(stepConfig.steps, selected),
       [key]: value
-    });
-  });
+    })
+  );
 
-  const updateField = curry((key, value) => {
-    const currentField = getSelectedField(stepConfig.steps, selected);
+  const updateField = curry((key, value) =>
     fieldConfig.fieldEdit(selected.step, {
-      ...currentField,
+      ...getSelectedField(stepConfig.steps, selected),
       [key]: value
-    });
-  });
+    })
+  );
 
   const handleCancel = () => sdk.close({ steps: null });
   const handleConfirm = () => sdk.close({ steps: stepConfig.steps });
@@ -142,14 +136,14 @@ function EditorModal() {
               setSelection({
                 type: 'step',
                 field: null,
-                step: currentStep
+                step: currentStep.id
               })
             }
             onFieldClick={(currentField, currentStep) =>
               setSelection({
                 type: 'field',
-                step: currentStep,
-                field: currentField
+                step: currentStep.id,
+                field: currentField.id
               })
             }
           />
