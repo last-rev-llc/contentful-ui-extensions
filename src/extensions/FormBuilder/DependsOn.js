@@ -1,197 +1,200 @@
 /* eslint-disable react/forbid-prop-types */
 
 import React, { useState } from 'react';
-import jsonLogic from 'json-logic-js';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { IconButton, FieldGroup, FormLabel, Textarea, CheckboxField } from '@contentful/forma-36-react-components';
+import { Query, Builder, Utils as QbUtils } from 'react-awesome-query-builder';
 
-import { safeParse } from './utils';
+import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
 
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
+import 'react-awesome-query-builder/lib/css/styles.css';
 
-const AddRow = styled(Row)`
-  button {
-    margin-right: 8px;
+const BuilderWrapper = styled.div`
+  .group {
+    background: whitesmoke;
+    border: 1px solid whitesmoke;
+  }
 
-    position: relative;
-    top: 4px;
+  .query-builder {
+    margin: 0;
+
+    .group-or-rule-container {
+      padding-right: 0;
+      width: 98%;
+      overflow: hidden;
+    }
+
+    .MuiInput-input {
+      max-width: 98%;
+    }
   }
 `;
 
-const JsonTextArea = styled(Textarea)`
-  min-height: 50px;
-  ${({ $hasError: hasError }) => hasError && `border-left: 4px solid red;`}
-`;
+function prefererredWidgetsFor({ type }) {
+  switch (type) {
+    case 'time':
+      return ['time'];
+    case 'number':
+      return ['number'];
+    case 'datetime':
+      return ['datetime'];
 
-const ResultArea = styled(Row)`
-  position: relative;
-
-  padding: 8px;
-  align-items: center;
-  justify-content: center;
-
-  width: 30%;
-  height: 100%;
-  min-height: 50px;
-`;
-
-const ErrorText = styled.span`
-  color: red;
-`;
-
-const TestRow = styled(Row)`
-  background: whitesmoke;
-`;
-
-const DeleteButton = styled(IconButton)`
-  position: absolute;
-  top: 2px;
-  right: 2px;
-`;
-
-export function isValidJson(json) {
-  try {
-    JSON.parse(json);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-function runTest(value, test) {
-  try {
-    return jsonLogic.apply(safeParse(value), safeParse(test));
-  } catch (error) {
-    return false;
+    case 'hidden':
+    case 'password':
+    case 'color':
+    case 'email':
+    case 'file':
+    case 'image':
+    case 'month':
+    case 'radio':
+    case 'range':
+    case 'required':
+    case 'search':
+    case 'string':
+    case 'submit':
+    case 'tel':
+    case 'text':
+    case 'week':
+    case 'url':
+    case 'button':
+    case 'reset':
+    default:
+      return ['text'];
   }
 }
 
-function testPasses(value, test) {
-  try {
-    runTest(value, test);
-    return true;
-  } catch (error) {
-    return false;
+function propsFor({ type, ...field }) {
+  switch (type) {
+    case 'select': {
+      const { options } = field;
+      return {
+        fieldSettings: {
+          listValues: options.map(({ label, value }) => ({ title: label, value }))
+        }
+      };
+    }
+
+    case 'time':
+    case 'number':
+    case 'datetime':
+    case 'hidden':
+    case 'password':
+    case 'color':
+    case 'email':
+    case 'file':
+    case 'image':
+    case 'month':
+    case 'radio':
+    case 'range':
+    case 'required':
+    case 'search':
+    case 'string':
+    case 'submit':
+    case 'tel':
+    case 'text':
+    case 'week':
+    case 'url':
+    case 'button':
+    case 'reset':
+    default:
+      return {};
   }
 }
 
-function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
-  const dependsOnError = isValidJson(value) === false;
-  const [enabled, setEnabled] = useState(value.length > 2);
+function typeFor({ type, value }) {
+  switch (type) {
+    case 'select':
+      return 'select';
 
-  if (!enabled) {
-    return (
-      <CheckboxField
-        checked={enabled}
-        id="dependsOnEnabled"
-        name="dependsOnEnabled"
-        labelText="Enable dependsOn logic"
-        onClick={() => setEnabled((prev) => !prev)}
-      />
-    );
+    case 'number':
+      return 'number';
+
+    case 'hidden':
+      if ([true, false].includes(value)) {
+        return 'boolean';
+      }
+
+      return 'text';
+
+    default:
+      return 'text';
   }
+}
+
+function labelFor({ name, label }) {
+  return name || label || 'unlabelled';
+}
+
+function buildConfig(steps) {
+  const toReturn = { ...MaterialConfig, fields: {} };
+
+  steps
+    .map(({ fields: fieldsForStep }) => fieldsForStep)
+    .reduce((acc, fieldArray) => acc.concat(fieldArray), [])
+    .forEach((field) => {
+      toReturn.fields[field.name] = {
+        label: labelFor(field),
+        type: typeFor(field),
+        valueSources: ['value'],
+        preferWidgets: prefererredWidgetsFor(field),
+        ...propsFor(field)
+      };
+    });
+
+  return toReturn;
+}
+
+function getValue(value) {
+  if (typeof value === 'string') {
+    return JSON.parse(value);
+  }
+
+  return value;
+}
+
+function DependsOn({ steps, value, onChange }) {
+  const config = buildConfig(steps);
+
+  const [state, setState] = useState({
+    config,
+    tree: QbUtils.checkTree(QbUtils.loadFromJsonLogic(getValue(value), config), config)
+  });
+
+  const handleChange = (immutableTree, config) => {
+    // Tip: for better performance you can apply `throttle` - see `examples/demo`
+    setState({ tree: immutableTree, config: buildConfig(steps) });
+
+    const { logic } = QbUtils.jsonLogicFormat(immutableTree, config);
+    console.log(logic);
+    onChange(logic);
+  };
 
   return (
-    <>
-      <CheckboxField
-        id="dependsOnEnabled"
-        name="dependsOnEnabled"
-        labelText="Disable dependsOn logic"
-        checked={enabled}
-        onClick={() =>
-          setEnabled((prev) => {
-            if (!prev) {
-              return true;
-            }
-
-            // Disable the dependsOn entirely
-            onChangeValue('{}');
-            onChangeTests([]);
-            return false;
-          })
-        }
-      />
-      <FieldGroup>
-        <FormLabel htmlFor="title">Depends On logic</FormLabel>
-        <JsonTextArea
-          required
-          defaultValue={value}
-          onChange={(e) => onChangeValue(e.currentTarget.value)}
-          $hasError={dependsOnError}
-        />
-        {dependsOnError && <ErrorText>Invalid JSON</ErrorText>}
-      </FieldGroup>
-
-      {tests.map((test, index) => {
-        const testError = isValidJson(test) === false;
-
-        return (
-          <FieldGroup
-            // NOTE: Tests do not contain ID so we pretty much require keyed by Idx here
-            //       If you can think of a better way please replace
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}>
-            <FormLabel htmlFor="title">Test {index + 1}</FormLabel>
-            <TestRow>
-              <JsonTextArea
-                $hasError={testError}
-                onChange={(e) => {
-                  tests.splice(index, 1, e.currentTarget.value);
-                  onChangeTests(tests);
-                }}
-                defaultValue={test}
-              />
-              <ResultArea>
-                <DeleteButton
-                  label="Delete test"
-                  buttonType="negative"
-                  iconProps={{ icon: 'Delete' }}
-                  onClick={() => onChangeTests(tests.filter((_, i) => i !== index))}
-                />
-                <pre>{JSON.stringify(runTest(value, test), null, 4)}</pre>
-              </ResultArea>
-            </TestRow>
-            {testError && <ErrorText>Invalid JSON</ErrorText>}
-            {!testPasses(value, test) && (
-              <ErrorText>
-                Schema does not match test. See <a href="https://jsonlogic.com/operations.html">jsonLogic</a>
-              </ErrorText>
-            )}
-          </FieldGroup>
-        );
-      })}
-      <AddRow onClick={() => onChangeTests(tests.concat('{}'))}>
-        <IconButton
-          label="Add new test"
-          buttonType="primary"
-          size="small"
-          className="card-item-button"
-          iconProps={{ icon: 'PlusCircle' }}>
-          Add a new dependsOn test
-        </IconButton>
-        <span>Add test</span>
-      </AddRow>
-    </>
+    <Query
+      {...state.config}
+      value={state.tree}
+      onChange={handleChange}
+      renderBuilder={(props) => (
+        <BuilderWrapper className="query-builder-container">
+          <div className="query-builder qb-lite">
+            <Builder {...props} />
+          </div>
+        </BuilderWrapper>
+      )}
+    />
   );
 }
 
 DependsOn.propTypes = {
-  onChangeValue: PropTypes.func.isRequired,
-  onChangeTests: PropTypes.func.isRequired,
-
   // our dependsOn object (jsonLogic)
-  tests: PropTypes.arrayOf(PropTypes.string),
-  value: PropTypes.string
+
+  steps: PropTypes.arrayOf(PropTypes.object),
+  value: PropTypes.object,
+  onChange: PropTypes.func.isRequired
 };
 
 DependsOn.defaultProps = {
-  tests: [],
-  value: '{}'
+  value: {}
 };
 
 export default DependsOn;

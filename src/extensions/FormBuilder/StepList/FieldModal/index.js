@@ -30,7 +30,9 @@ function isValid(field) {
 
 function FieldModal() {
   const sdk = useSDK();
-  const [field, setField] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
+
+  const { invocation } = sdk.parameters;
+  const [field, setField] = useState(omit(['modal'], normalizeValues(invocation.field)));
 
   const updateField = curry((key, newValue) => {
     setField((prev) => ({
@@ -45,12 +47,7 @@ function FieldModal() {
   return (
     <ModalStyle>
       <FieldEditor title="Field Editor" field={field} updateField={updateField} />
-      <DependsOn
-        value={field.dependsOn}
-        tests={field.dependsOnTests}
-        onChangeValue={updateField('dependsOn')}
-        onChangeTests={updateField('dependsOnTests')}
-      />
+      <DependsOn value={field.dependsOn} steps={invocation.steps} onChange={updateField('dependsOn')} />
       <footer>
         <div className="confirm-delete-dialog-actions">
           <Button type="submit" buttonType="negative" size="small" onClick={handleCancel}>
