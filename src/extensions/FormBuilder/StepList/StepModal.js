@@ -10,7 +10,9 @@ import { denormalizeValues, normalizeValues } from './utils';
 
 function StepModal() {
   const sdk = useSDK();
-  const [step, setStep] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
+
+  const { invocation } = sdk.parameters;
+  const [step, setStep] = useState(omit(['modal'], normalizeValues(invocation.step)));
 
   const updateStep = curry((key, value) => {
     setStep((prev) => ({
@@ -33,12 +35,7 @@ function StepModal() {
         <FormLabel htmlFor="title">Step Name</FormLabel>
         <TextInput required defaultValue={title} onChange={updateStepEvent('title')} />
       </FieldGroup>
-      <DependsOn
-        value={step.dependsOn}
-        tests={step.dependsOnTests}
-        onChangeValue={updateStep('dependsOn')}
-        onChangeTests={updateStep('dependsOnTests')}
-      />
+      <DependsOn dependsOn={step.dependsOn} steps={invocation.steps} onChange={updateStep('dependsOn')} />
       <footer>
         <div className="confirm-delete-dialog-actions">
           <Button type="submit" buttonType="negative" size="small" onClick={handleCancel}>

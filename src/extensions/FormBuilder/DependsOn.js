@@ -1,197 +1,252 @@
 /* eslint-disable react/forbid-prop-types */
 
 import React, { useState } from 'react';
-import jsonLogic from 'json-logic-js';
+import { pick, prop } from 'lodash/fp';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { IconButton, FieldGroup, FormLabel, Textarea, CheckboxField } from '@contentful/forma-36-react-components';
-
-import { safeParse } from './utils';
+import { v4 as uuidv4 } from 'uuid';
+import ReactSelect from 'react-select';
+import { Button, Switch, TextField } from '@contentful/forma-36-react-components';
 
 const Row = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: center;
 `;
 
-const AddRow = styled(Row)`
-  button {
-    margin-right: 8px;
+const Col = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
-    position: relative;
-    top: 4px;
+const ValueInputStyle = styled(Row)`
+  margin-top: 1rem;
+  justify-content: flex-end;
+`;
+
+const DependencyStyle = styled(Col)`
+  padding-bottom: 1rem;
+`;
+
+const DependencyWrapper = styled(Col)`
+  padding-bottom: 1rem;
+
+  ${DependencyStyle} {
+    margin-left: ${({ count }) => (count > 0 ? '1rem' : '0')};
   }
 `;
 
-const JsonTextArea = styled(Textarea)`
-  min-height: 50px;
-  ${({ $hasError: hasError }) => hasError && `border-left: 4px solid red;`}
-`;
-
-const ResultArea = styled(Row)`
-  position: relative;
-
-  padding: 8px;
-  align-items: center;
-  justify-content: center;
-
-  width: 30%;
-  height: 100%;
-  min-height: 50px;
-`;
-
-const ErrorText = styled.span`
-  color: red;
-`;
-
-const TestRow = styled(Row)`
-  background: whitesmoke;
-`;
-
-const DeleteButton = styled(IconButton)`
-  position: absolute;
-  top: 2px;
-  right: 2px;
-`;
-
-export function isValidJson(json) {
-  try {
-    JSON.parse(json);
-    return true;
-  } catch (error) {
-    return false;
+const DependsOnWrapper = styled.div`
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: ;
   }
+`;
+
+const Select = styled(ReactSelect)`
+  flex-grow: 1;
+  margin-right: 1rem;
+
+  &:last-of-type {
+    margin-right: 0;
+  }
+`;
+
+function labelFor({ name, label }) {
+  return name || label || 'unlabelled';
 }
 
-function runTest(value, test) {
-  try {
-    return jsonLogic.apply(safeParse(value), safeParse(test));
-  } catch (error) {
-    return false;
-  }
+function buildConfig(steps) {
+  const toReturn = {};
+
+  steps
+    .map(({ fields: fieldsForStep }) => fieldsForStep)
+    .reduce((acc, fieldArray) => acc.concat(fieldArray), [])
+    .forEach((field) => {
+      toReturn[field.id] = {
+        ...field,
+        label: labelFor(field)
+      };
+    });
+
+  return toReturn;
 }
 
-function testPasses(value, test) {
-  try {
-    runTest(value, test);
-    return true;
-  } catch (error) {
-    return false;
-  }
+const DEPEND_TYPES = [
+  { value: '==', label: 'is' },
+  { value: '!!', label: 'exists' },
+  { value: '!', label: 'does not exist' },
+  { value: '!=', label: 'does not equal' },
+  { value: 'in', label: 'in' }
+];
+
+function isBoolean(value) {
+  return [true, false].includes(value);
 }
 
-function DependsOn({ value, tests, onChangeValue, onChangeTests }) {
-  const dependsOnError = isValidJson(value) === false;
-  const [enabled, setEnabled] = useState(value.length > 2);
+function isEqualityCheck(value) {
+  return ['==', '!='].includes(value);
+}
 
-  if (!enabled) {
+function ValueInputArea({ config, item, updateItem }) {
+  const selectedFormItem = config[item.var];
+  if (!selectedFormItem) return null;
+
+  switch (item.type) {
+    case '!!':
+    case '!':
+      return null;
+
+    default:
+      break;
+  }
+
+  // In some cases (such as select) we want to fill out the
+  // available options to the user so they can choose from a
+  // set list of items rather than giving them a direct text entry
+  switch (selectedFormItem.type) {
+    case 'select':
+      return (
+        <Select
+          isMulti={item.type === 'in'}
+          onChange={(option) => {
+            // Support multiselect
+            if (option instanceof Array) {
+              return updateItem({ ...item, value: option.map(prop('value')) });
+            }
+            return updateItem({ ...item, value: option.value });
+          }}
+          options={selectedFormItem.options}
+        />
+      );
+
+    default:
+      if (isEqualityCheck(item.type)) {
+        break;
+      }
+
+      return null;
+  }
+
+  /** Show a switch button if our value from the form is boolean (hidden field etc) */
+  if (isBoolean(selectedFormItem.value)) {
     return (
-      <CheckboxField
-        checked={enabled}
-        id="dependsOnEnabled"
-        name="dependsOnEnabled"
-        labelText="Enable dependsOn logic"
-        onClick={() => setEnabled((prev) => !prev)}
+      <Switch
+        isChecked={item.value}
+        labelText={item.value ? 'Enabled' : 'Disabled'}
+        onToggle={(isChecked) => updateItem({ ...item, value: isChecked })}
       />
     );
   }
 
+  /** Show a default text entry so the user can update the equals to whatever they need */
+  return <TextField onChange={(event) => updateItem({ ...item, value: event.currentTarget.value })} />;
+}
+
+function getDependsTypesForItem(item, config) {
+  const currentConfigItem = config[item.var];
+  if (!currentConfigItem) return DEPEND_TYPES;
+
+  switch (currentConfigItem.type) {
+    case 'select':
+      return DEPEND_TYPES;
+
+    default:
+      return DEPEND_TYPES.filter(({ value }) => value !== 'in');
+  }
+}
+
+function DependencySelector({ config, item, updateItem }) {
   return (
-    <>
-      <CheckboxField
-        id="dependsOnEnabled"
-        name="dependsOnEnabled"
-        labelText="Disable dependsOn logic"
-        checked={enabled}
-        onClick={() =>
-          setEnabled((prev) => {
-            if (!prev) {
-              return true;
-            }
-
-            // Disable the dependsOn entirely
-            onChangeValue('{}');
-            onChangeTests([]);
-            return false;
-          })
-        }
-      />
-      <FieldGroup>
-        <FormLabel htmlFor="title">Depends On logic</FormLabel>
-        <JsonTextArea
-          required
-          defaultValue={value}
-          onChange={(e) => onChangeValue(e.currentTarget.value)}
-          $hasError={dependsOnError}
+    <DependencyStyle>
+      <Row>
+        <Select
+          onChange={(option) => updateItem({ ...item, var: option.id })}
+          options={Object.values(config).map(pick(['id', 'label']))}
         />
-        {dependsOnError && <ErrorText>Invalid JSON</ErrorText>}
-      </FieldGroup>
+        <Select
+          onChange={(option) => updateItem({ ...item, type: option.value })}
+          options={getDependsTypesForItem(item, config)}
+        />
+      </Row>
+      <ValueInputStyle>
+        <ValueInputArea config={config} item={item} updateItem={updateItem} />
+      </ValueInputStyle>
+    </DependencyStyle>
+  );
+}
 
-      {tests.map((test, index) => {
-        const testError = isValidJson(test) === false;
+function buildDependency(extra = {}) {
+  return {
+    id: uuidv4(),
+    var: undefined,
+    ...extra
+  };
+}
 
-        return (
-          <FieldGroup
-            // NOTE: Tests do not contain ID so we pretty much require keyed by Idx here
-            //       If you can think of a better way please replace
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}>
-            <FormLabel htmlFor="title">Test {index + 1}</FormLabel>
-            <TestRow>
-              <JsonTextArea
-                $hasError={testError}
-                onChange={(e) => {
-                  tests.splice(index, 1, e.currentTarget.value);
-                  onChangeTests(tests);
-                }}
-                defaultValue={test}
-              />
-              <ResultArea>
-                <DeleteButton
-                  label="Delete test"
-                  buttonType="negative"
-                  iconProps={{ icon: 'Delete' }}
-                  onClick={() => onChangeTests(tests.filter((_, i) => i !== index))}
-                />
-                <pre>{JSON.stringify(runTest(value, test), null, 4)}</pre>
-              </ResultArea>
-            </TestRow>
-            {testError && <ErrorText>Invalid JSON</ErrorText>}
-            {!testPasses(value, test) && (
-              <ErrorText>
-                Schema does not match test. See <a href="https://jsonlogic.com/operations.html">jsonLogic</a>
-              </ErrorText>
-            )}
-          </FieldGroup>
-        );
-      })}
-      <AddRow onClick={() => onChangeTests(tests.concat('{}'))}>
-        <IconButton
-          label="Add new test"
-          buttonType="primary"
-          size="small"
-          className="card-item-button"
-          iconProps={{ icon: 'PlusCircle' }}>
-          Add a new dependsOn test
-        </IconButton>
-        <span>Add test</span>
-      </AddRow>
-    </>
+function buildDepends(dependsOn, config) {
+  const toReturn = [];
+
+  // Default to AND type comparison every time
+  const { and = dependsOn } = dependsOn;
+
+  Object.values(and).map((logic) => {
+    Object.entries(logic).forEach(([key, value]) => {
+      switch (key) {
+        case '!':
+        case '!!':
+          return toReturn.push(buildDependency({ type: key, var: value.var }));
+
+        case '<':
+        case '>':
+        case '>=':
+        case '<=':
+        case 'in':
+          return toReturn.push(buildDependency({ type: key, var: value[0]?.var, value: value[1] }));
+
+        default:
+          return false;
+      }
+    });
+  });
+
+  console.log(toReturn);
+
+  return toReturn;
+}
+
+function DependsOn({ steps, dependsOn, onChange }) {
+  const config = buildConfig(steps);
+  const [depends, setDepends] = useState(buildDepends(dependsOn, config));
+
+  const addDepend = () => setDepends(depends.concat(buildDependency()));
+  const updateItem = (newItem) => setDepends(depends.map((item) => (item.id === newItem.id ? newItem : item)));
+
+  return (
+    <div>
+      <h4>Dependencies</h4>
+      <DependencyWrapper count={depends.length}>
+        <h5>AND</h5>
+        {depends.map((item) => (
+          <DependencySelector key={item.id} config={config} item={item} updateItem={updateItem} />
+        ))}
+      </DependencyWrapper>
+      <Button onClick={addDepend}>Add Dependency</Button>
+    </div>
   );
 }
 
 DependsOn.propTypes = {
-  onChangeValue: PropTypes.func.isRequired,
-  onChangeTests: PropTypes.func.isRequired,
-
   // our dependsOn object (jsonLogic)
-  tests: PropTypes.arrayOf(PropTypes.string),
-  value: PropTypes.string
+
+  steps: PropTypes.arrayOf(PropTypes.object),
+  dependsOn: PropTypes.object,
+  onChange: PropTypes.func.isRequired
 };
 
 DependsOn.defaultProps = {
-  tests: [],
-  value: '{}'
+  dependsOn: {}
 };
 
 export default DependsOn;
