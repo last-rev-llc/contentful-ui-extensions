@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { FieldGroup, SelectField, Option } from '@contentful/forma-36-react-components';
+import { CheckboxField, FieldGroup, SelectField, Option } from '@contentful/forma-36-react-components';
 
 import { schemaPropType } from './prop-types';
 import AdditionalOptions from './AdditionalOptions';
@@ -36,8 +36,20 @@ function SchemaEditor({ field, updateField }) {
 
   return (
     <SchemaWrapper>
+      <CheckboxField
+        id="field.required"
+        name="field.required"
+        checked={schema.required}
+        labelText={schema.required ? 'Field is required' : 'Field is optional'}
+        onChange={(event) =>
+          updateField('schema', {
+            ...schema,
+            required: event.target.checked
+          })
+        }
+      />
       <SelectField
-        labelText="Field Schema"
+        labelText="Validation"
         id="schema.type"
         name="schema.type"
         value={schema.type || 'any'}
