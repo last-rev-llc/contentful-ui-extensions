@@ -39,7 +39,7 @@ In order to help streamline the process of development we have created a mock SD
 This will be a list of all available UI Extensions.
 
 ### Using Netlify Lambda Functions
-Some UI Extensions, especially ones that integrate with third party services will nee dto communicate using a serverless function. We use Netlify for hosting and below are the instructions to run them locally
+Some UI Extensions, especially ones that integrate with third party services will need to communicate using a serverless function. We use Netlify for hosting and below are the instructions to run them locally
 
 First you need to install the [Netlify CLI Tools](https://github.com/netlify/cli)
 > npm install netlify-cli -g

@@ -1,50 +1,54 @@
 const mockFieldValue = {
-  title: {
-    name: "title",
-    value: "Last Rev: Connecting the Modern Web"
+  'title': {
+    name: 'title',
+    value: 'Last Rev: Connecting the Modern Web'
   },
-  robots: {
-    name: "robots",
-    value: "index,follow"
+  'robots': {
+    name: 'robots',
+    value: 'index,follow'
   },
-  description: {
-    name: "description",
-    value: "some description"
+  'description': {
+    name: 'description',
+    value: 'some description'
   },
-  keywords: {
-    name: "keywords",
-    value: "These, are my, keywords"
+  'keywords': {
+    name: 'keywords',
+    value: 'These, are my, keywords'
   },
-  "og:title": {
-    name: "og:title",
-    value: "Social Sharing Title"
+  'canonical': {
+    name: 'canonical',
+    value: 'https://www.lastrev.com'
   },
-  "og:description": {
-    name: "og:description",
-    value: "Social Sharing Description"
+  'og:title': {
+    name: 'og:title',
+    value: 'Social Sharing Title'
   },
-  "og:image": {
-    name: "og:image",
+  'og:description': {
+    name: 'og:description',
+    value: 'Social Sharing Description'
+  },
+  'og:image': {
+    name: 'og:image',
     value: {
-      id: "1234asdf",
-      title: "test",
-      url: "//placehold.it/600x315"
+      id: '1234asdf',
+      title: 'test',
+      url: '//placehold.it/600x315'
     }
   },
-  "twitter:title": {
-    name: "twitter:title",
-    value: "Twitter Title"
+  'twitter:title': {
+    name: 'twitter:title',
+    value: 'Twitter Title'
   },
-  "twitter:description": {
-    name: "twitter:description",
-    value: "Twitter Description"
+  'twitter:description': {
+    name: 'twitter:description',
+    value: 'Twitter Description'
   },
-  "twitter:image": {
-    name: "og:image",
+  'twitter:image': {
+    name: 'og:image',
     value: {
-      id: "1234asdf",
-      title: "test",
-      url: "//placehold.it/600x315"
+      id: '1234asdf',
+      title: 'test',
+      url: '//placehold.it/600x315'
     }
   }
 };
