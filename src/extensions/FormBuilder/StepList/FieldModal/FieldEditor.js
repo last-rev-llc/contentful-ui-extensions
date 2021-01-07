@@ -26,23 +26,29 @@ function FieldEditor({ errors, field, updateField }) {
     <FieldEditorWrapper>
       <TextField
         required
+        id="label"
+        name="label"
         labelText="Label"
-        defaultValue={field.label}
+        value={field.label}
         onChange={(e) => updateField('label', e.currentTarget.value)}
       />
       <FieldGroup>
         <TextField
           required
+          id="name"
+          name="name"
           labelText="Form key"
-          defaultValue={field.name}
+          value={field.name}
           onChange={(e) => updateField('name', e.currentTarget.value)}
         />
         {nameError && <WarningStyle>{nameError.message}</WarningStyle>}
       </FieldGroup>
       {field.type !== 'hidden' && (
         <TextField
+          id="placeholder"
+          name="placeholder"
           labelText="Placeholder"
-          defaultValue={field.placeholder}
+          value={field.placeholder}
           onChange={(e) => updateField('placeholder', e.currentTarget.value)}
         />
       )}
@@ -61,6 +67,7 @@ function FieldEditor({ errors, field, updateField }) {
 FieldEditor.propTypes = {
   field: PropTypes.shape({
     id: PropTypes.string,
+    type: PropTypes.string,
     label: PropTypes.string,
     name: PropTypes.string,
     placeholder: PropTypes.string,
