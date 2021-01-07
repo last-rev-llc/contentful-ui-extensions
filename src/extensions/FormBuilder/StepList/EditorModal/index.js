@@ -10,23 +10,40 @@ import StepList from '../StepList';
 import StepEditor from '../StepModal/StepEditor';
 import FieldEditor from '../FieldModal/FieldEditor';
 
+import { validateSteps } from '../../validate';
 import { EditorStyle, SectionWrapper, NothingHere, LeftSection, RightSection, ActionSection } from './styles';
 
-function RightContent({ selected, updateStep, updateField }) {
+function getSelectedItem(array, idToFind) {
+  return array.find(({ id }) => id === idToFind);
+}
+
+function getSelectedStep(steps, { step }) {
+  return getSelectedItem(steps, step);
+}
+
+function getSelectedField(steps, selected) {
+  const selectedStep = getSelectedStep(steps, selected) || {};
+  const { fields = [] } = selectedStep;
+  return getSelectedItem(fields, selected.field);
+}
+
+function RightContent({ steps, selected, updateStep, updateField }) {
+  const errors = validateSteps(steps);
+
   switch (selected.type) {
     case 'step':
       return (
-        <RightSection key={selected.step.id}>
+        <RightSection key={selected.step}>
           <Heading>Step editor</Heading>
-          <StepEditor step={selected.step} updateStep={updateStep} />
+          <StepEditor errors={errors} step={getSelectedStep(steps, selected)} updateStep={updateStep} />
         </RightSection>
       );
 
     case 'field':
       return (
-        <RightSection key={selected.field.id}>
+        <RightSection key={selected.field}>
           <Heading>Field editor</Heading>
-          <FieldEditor field={selected.field} updateField={updateField} />
+          <FieldEditor errors={errors} field={getSelectedField(steps, selected)} updateField={updateField} />
         </RightSection>
       );
 
@@ -43,11 +60,31 @@ RightContent.propTypes = {
   updateStep: PropTypes.func.isRequired,
   updateField: PropTypes.func.isRequired,
   selected: PropTypes.shape({
-    step: PropTypes.object,
-    field: PropTypes.object,
+    step: PropTypes.string,
+    field: PropTypes.string,
     type: PropTypes.oneOf(['step', 'field', null])
-  }).isRequired
+  }).isRequired,
+
+  steps: PropTypes.arrayOf(PropTypes.object)
 };
+
+RightContent.defaultProps = {
+  steps: []
+};
+
+function getInitiallySelectedType({ step, field }) {
+  if (field) return 'field';
+  if (step) return 'step';
+
+  return null;
+}
+
+function getActiveId({ step, field }) {
+  if (field) return field.id;
+  if (step) return step.id;
+
+  return null;
+}
 
 function EditorModal() {
   const sdk = useSDK();
@@ -61,17 +98,23 @@ function EditorModal() {
   const stepConfig = useFormSteps(sdk.parameters.invocation.steps);
   const fieldConfig = useFieldConfig(stepConfig.stepEdit);
 
-  const [selected, setSelection] = useState({ type: null, step: null, field: null });
+  const { step = null, field = null } = sdk.parameters.invocation;
+  const [selected, setSelection] = useState({
+    step: step && step.id,
+    field: field && field.id,
+    type: getInitiallySelectedType({ step, field })
+  });
 
   const updateStep = curry((key, value) =>
-    stepConfig.stepEdit(selected.step.id, {
-      ...selected.step,
+    stepConfig.stepEdit(selected.step, {
+      ...getSelectedStep(stepConfig.steps, selected),
       [key]: value
     })
   );
+
   const updateField = curry((key, value) =>
-    fieldConfig.fieldEdit(selected.step.id, {
-      ...selected.field,
+    fieldConfig.fieldEdit(selected.step, {
+      ...getSelectedField(stepConfig.steps, selected),
       [key]: value
     })
   );
@@ -86,13 +129,26 @@ function EditorModal() {
         <LeftSection>
           <Heading>Steps</Heading>
           <StepList
+            activeId={getActiveId(selected)}
             stepConfig={stepConfig}
             fieldConfig={fieldConfig}
-            onStepClick={(step) => setSelection({ type: 'step', step, field: null })}
-            onFieldClick={(field, step) => setSelection({ type: 'field', step, field })}
+            onStepClick={(currentStep) =>
+              setSelection({
+                type: 'step',
+                field: null,
+                step: currentStep.id
+              })
+            }
+            onFieldClick={(currentField, currentStep) =>
+              setSelection({
+                type: 'field',
+                step: currentStep.id,
+                field: currentField.id
+              })
+            }
           />
         </LeftSection>
-        <RightContent selected={selected} updateStep={updateStep} updateField={updateField} />
+        <RightContent steps={stepConfig.steps} selected={selected} updateStep={updateStep} updateField={updateField} />
       </SectionWrapper>
       <ActionSection>
         <Button buttonType="negative" onClick={handleCancel}>

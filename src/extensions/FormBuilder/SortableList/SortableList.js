@@ -8,6 +8,23 @@ import { sortableContainer, sortableElement, sortableHandle } from 'react-sortab
 
 const DragHandle = sortableHandle(() => <CardDragHandle>Reorder card</CardDragHandle>);
 
+function addActiveStyle({ $active: active }) {
+  if (!active) return '';
+
+  return `
+color: white;
+background: #0074D9;
+
+p {
+  color: white;
+}
+
+button:first-of-type svg {
+  fill: white;
+}
+`;
+}
+
 const ItemStyle = styled(Card)`
   padding: 0;
   height: 50px;
@@ -27,6 +44,8 @@ const ItemStyle = styled(Card)`
 
   z-index: 100;
   margin-bottom: 4px;
+
+  ${addActiveStyle}
 `;
 
 const ChildrenStyle = styled(Card)`
@@ -45,25 +64,28 @@ function hasSomeChildren(children) {
 }
 
 const SortableItem = sortableElement(
-  ({ autoexpand, item, onRemoveItem, onEditItem, children, renderItem, dragging, readOnly }) => {
+  ({ active, autoexpand, item, onRemoveItem, onClickItem, children, renderItem, dragging, readOnly }) => {
     const [childrenShown, setChildrenShown] = useState(autoexpand || false);
     const toggleChildren = () => setChildrenShown((prev) => !prev);
 
     const withoutPropagation = curry((func, event) => {
       event.stopPropagation();
-      func(event);
+      if (func instanceof Function) func(event);
     });
 
     return (
       <>
         <ItemStyle
+          $active={active}
           onClick={(event) =>
-            readOnly ? withoutPropagation(toggleChildren, event) : withoutPropagation(onEditItem, event)
+            hasSomeChildren(children) && readOnly
+              ? withoutPropagation(toggleChildren, event)
+              : withoutPropagation(onClickItem, event)
           }>
           {!readOnly && <DragHandle />}
           <div className="card-item-content">
             <div className="card-item-title">
-              {renderItem && renderItem(item)}
+              {renderItem && renderItem({ ...item, active })}
               {!renderItem && <Paragraph element="p">{item.title || item.name || 'No Title'}</Paragraph>}
             </div>
             {hasSomeChildren(children) && (
@@ -102,7 +124,17 @@ const SortableContainer = sortableContainer(({ children }) => (
   <List className="sortable-list">{children}</List>
 ));
 
-function SortableList({ autoexpand, items, onSortEnd, onRemoveItem, onEditItem, children, readOnly, renderItem }) {
+function SortableList({
+  activeId,
+  autoexpand,
+  items,
+  onSortEnd,
+  onRemoveItem,
+  onClickItem,
+  children,
+  readOnly,
+  renderItem
+}) {
   const [dragging, setDragging] = useState(false);
 
   return (
@@ -124,8 +156,9 @@ function SortableList({ autoexpand, items, onSortEnd, onRemoveItem, onEditItem, 
             dragging={dragging}
             autoexpand={autoexpand}
             renderItem={renderItem}
-            onEditItem={() => !readOnly && onEditItem(item)}
-            onRemoveItem={() => !readOnly && onRemoveItem(item)}>
+            active={item.id === activeId}
+            onRemoveItem={() => !readOnly && onRemoveItem(item)}
+            onClickItem={() => onClickItem instanceof Function && onClickItem(item)}>
             {children instanceof Function && children(item)}
           </SortableItem>
         ))}
@@ -135,6 +168,7 @@ function SortableList({ autoexpand, items, onSortEnd, onRemoveItem, onEditItem, 
 }
 
 SortableList.propTypes = {
+  activeId: PropTypes.string,
   items: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -144,7 +178,7 @@ SortableList.propTypes = {
   ).isRequired,
   onSortEnd: PropTypes.func.isRequired,
   onRemoveItem: PropTypes.func.isRequired,
-  onEditItem: PropTypes.func.isRequired,
+  onClickItem: PropTypes.func,
   children: PropTypes.func,
   renderItem: PropTypes.func,
 
@@ -156,7 +190,9 @@ SortableList.defaultProps = {
   readOnly: false,
   autoexpand: true,
   children: null,
-  renderItem: null
+  renderItem: null,
+  activeId: undefined,
+  onClickItem: undefined
 };
 
 export default SortableList;

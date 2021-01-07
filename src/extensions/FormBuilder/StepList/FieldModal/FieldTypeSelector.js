@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FieldGroup, FormLabel, Option, Select } from '@contentful/forma-36-react-components';
+import { Option, SelectField } from '@contentful/forma-36-react-components';
 
 import AdditionalFields from './AdditionalFields';
 
@@ -39,25 +39,23 @@ const fieldTypes = [
   { value: 'week', label: 'Week' }
 ];
 
-function FieldTypeSelector({ field, updateField }) {
+function FieldTypeSelector({ errors, field, updateField }) {
   return (
     <>
-      <FieldGroup>
-        <FormLabel htmlFor="type">Field Type</FormLabel>
-        <Select
-          required
-          id="type"
-          name="type"
-          defaultValue={field.type}
-          onChange={(e) => updateField('type', e.currentTarget.value)}>
-          {fieldTypes.map(({ value: fieldType, label }) => (
-            <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
-              {label}
-            </Option>
-          ))}
-        </Select>
-      </FieldGroup>
-      <AdditionalFields updateField={updateField} field={field} />
+      <SelectField
+        required
+        id="type"
+        name="type"
+        labelText="Field Type"
+        defaultValue={field.type}
+        onChange={(e) => updateField('type', e.currentTarget.value)}>
+        {fieldTypes.map(({ value: fieldType, label }) => (
+          <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
+            {label}
+          </Option>
+        ))}
+      </SelectField>
+      <AdditionalFields updateField={updateField} field={field} errors={errors} />
     </>
   );
 }
@@ -66,7 +64,14 @@ FieldTypeSelector.propTypes = {
   updateField: PropTypes.func.isRequired,
   field: PropTypes.shape({
     type: PropTypes.string
-  }).isRequired
+  }).isRequired,
+
+  // eslint-disable-next-line react/forbid-prop-types
+  errors: PropTypes.object
+};
+
+FieldTypeSelector.defaultProps = {
+  errors: []
 };
 
 export default FieldTypeSelector;

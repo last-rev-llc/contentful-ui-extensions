@@ -1,14 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import arrayMove from 'array-move';
 import PropTypes from 'prop-types';
-import { curry } from 'lodash/fp';
 import { Button, IconButton } from '@contentful/forma-36-react-components';
 
-import SectionWrapper from '../SectionWrapper';
 import SortableList from '../SortableList';
 import { showModal } from '../utils';
 import { useSDK } from '../../../context';
+import { validateSteps, onlyErrors, onlyWarnings } from '../validate';
 
 const Col = styled.div`
   display: flex;
@@ -26,38 +24,52 @@ const FieldDisplay = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  ${({ hasError }) => hasError && 'border-bottom: 2px solid red;'}
+  ${({ hasWarning }) => hasWarning && 'border-bottom: 2px solid orange;'}
 `;
 
 const TypeText = styled.span`
   background-color: #fafafa;
   padding: 8px;
+
+  ${({ active }) => active && `background: #7dafff; color: black;`}
 `;
 
-function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, onFieldClick }) {
+function StepList({ activeId, autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, onFieldClick }) {
   const sdk = useSDK();
 
   const { steps, stepAdd, stepRemove, stepReorder } = stepConfig;
   const { fieldAdd, fieldRemove, fieldReorder } = fieldConfig;
 
+  // Validate fields for errors such as missing or duplicate names
+  const allErrors = validateSteps(steps);
+
+  const errors = onlyErrors(allErrors);
+  const warnings = onlyWarnings(allErrors);
+
   return (
     <div className="setup-form">
       <SortableList
         items={steps}
+        activeId={activeId}
         readOnly={readOnly}
         onSortEnd={stepReorder}
-        onEditItem={onStepClick}
         autoexpand={autoexpand}
+        onClickItem={onStepClick}
         onRemoveItem={(step) =>
           showModal(sdk, { name: 'step-remove' }, { steps, step, type: 'step' }, { steps }).then(
             ({ confirmation }) => confirmation && stepRemove(step)
           )
         }>
+        {/* Uses a functional child, we get passed the parent item and can render children */}
         {(step) => (
           <Col>
             <SortableList
+              activeId={activeId}
               readOnly={readOnly}
               items={step.fields}
-              onEditItem={(field) => onFieldClick(field, step)}
+              onClickItem={(field) => onFieldClick(field, step)}
               onSortEnd={fieldReorder(step.id)}
               onRemoveItem={(field) =>
                 showModal(sdk, { name: 'field-remove' }, { steps, field, type: 'field' }).then(
@@ -65,9 +77,9 @@ function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, 
                 )
               }
               renderItem={(field) => (
-                <FieldDisplay>
+                <FieldDisplay hasError={errors[field.id]} hasWarning={warnings[field.id]}>
                   <span>{field.name}</span>
-                  <TypeText>{field.type}</TypeText>
+                  <TypeText active={field.active}>{field.type}</TypeText>
                 </FieldDisplay>
               )}
             />
@@ -119,13 +131,20 @@ StepList.propTypes = {
     fieldReorder: PropTypes.func
   }).isRequired,
 
-  onStepClick: PropTypes.func.isRequired,
-  onFieldClick: PropTypes.func.isRequired,
+  onStepClick: PropTypes.func,
+  onFieldClick: PropTypes.func,
 
+  activeId: PropTypes.string,
   autoexpand: PropTypes.bool, // Show the fields by defult
   readOnly: PropTypes.bool // Don't allow editing of fields or steps
 };
 
-StepList.defaultProps = { autoexpand: true, readOnly: false };
+StepList.defaultProps = {
+  autoexpand: true,
+  readOnly: false,
+  activeId: undefined,
+  onStepClick: undefined,
+  onFieldClick: undefined
+};
 
 export default StepList;

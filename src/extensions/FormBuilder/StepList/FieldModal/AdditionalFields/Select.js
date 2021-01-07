@@ -4,6 +4,9 @@ import styled from 'styled-components';
 
 import { TextInput, IconButton, FormLabel } from '@contentful/forma-36-react-components';
 
+import { ErrorStyle } from '../../styles';
+import { errorOfType, errorTypes } from '../../../validate';
+
 const AddButton = styled(IconButton)`
   margin-bottom: 24px;
   width: 24px;
@@ -37,17 +40,19 @@ const Hidden = styled.div`
   opacity: 0;
 `;
 
-function Select({ field, updateField }) {
+function Select({ errors, field, updateField }) {
   const { options = [] } = field;
 
+  // State changes
   const updateOptions = (newOptions) => updateField('options')(newOptions);
-
+  const removeOption = (indexToReplace) => options.filter((option, index) => index !== indexToReplace);
+  const addEmptyOption = () => updateOptions(options.concat({ value: '', label: '' }));
   const replaceOption = (indexToReplace, newOption) =>
     options.map((option, index) => (index === indexToReplace ? newOption : option));
 
-  const removeOption = (indexToReplace) => options.filter((option, index) => index !== indexToReplace);
-
-  const addEmptyOption = () => updateOptions(options.concat({ value: '', label: '' }));
+  // Error checking
+  const fieldErrors = errors[field.id];
+  const valueError = errorOfType(errorTypes.INVALID_VALUE, fieldErrors);
 
   return (
     <div>
@@ -103,6 +108,7 @@ function Select({ field, updateField }) {
         />
         <span>Add Option</span>
       </AddRowStyle>
+      {valueError && <ErrorStyle>{valueError.message}</ErrorStyle>}
     </div>
   );
 }
@@ -117,7 +123,14 @@ Select.propTypes = {
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
       })
     )
-  }).isRequired
+  }).isRequired,
+
+  // eslint-disable-next-line react/forbid-prop-types
+  errors: PropTypes.object
+};
+
+Select.defaultProps = {
+  errors: {}
 };
 
 export default Select;

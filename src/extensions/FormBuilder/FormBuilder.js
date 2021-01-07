@@ -3,7 +3,7 @@ import copy from 'copy-to-clipboard';
 import { set } from 'lodash';
 import { curry, clone } from 'lodash/fp';
 import styled from 'styled-components';
-import { Button, IconButton, Textarea, SectionHeading } from '@contentful/forma-36-react-components';
+import { Button, IconButton, Textarea } from '@contentful/forma-36-react-components';
 
 import { useSDK } from '../../context';
 
@@ -17,6 +17,7 @@ import EditorModal from './StepList/EditorModal';
 import ConfirmModal from './StepList/ConfirmDeleteModal';
 
 import './FormBuilder.scss';
+import { validateSteps, onlyErrors } from './validate';
 import { safeParse, showModal } from './utils';
 import { useFormConfig, useFieldConfig } from './hooks';
 
@@ -61,10 +62,29 @@ function FormBuilder() {
 
   const { formConfig, stepConfig, loadState } = useFormConfig(
     curry((fieldName, newValue) => {
-      sdk.field.setValue(
-        // Use lodash set to insert items at deep.key.level
-        set(clone(sdk.field.getValue() || {}), fieldName, newValue)
-      );
+      // Use lodash set to insert items at deep.key.level
+      const newFieldValue = set(clone(sdk.field.getValue() || {}), fieldName, newValue);
+
+      const { steps = [] } = newFieldValue;
+
+      const errors = onlyErrors(validateSteps(steps));
+      const hasErrors = Object.keys(errors).length > 0;
+
+      // If we have some errors, disable publishing
+      if (hasErrors) {
+        // Save the result as single key in the JSON
+        // We do this to present invalid JSON and prevent
+        // contentful from allowing publishing of the field
+        //
+        // Check the content model validation in Contentful
+        // we have specified at least 2 properties in the JSON
+        sdk.field.setValue({ error: newFieldValue });
+      }
+
+      // We should be able to publish without issue
+      else {
+        sdk.field.setValue(newFieldValue);
+      }
     })
   );
 
@@ -78,8 +98,19 @@ function FormBuilder() {
   useEffect(
     () => {
       if (sdk.field?.getValue instanceof Function) {
-        loadState(sdk.field.getValue() || {});
+        const value = sdk.field.getValue() || {};
+
+        // Handle parsing of a blocked field
+        // We do this to prevent contentful from publishing
+        if (value.error) {
+          return loadState(value.error);
+        }
+
+        return loadState(value);
       }
+
+      // explicit for eslint
+      return undefined;
     },
     // I only actually want to update when the field changes
     // this is only initial configuration setup
@@ -113,89 +144,72 @@ function FormBuilder() {
    * of the form steps section
    * */
   const getEditableValue = () => {
-    const { provider, ...rest } = sdk.field.getValue();
+    const { provider, ...rest } = sdk.field.getValue() || {};
     return rest;
   };
 
-  const onStepClick = (step) =>
-    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps, step })
-      // If the modal returned us a new step we'll update the values in our current state
-      // The modal  stateless so it's not changing our step directly
-      .then(({ step: newStep } = {}) => newStep && stepConfig.stepEdit(step.id, newStep));
+  const handleUpdate = ({ steps: newSteps }) =>
+    // If new steps are returned from the modal
+    // the user clicked the confirm button, if null it's cancel
+    newSteps &&
+    stepConfig.stepsUpdate(
+      newSteps,
+      // & also save to contentful
+      true
+    );
 
   const onFieldClick = (field, step) =>
-    showModal(sdk, { name: 'field-modal' }, { steps: stepConfig.steps, field })
-      // When the user clicks save in the modal we'll get the new field back
-      // orr null if the user clicks cancel
-      .then(({ field: newField } = {}) => newField && fieldConfig.fieldEdit(step.id, newField));
+    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps, step, field }).then(handleUpdate);
 
-  try {
-    return (
-      <div>
-        <QuickIcons>
-          <IconButton
-            label="Copy JSON"
-            iconProps={{ icon: 'Copy' }}
-            onClick={() => copy(JSON.stringify(sdk.field.getValue(), null, 2))}
-          />
-          <IconButton label="Toggle JSON mode" iconProps={{ icon: 'Edit' }} onClick={() => setJsonMode(!jsonMode)} />
-        </QuickIcons>
-        {!jsonMode && (
-          <>
-            <FormInfo formConfig={formConfig} />
-            <SectionWrapper
-              title={
-                <SectionHeaderWithButton>
-                  Form Content
-                  <Button
-                    onClick={() =>
-                      showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(
-                        ({ steps }) =>
-                          // If new steps are returned from the modal
-                          // the user clicked the confirm button, if null it's cancel
-                          steps &&
-                          stepConfig.stepsUpdate(
-                            steps,
-                            // & also save to contentful
-                            true
-                          )
-                      )
-                    }>
-                    Edit Form
-                  </Button>
-                </SectionHeaderWithButton>
-              }>
-              <StepList
-                readOnly
-                autoexpand={false}
-                stepConfig={stepConfig}
-                fieldConfig={fieldConfig}
-                onStepClick={onStepClick}
-                onFieldClick={onFieldClick}
-              />
-            </SectionWrapper>
-          </>
-        )}
-        {jsonMode && (
-          <JsonInput
-            value={JSON.stringify(getEditableValue(), null, 2)}
-            onChange={(event) => {
-              const newFormState = safeParse(event.currentTarget.value);
-              if (newFormState) {
-                sdk.field.setValue(newFormState);
-                loadState(newFormState);
-              }
-            }}
-          />
-        )}
-      </div>
-    );
-  } catch (error) {
-    // Fallback to json entry on error
-    // eslint-disable-next-line no-console
-    console.error(error);
-    setJsonMode(true);
-  }
+  return (
+    <div>
+      <QuickIcons>
+        <IconButton
+          label="Copy JSON"
+          iconProps={{ icon: 'Copy' }}
+          onClick={() => copy(JSON.stringify(sdk.field.getValue(), null, 2))}
+        />
+        <IconButton label="Toggle JSON mode" iconProps={{ icon: 'Edit' }} onClick={() => setJsonMode(!jsonMode)} />
+      </QuickIcons>
+      {!jsonMode && (
+        <>
+          <FormInfo formConfig={formConfig} />
+          <SectionWrapper
+            title={
+              <SectionHeaderWithButton>
+                Form Content
+                <Button
+                  onClick={() =>
+                    showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps }).then(handleUpdate)
+                  }>
+                  Edit Form
+                </Button>
+              </SectionHeaderWithButton>
+            }>
+            <StepList
+              readOnly
+              autoexpand={false}
+              stepConfig={stepConfig}
+              fieldConfig={fieldConfig}
+              onFieldClick={onFieldClick}
+            />
+          </SectionWrapper>
+        </>
+      )}
+      {jsonMode && (
+        <JsonInput
+          value={JSON.stringify(getEditableValue(), null, 2)}
+          onChange={(event) => {
+            const newFormState = safeParse(event.currentTarget.value);
+            if (newFormState) {
+              sdk.field.setValue(newFormState);
+              loadState(newFormState);
+            }
+          }}
+        />
+      )}
+    </div>
+  );
 }
 
 export default FormBuilder;

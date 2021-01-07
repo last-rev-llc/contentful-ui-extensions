@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { curry } from 'lodash/fp';
 import { Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
 
-import DependsOn from '../../DependsOn';
+import DependsOn from '../DependsOn';
 import { useSDK } from '../../../../context';
 
 import { denormalizeValues } from '../utils';

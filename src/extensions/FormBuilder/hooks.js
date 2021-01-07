@@ -5,7 +5,11 @@ import arrayMove from 'array-move';
 
 import { buildStep, buildField, URL_TYPES } from './utils';
 
-export function useProviderConfig(setContentfulKey, { parameters = {}, type = 'custom' } = {}) {
+function noop() {
+  return null;
+}
+
+export function useProviderConfig({ parameters = {}, type = 'custom' } = {}, setContentfulKey = noop) {
   const { formId = '', portalId = '' } = parameters;
   const [values, setValues] = useState({ type, formId, portalId });
 
@@ -21,8 +25,8 @@ export function useProviderConfig(setContentfulKey, { parameters = {}, type = 'c
           type: newType,
 
           // Disable the URL if this type does not support it
-          formId: URL_TYPES.includes(newType) ? oldValues.portalId : undefined,
-          portalId: URL_TYPES.includes(newType) ? oldValues.portalId : undefined
+          formId: URL_TYPES.includes(newType) ? oldValues.formId : null,
+          portalId: URL_TYPES.includes(newType) ? oldValues.portalId : null
         })
       );
     },
@@ -177,7 +181,7 @@ function ensureIds(steps) {
 }
 
 export function useFormConfig(handleFieldChange) {
-  const formConfig = useProviderConfig(handleFieldChange);
+  const formConfig = useProviderConfig({}, handleFieldChange);
   const stepConfig = useFormSteps([buildStep('First step')], handleFieldChange);
 
   const loadState = ({ steps = [], provider = {} }) => {
