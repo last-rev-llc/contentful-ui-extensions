@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FieldGroup, FormLabel, TextInput, Select, Option } from '@contentful/forma-36-react-components';
 
-import { URL_TYPES } from '../utils';
+import { URL_TYPES } from '../hooks/utils';
 import SectionWrapper from '../SectionWrapper';
 
 function FormInfo({ formConfig }) {
