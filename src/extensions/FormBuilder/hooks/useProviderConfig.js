@@ -3,12 +3,21 @@ import { merge } from 'lodash/fp';
 
 import { URL_TYPES } from './utils';
 
-function noop() {
-  return null;
-}
+/**
+ * Provider configuration holds the remote endpoint for the form
+ * currently this is mostly hubspot, but in future the idea is to add
+ * different provider configurations here.
+ *
+ * By passing in the initial provider configuration we get a set of functions
+ * which can be used to update that (and callback to contentful)
 
-export default function useProviderConfig({ parameters = {}, type = 'custom' } = {}, setContentfulKey = noop) {
+ * * onChange should be a function which takes a string<key> and a <value>
+ * onChange('some.maybe.deep.key', someValue)
+ * */
+export default function useProviderConfig(onChangeField, { provider = {} } = {}) {
+  const { parameters = {}, type = 'custom' } = provider;
   const { formId = '', portalId = '' } = parameters;
+
   const [values, setValues] = useState({ type, formId, portalId });
 
   return {
@@ -16,7 +25,7 @@ export default function useProviderConfig({ parameters = {}, type = 'custom' } =
 
     setType: (newType) => {
       // Save to contentful
-      setContentfulKey('provider.type', newType);
+      onChangeField('provider.type', newType);
 
       setValues((oldValues) =>
         merge(oldValues)({
@@ -31,14 +40,14 @@ export default function useProviderConfig({ parameters = {}, type = 'custom' } =
 
     setFormId: (newUrl) => {
       // Save to contentful
-      setContentfulKey('provider.parameters.formId', newUrl);
+      onChangeField('provider.parameters.formId', newUrl);
 
       setValues((oldValues) => merge(oldValues)({ formId: newUrl }));
     },
 
     setPortalId: (newUrl) => {
       // Save to contentful
-      setContentfulKey('provider.parameters.portalId', newUrl);
+      onChangeField('provider.parameters.portalId', newUrl);
 
       setValues((oldValues) => merge(oldValues)({ portalId: newUrl }));
     },

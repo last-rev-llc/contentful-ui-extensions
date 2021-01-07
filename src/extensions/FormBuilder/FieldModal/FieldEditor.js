@@ -4,13 +4,13 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { FieldGroup, TextField } from '@contentful/forma-36-react-components';
-import DependsOn from '../DependsOn';
+import DependsOn from '../StepList/DependsOn';
 
 import SchemaEditor from './SchemaEditor';
 import FieldTypeSelector from './FieldTypeSelector';
 
-import { errorOfType, errorTypes } from '../../validate';
-import { WarningStyle } from '../styles';
+import { errorOfType, errorTypes } from '../validate';
+import { WarningStyle } from '../StepList/styles';
 
 const FieldEditorWrapper = styled.div`
   > * {

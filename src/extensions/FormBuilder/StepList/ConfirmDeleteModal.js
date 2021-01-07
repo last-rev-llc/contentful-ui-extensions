@@ -4,7 +4,7 @@ import { Heading, Button, FormLabel } from '@contentful/forma-36-react-component
 
 import { useSDK } from '../../../context';
 
-import { ModalStyle } from './styles';
+import { ModalStyle } from '../styles';
 
 const Col = styled.div`
   display: flex;

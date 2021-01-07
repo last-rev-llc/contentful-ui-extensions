@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { curry, omit } from 'lodash/fp';
 import { Button, Heading } from '@contentful/forma-36-react-components';
 
-import { useSDK } from '../../../../context';
+import { useSDK } from '../../../context';
 
 import { ModalStyle } from '../styles';
-import { normalizeValues, denormalizeValues } from '../utils';
 
 import FieldEditor from './FieldEditor';
 
@@ -30,7 +29,7 @@ function isValid(field) {
 function FieldModal() {
   const sdk = useSDK();
   const { invocation } = sdk.parameters;
-  const [field, setField] = useState(omit(['modal'], normalizeValues(invocation.field)));
+  const [field, setField] = useState(omit(['modal'], invocation.field || {}));
 
   const updateField = curry((key, newValue) => {
     setField((prev) => ({
@@ -40,11 +39,11 @@ function FieldModal() {
   });
 
   const handleCancel = () => sdk.close({ field: null });
-  const handleSubmit = () => sdk.close({ field: denormalizeValues(field) });
+  const handleSubmit = () => sdk.close({ field });
 
   return (
     <ModalStyle>
-      <Heading>Field Editor</Heading>}
+      <Heading>Field Editor</Heading>
       <FieldEditor field={field} updateField={updateField} />
       <footer>
         <div className="confirm-delete-dialog-actions">

@@ -3,17 +3,15 @@ import PropTypes from 'prop-types';
 import { curry } from 'lodash/fp';
 import { Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
 
-import DependsOn from '../DependsOn';
-import { useSDK } from '../../../../context';
-
-import { denormalizeValues } from '../utils';
+import DependsOn from '../StepList/DependsOn';
+import { useSDK } from '../../../context';
 
 function StepEditor({ step, updateStep }) {
   const sdk = useSDK();
   const updateStepEvent = curry((key, event) => updateStep(key, event.currentTarget.value));
 
+  const handleSubmit = () => sdk.close({ step });
   const handleCancel = () => sdk.close({ step: null });
-  const handleSubmit = () => sdk.close({ step: denormalizeValues(step) });
 
   const { title = '' } = step;
 

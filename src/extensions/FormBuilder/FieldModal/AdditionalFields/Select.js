@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import { TextInput, IconButton, FormLabel } from '@contentful/forma-36-react-components';
 
-import { ErrorStyle } from '../../styles';
-import { errorOfType, errorTypes } from '../../../validate';
+import { ErrorStyle } from '../../StepList/styles';
+import { errorOfType, errorTypes } from '../../validate';
 
 const AddButton = styled(IconButton)`
   margin-bottom: 24px;

@@ -1,50 +1,38 @@
-import { useState } from 'react';
 import arrayMove from 'array-move';
 
 import { buildStep } from './utils';
 
-function noop() {
-  return null;
-}
-
-export default function useFormSteps(initialSteps = [], onChange = noop) {
-  const [steps, setStepsBase] = useState(initialSteps);
-
-  const setSteps = (newValues) => {
+/**
+ * Pass in a set of JSON steps and we'll generate a set of functionality
+ * surrounding editing or reordering those steps
+ *
+ * We rely on the parent components state here so this function will use the onChange
+ * callback to update that.
+ *
+ * onChange should be a function which takes a string<key> and a <value>
+ * onChange('some.maybe.deep.key', someValue)
+ * */
+export default function useFormSteps(onChange, { steps = [] } = {}) {
+  const stepsUpdate = (newValues) => {
     if (newValues instanceof Function) {
-      return setStepsBase((oldValues) => {
-        const toReturn = newValues(oldValues);
-
-        // Allow us to pass in a callback function
-        // Helps when we want to automatically update the steps
-        if (onChange instanceof Function) {
-          onChange('steps', toReturn);
-        }
-        return toReturn;
-      });
+      return onChange('steps', newValues(steps));
     }
 
-    // Allow us to pass in a callback function
-    // Helps when we want to automatically update the steps
-    if (onChange instanceof Function) {
-      onChange('steps', newValues);
-    }
-
-    return setStepsBase(newValues);
+    return onChange('steps', newValues);
   };
 
   const stepAdd = () =>
-    setSteps((oldSteps) =>
+    stepsUpdate((oldSteps) =>
       // Generate a new empty step
       oldSteps.concat(buildStep(`New Step ${steps.length + 1}`))
     );
 
   const stepRemove = ({ id: idToRemove }) =>
     // Filter out old step by ID
-    setSteps((oldSteps) => oldSteps.filter(({ id }) => id !== idToRemove));
+    stepsUpdate((oldSteps) => oldSteps.filter(({ id }) => id !== idToRemove));
 
   const stepEdit = (stepId, stepUpdates) =>
-    setSteps((oldSteps) =>
+    stepsUpdate((oldSteps) =>
       oldSteps.map((step) => {
         // If matching ID found replace the step, else return old step
         // We should pass the entire new step here to update
@@ -62,7 +50,7 @@ export default function useFormSteps(initialSteps = [], onChange = noop) {
 
   const stepReorder = ({ oldIndex, newIndex }) =>
     // Move the item to position requested
-    setSteps((oldSteps) => arrayMove(oldSteps, oldIndex, newIndex));
+    stepsUpdate((oldSteps) => arrayMove(oldSteps, oldIndex, newIndex));
 
   return {
     steps,
@@ -70,7 +58,6 @@ export default function useFormSteps(initialSteps = [], onChange = noop) {
     stepEdit,
     stepRemove,
     stepReorder,
-    stepsUpdate: (newSteps, saveToContentful = false) =>
-      saveToContentful ? setSteps(newSteps) : setStepsBase(newSteps)
+    stepsUpdate
   };
 }
