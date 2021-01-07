@@ -3,7 +3,11 @@ import arrayMove from 'array-move';
 
 import { buildStep } from './utils';
 
-export default function useFormSteps(initialSteps = [], onChange) {
+function noop() {
+  return null;
+}
+
+export default function useFormSteps(initialSteps = [], onChange = noop) {
   const [steps, setStepsBase] = useState(initialSteps);
 
   const setSteps = (newValues) => {
