@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import arrayMove from 'array-move';
 import PropTypes from 'prop-types';
 import { curry } from 'lodash/fp';
-import { Button, IconButton, SectionHeading } from '@contentful/forma-36-react-components';
+import { Button, IconButton } from '@contentful/forma-36-react-components';
 
 import SectionWrapper from '../SectionWrapper';
 import SortableList from '../SortableList';
-import { buildField, showModal } from '../utils';
+import { showModal } from '../utils';
 import { useSDK } from '../../../context';
 
 const Col = styled.div`
@@ -33,98 +33,45 @@ const TypeText = styled.span`
   padding: 8px;
 `;
 
-function useFieldsConfig(stepEdit) {
-  const fieldRemove = curry((stepId, field) =>
-    stepEdit(
-      stepId,
-
-      // Filter out the step
-      // we're passing a function to stepEdit which will give us
-      // the latest version of the step (actomic update)
-      (oldStep) => ({
-        ...oldStep,
-        fields: oldStep.fields.filter(({ id: fieldId }) => fieldId !== field.id)
-      })
-    )
-  );
-
-  // We want to keep this function curried so we
-  // must provide a second argument (for lodash)
-  // eslint-disable-next-line no-unused-vars
-  const fieldAdd = curry((stepId, _event) => {
-    stepEdit(stepId, (oldStep) => ({
-      ...oldStep,
-      fields: oldStep.fields.concat(buildField())
-    }));
-  });
-
-  const fieldUpdate = curry((stepId, newField) => {
-    stepEdit(stepId, (oldStep) => ({
-      ...oldStep,
-      fields: oldStep.fields.map((field) => (field.id === newField.id ? newField : field))
-    }));
-  });
-
-  const fieldReorder = curry((stepId, { oldIndex, newIndex }) => {
-    // Move the item to position requested
-    stepEdit(stepId, (step) => ({ ...step, fields: arrayMove(step.fields, oldIndex, newIndex) }));
-  });
-
-  return {
-    fieldAdd,
-    fieldRemove,
-    fieldUpdate,
-    fieldReorder
-  };
-}
-
-function StepList({ stepConfig }) {
+function StepList({ autoexpand, stepConfig, fieldConfig, readOnly, onStepClick, onFieldClick }) {
   const sdk = useSDK();
 
-  const { steps, stepAdd, stepRemove, stepEdit, stepReorder } = stepConfig;
-  const { fieldAdd, fieldRemove, fieldUpdate, fieldReorder } = useFieldsConfig(stepEdit);
+  const { steps, stepAdd, stepRemove, stepReorder } = stepConfig;
+  const { fieldAdd, fieldRemove, fieldReorder } = fieldConfig;
 
   return (
-    <SectionWrapper title="Setup Form">
-      <div className="setup-form">
-        <SectionHeading className="title">Steps</SectionHeading>
-        <SortableList
-          items={steps}
-          onSortEnd={stepReorder}
-          onRemoveItem={(step) =>
-            showModal(sdk, 'step-remove', { step, type: 'step' }).then(
-              ({ confirmation }) => confirmation && stepRemove(step)
-            )
-          }
-          onEditItem={(step) =>
-            showModal(sdk, 'step-modal', step)
-              // If the modal returned us a new step we'll update the values in our current state
-              // The modal is stateless so it's not changing our step directly
-              .then(({ step: newStep } = {}) => newStep && stepEdit(step.id, newStep))
-          }>
-          {(step) => (
-            <Col>
-              <SortableList
-                items={step.fields}
-                onSortEnd={fieldReorder(step.id)}
-                onEditItem={(field) =>
-                  showModal(sdk, 'field-modal', field)
-                    // When the user clicks save in the modal we'll get the new field back
-                    // orr null if the user clicks cancel
-                    .then(({ field: newField } = {}) => newField && fieldUpdate(step.id, newField))
-                }
-                onRemoveItem={(field) =>
-                  showModal(sdk, 'field-remove', { field, type: 'field' }).then(
-                    ({ confirmation }) => confirmation && fieldRemove(step.id, field)
-                  )
-                }
-                renderItem={(field) => (
-                  <FieldDisplay>
-                    <span>{field.name}</span>
-                    <TypeText>{field.type}</TypeText>
-                  </FieldDisplay>
-                )}
-              />
+    <div className="setup-form">
+      <SortableList
+        items={steps}
+        readOnly={readOnly}
+        onSortEnd={stepReorder}
+        onEditItem={onStepClick}
+        autoexpand={autoexpand}
+        onRemoveItem={(step) =>
+          showModal(sdk, { name: 'step-remove' }, { steps, step, type: 'step' }, { steps }).then(
+            ({ confirmation }) => confirmation && stepRemove(step)
+          )
+        }>
+        {(step) => (
+          <Col>
+            <SortableList
+              readOnly={readOnly}
+              items={step.fields}
+              onEditItem={(field) => onFieldClick(field, step)}
+              onSortEnd={fieldReorder(step.id)}
+              onRemoveItem={(field) =>
+                showModal(sdk, { name: 'field-remove' }, { steps, field, type: 'field' }).then(
+                  ({ confirmation }) => confirmation && fieldRemove(step.id, field)
+                )
+              }
+              renderItem={(field) => (
+                <FieldDisplay>
+                  <span>{field.name}</span>
+                  <TypeText>{field.type}</TypeText>
+                </FieldDisplay>
+              )}
+            />
+            {!readOnly && (
               <LeftIconButton
                 size="small"
                 buttonType="primary"
@@ -132,16 +79,18 @@ function StepList({ stepConfig }) {
                 onClick={fieldAdd(step.id)}
                 iconProps={{ icon: 'PlusCircle' }}
               />
-            </Col>
-          )}
-        </SortableList>
+            )}
+          </Col>
+        )}
+      </SortableList>
+      {!readOnly && (
         <div className="actions">
           <Button onClick={stepAdd} size="small">
             Add Step
           </Button>
         </div>
-      </div>
-    </SectionWrapper>
+      )}
+    </div>
   );
 }
 
@@ -157,9 +106,26 @@ StepList.propTypes = {
     stepRemove: PropTypes.func,
     stepEdit: PropTypes.func,
     stepReorder: PropTypes.func
-  }).isRequired
+  }).isRequired,
+
+  fieldConfig: PropTypes.shape({
+    fields: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string
+      })
+    ),
+    fieldAdd: PropTypes.func,
+    fieldRemove: PropTypes.func,
+    fieldReorder: PropTypes.func
+  }).isRequired,
+
+  onStepClick: PropTypes.func.isRequired,
+  onFieldClick: PropTypes.func.isRequired,
+
+  autoexpand: PropTypes.bool, // Show the fields by defult
+  readOnly: PropTypes.bool // Don't allow editing of fields or steps
 };
 
-StepList.defaultProps = {};
+StepList.defaultProps = { autoexpand: true, readOnly: false };
 
 export default StepList;

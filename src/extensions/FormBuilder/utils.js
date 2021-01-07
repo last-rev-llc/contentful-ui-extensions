@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import { curry } from 'lodash/fp';
 
 export function safeParse(maybeJson) {
   let parsed;
@@ -19,19 +18,22 @@ export function safeParse(maybeJson) {
   }
 }
 
-export const showModal = curry((sdk, modalName, parameters) =>
-  sdk.dialogs.openExtension({
-    width: 500,
+export const showModal = (sdk, modalProps = {}, parameters = {}) => {
+  const { width = 'fullWidth', name } = modalProps;
+
+  return sdk.dialogs.openExtension({
+    width,
     id: sdk.ids.extension,
+    allowHeightOverflow: false,
     shouldCloseOnOverlayClick: true,
     shouldCloseOnEscapePress: true,
     position: 'center',
     parameters: {
-      modal: modalName,
+      modal: name,
       ...parameters
     }
-  })
-);
+  });
+};
 
 export function buildField({ name = 'no_name', type = 'hidden' } = {}) {
   return {

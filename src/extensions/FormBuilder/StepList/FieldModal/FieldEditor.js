@@ -1,37 +1,50 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Heading, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
-import FieldTypeSelector from './FieldTypeSelector';
+  /* eslint-disable react/forbid-prop-types */
 
-function FieldEditor({ title, field, updateField }) {
-  const { name, label } = field;
-  return (
-    <>
-      {title && <Heading>{title}</Heading>}
-      <FieldGroup>
-        <FormLabel htmlFor="label">Field Label</FormLabel>
-        <TextInput required defaultValue={label} onChange={(e) => updateField('label', e.currentTarget.value)} />
-      </FieldGroup>
-      <FieldGroup>
-        <FormLabel htmlFor="title">Form key</FormLabel>
-        <TextInput required defaultValue={name} onChange={(e) => updateField('name', e.currentTarget.value)} />
-      </FieldGroup>
-      <FieldTypeSelector field={field} updateField={updateField} />
-    </>
-  );
-}
+  import React from 'react';
+  import PropTypes from 'prop-types';
+  import { FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
+  import DependsOn from '../../DependsOn';
+  import FieldTypeSelector from './FieldTypeSelector';
 
-FieldEditor.propTypes = {
-  title: PropTypes.string,
-  field: PropTypes.shape({
-    label: PropTypes.string,
-    name: PropTypes.string
-  }).isRequired,
-  updateField: PropTypes.func.isRequired
-};
+  function FieldEditor({ field, updateField }) {
+    return (
+      <>
+        <FieldGroup>
+          <FormLabel htmlFor="label">Label</FormLabel>
+          <TextInput required defaultValue={field.label} onChange={(e) => updateField('label', e.currentTarget.value)} />
+        </FieldGroup>
+        <FieldGroup>
+          <FormLabel htmlFor="title">Form key</FormLabel>
+          <TextInput required defaultValue={field.name} onChange={(e) => updateField('name', e.currentTarget.value)} />
+        </FieldGroup>
+        <FieldTypeSelector field={field} updateField={updateField} />
+        <DependsOn
+          value={field.dependsOn}
+          tests={field.dependsOnTests}
+          onChangeValue={updateField('dependsOn')}
+          onChangeTests={updateField('dependsOnTests')}
+        />
+      </>
+    );
+  }
 
-FieldEditor.defaultProps = {
-  title: undefined
-};
+  FieldEditor.propTypes = {
+    field: PropTypes.shape({
+      id: PropTypes.string,
+      label: PropTypes.string,
+      name: PropTypes.string,
+      dependsOn: PropTypes.string,
+      dependsOnTests: PropTypes.arrayOf(PropTypes.string)
+    }).isRequired,
+    updateField: PropTypes.func.isRequired,
 
-export default FieldEditor;
+    dependsOn: PropTypes.string,
+    dependsOnTests: PropTypes.arrayOf(PropTypes.object)
+  };
+
+  FieldEditor.defaultProps = {
+    dependsOn: '',
+    dependsOnTests: []
+  };
+
+  export default FieldEditor;

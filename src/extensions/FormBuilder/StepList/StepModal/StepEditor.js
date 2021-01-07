@@ -1,24 +1,15 @@
-import React, { useState } from 'react';
-import { curry, omit } from 'lodash/fp';
-import { Heading, Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { curry } from 'lodash/fp';
+import { Button, FieldGroup, FormLabel, TextInput } from '@contentful/forma-36-react-components';
 
-import DependsOn from '../DependsOn';
-import { useSDK } from '../../../context';
+import DependsOn from '../../DependsOn';
+import { useSDK } from '../../../../context';
 
-import { ModalStyle } from './styles';
-import { denormalizeValues, normalizeValues } from './utils';
+import { denormalizeValues } from '../utils';
 
-function StepModal() {
+function StepEditor({ step, updateStep }) {
   const sdk = useSDK();
-  const [step, setStep] = useState(omit(['modal'], normalizeValues(sdk.parameters.invocation)));
-
-  const updateStep = curry((key, value) => {
-    setStep((prev) => ({
-      ...prev,
-      [key]: value
-    }));
-  });
-
   const updateStepEvent = curry((key, event) => updateStep(key, event.currentTarget.value));
 
   const handleCancel = () => sdk.close({ step: null });
@@ -27,10 +18,9 @@ function StepModal() {
   const { title = '' } = step;
 
   return (
-    <ModalStyle>
-      <Heading>Edit Step</Heading>
+    <>
       <FieldGroup>
-        <FormLabel htmlFor="title">Step Name</FormLabel>
+        <FormLabel htmlFor="title">Label</FormLabel>
         <TextInput required defaultValue={title} onChange={updateStepEvent('title')} />
       </FieldGroup>
       <DependsOn
@@ -54,8 +44,19 @@ function StepModal() {
           </Button>
         </div>
       </footer>
-    </ModalStyle>
+    </>
   );
 }
 
-export default StepModal;
+StepEditor.propTypes = {
+  step: PropTypes.shape({
+    title: PropTypes.string,
+    dependsOn: PropTypes.string,
+    dependsOnTests: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired,
+  updateStep: PropTypes.func.isRequired
+};
+
+StepEditor.defaultProps = {};
+
+export default StepEditor;

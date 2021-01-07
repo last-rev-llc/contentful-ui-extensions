@@ -32,7 +32,6 @@ function Toggleable({ field, updateField }) {
     <FieldGroup>
       <SubfieldStyle>
         <FieldEditor
-          title="Subfield Editor"
           field={subfield}
           updateField={curry((key, newValue) =>
             updateField('field', {

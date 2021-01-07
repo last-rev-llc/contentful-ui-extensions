@@ -44,78 +44,88 @@ function hasSomeChildren(children) {
   return !!children;
 }
 
-const SortableItem = sortableElement(({ item, onRemoveItem, onEditItem, children, renderItem, dragging }) => {
-  const [childrenShown, setChildrenShown] = useState(true);
-  const toggleChildren = () => setChildrenShown((prev) => !prev);
+const SortableItem = sortableElement(
+  ({ autoexpand, item, onRemoveItem, onEditItem, children, renderItem, dragging, readOnly }) => {
+    const [childrenShown, setChildrenShown] = useState(autoexpand || false);
+    const toggleChildren = () => setChildrenShown((prev) => !prev);
 
-  const withoutPropagation = curry((func, event) => {
-    event.stopPropagation();
-    func(event);
-  });
+    const withoutPropagation = curry((func, event) => {
+      event.stopPropagation();
+      func(event);
+    });
 
-  return (
-    <>
-      <ItemStyle onClick={withoutPropagation(onEditItem)}>
-        <DragHandle />
-        <div className="card-item-content">
-          <div className="card-item-title">
-            {renderItem && renderItem(item)}
-            {!renderItem && <Paragraph element="p">{item.title || item.name || 'No Title'}</Paragraph>}
+    return (
+      <>
+        <ItemStyle
+          onClick={(event) =>
+            readOnly ? withoutPropagation(toggleChildren, event) : withoutPropagation(onEditItem, event)
+          }>
+          {!readOnly && <DragHandle />}
+          <div className="card-item-content">
+            <div className="card-item-title">
+              {renderItem && renderItem(item)}
+              {!renderItem && <Paragraph element="p">{item.title || item.name || 'No Title'}</Paragraph>}
+            </div>
+            {hasSomeChildren(children) && (
+              <IconButton
+                buttonType="primary"
+                size="small"
+                label="Expand/Collapse children"
+                className="card-item-button"
+                iconProps={{ icon: 'EmbeddedEntryBlock' }}
+                onClick={withoutPropagation(toggleChildren)}>
+                Expand/Collapse children
+              </IconButton>
+            )}
+            {!readOnly && (
+              <IconButton
+                buttonType="negative"
+                size="small"
+                label="Delete item"
+                className="card-item-button"
+                iconProps={{ icon: 'Delete' }}
+                onClick={withoutPropagation(onRemoveItem)}>
+                Delete item
+              </IconButton>
+            )}
           </div>
-          {hasSomeChildren(children) && (
-            <IconButton
-              buttonType="primary"
-              size="small"
-              label="Expand/Collapse children"
-              className="card-item-button"
-              iconProps={{ icon: 'EmbeddedEntryBlock' }}
-              onClick={withoutPropagation(toggleChildren)}>
-              Expand/Collapse children
-            </IconButton>
-          )}
-          <IconButton
-            buttonType="negative"
-            size="small"
-            label="Delete item"
-            className="card-item-button"
-            iconProps={{ icon: 'Delete' }}
-            onClick={withoutPropagation(onRemoveItem)}>
-            Delete item
-          </IconButton>
-        </div>
-      </ItemStyle>
+        </ItemStyle>
 
-      <ChildrenStyle $shown={!dragging && childrenShown && hasSomeChildren(children)}>{children}</ChildrenStyle>
-    </>
-  );
-});
+        <ChildrenStyle $shown={!dragging && childrenShown && hasSomeChildren(children)}>{children}</ChildrenStyle>
+      </>
+    );
+  }
+);
 
 const SortableContainer = sortableContainer(({ children }) => (
   //
   <List className="sortable-list">{children}</List>
 ));
 
-function SortableList({ items, onSortEnd, onRemoveItem, onEditItem, children, renderItem }) {
+function SortableList({ autoexpand, items, onSortEnd, onRemoveItem, onEditItem, children, readOnly, renderItem }) {
   const [dragging, setDragging] = useState(false);
 
   return (
     <div className="sortable-list">
       <SortableContainer
         onSortEnd={(sortingData) => {
+          if (readOnly) return;
           setDragging(false);
           onSortEnd(sortingData);
         }}
-        onSortStart={() => setDragging(true)}
+        onSortStart={() => !readOnly && setDragging(true)}
         useDragHandle>
         {items.map((item, index) => (
           <SortableItem
             key={`item-${item.id || index}`}
             item={item}
             index={index}
+            readOnly={readOnly}
             dragging={dragging}
+            autoexpand={autoexpand}
             renderItem={renderItem}
-            onEditItem={() => onEditItem(item)}
-            onRemoveItem={() => onRemoveItem(item)}>
+            onEditItem={() => !readOnly && onEditItem(item)}
+            onRemoveItem={() => !readOnly && onRemoveItem(item)}>
             {children instanceof Function && children(item)}
           </SortableItem>
         ))}
@@ -136,10 +146,15 @@ SortableList.propTypes = {
   onRemoveItem: PropTypes.func.isRequired,
   onEditItem: PropTypes.func.isRequired,
   children: PropTypes.func,
-  renderItem: PropTypes.func
+  renderItem: PropTypes.func,
+
+  readOnly: PropTypes.bool,
+  autoexpand: PropTypes.bool
 };
 
 SortableList.defaultProps = {
+  readOnly: false,
+  autoexpand: true,
   children: null,
   renderItem: null
 };
