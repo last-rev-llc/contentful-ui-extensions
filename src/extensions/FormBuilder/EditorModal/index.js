@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { curry } from 'lodash';
+import { clone, curry, set } from 'lodash';
 import { Button, Heading } from '@contentful/forma-36-react-components';
 
-import { useFormSteps, useFieldConfig } from '../../hooks';
-import { useSDK } from '../../../../context';
+import { useFormSteps, useFieldConfig } from '../hooks';
+import { useSDK } from '../../../context';
 
 import StepList from '../StepList';
 import StepEditor from '../StepModal/StepEditor';
 import FieldEditor from '../FieldModal/FieldEditor';
 
-import { validateSteps } from '../../validate';
+import { validateSteps } from '../validate';
 import { EditorStyle, SectionWrapper, NothingHere, LeftSection, RightSection, ActionSection } from './styles';
 
 function getSelectedItem(array, idToFind) {
@@ -89,13 +89,16 @@ function getActiveId({ step, field }) {
 function EditorModal() {
   const sdk = useSDK();
 
+  const { invocation } = sdk.parameters;
+  const [value, setValue] = useState({ steps: invocation.steps || [] });
+
   // We can't pass in functionality from the SDK parameters
   // so here we receive the steps as JSON from the parent window frame.
   //
   // We can then build out our state management system as normal.
   // When we close the modal window the parent will handle updating the steps there
   // The parent will also handle updating the state in contentful
-  const stepConfig = useFormSteps(sdk.parameters.invocation.steps);
+  const stepConfig = useFormSteps((key, newValue) => setValue(set(clone(value), key, newValue)), value);
   const fieldConfig = useFieldConfig(stepConfig.stepEdit);
 
   const { step = null, field = null } = sdk.parameters.invocation;
@@ -105,22 +108,22 @@ function EditorModal() {
     type: getInitiallySelectedType({ step, field })
   });
 
-  const updateStep = curry((key, value) =>
+  const updateStep = curry((key, newValue) =>
     stepConfig.stepEdit(selected.step, {
       ...getSelectedStep(stepConfig.steps, selected),
-      [key]: value
+      [key]: newValue
     })
   );
 
-  const updateField = curry((key, value) =>
+  const updateField = curry((key, newValue) =>
     fieldConfig.fieldEdit(selected.step, {
       ...getSelectedField(stepConfig.steps, selected),
-      [key]: value
+      [key]: newValue
     })
   );
 
   const handleCancel = () => sdk.close({ steps: null });
-  const handleConfirm = () => sdk.close({ steps: stepConfig.steps });
+  const handleConfirm = () => sdk.close({ steps: value.steps });
 
   return (
     <EditorStyle>

@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { curry, omit } from 'lodash/fp';
 
 import { Heading } from '@contentful/forma-36-react-components';
-import { useSDK } from '../../../../context';
+import { useSDK } from '../../../context';
 
 import { ModalStyle } from '../styles';
-import { normalizeValues } from '../utils';
 import StepEditor from './StepEditor';
 
 function StepModal() {
   const sdk = useSDK();
   const { invocation } = sdk.parameters;
-  const [step, setStep] = useState(omit(['modal'], normalizeValues(invocation.step)));
+  const [step, setStep] = useState(omit(['modal'], invocation.step || {}));
 
   const updateStep = curry((key, value) => {
     setStep((prev) => ({

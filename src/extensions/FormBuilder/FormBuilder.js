@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import copy from 'copy-to-clipboard';
 import { set } from 'lodash';
-import { curry, clone } from 'lodash/fp';
+import { curry, clone, omit } from 'lodash/fp';
 import styled from 'styled-components';
 import { Button, IconButton, Textarea } from '@contentful/forma-36-react-components';
 
@@ -11,9 +11,9 @@ import FormInfo from './FormInfo';
 import StepList from './StepList';
 
 import SectionWrapper from './SectionWrapper';
-import StepModal from './StepList/StepModal';
-import FieldModal from './StepList/FieldModal';
-import EditorModal from './StepList/EditorModal';
+import StepModal from './StepModal';
+import FieldModal from './FieldModal';
+import EditorModal from './EditorModal';
 import ConfirmModal from './StepList/ConfirmDeleteModal';
 
 import './FormBuilder.scss';
@@ -59,11 +59,15 @@ function getModal(sdk) {
 function FormBuilder() {
   const sdk = useSDK();
   const [jsonMode, setJsonMode] = useState(false);
+  const [fieldValue, setFieldValue] = useState(sdk.field ? sdk.field.getValue() : {});
 
   const { formConfig, stepConfig, loadState } = useFormConfig(
     curry((fieldName, newValue) => {
       // Use lodash set to insert items at deep.key.level
       const newFieldValue = set(clone(sdk.field.getValue() || {}), fieldName, newValue);
+
+      // Save to our local state
+      setFieldValue(newFieldValue);
 
       const { steps = [] } = newFieldValue;
 
@@ -83,9 +87,12 @@ function FormBuilder() {
 
       // We should be able to publish without issue
       else {
-        sdk.field.setValue(newFieldValue);
+        sdk.field.setValue(omit(['error'], newFieldValue));
       }
-    })
+    }),
+
+    // Default value for the fields
+    fieldValue
   );
 
   const fieldConfig = useFieldConfig(stepConfig.stepEdit);
@@ -148,15 +155,10 @@ function FormBuilder() {
     return rest;
   };
 
-  const handleUpdate = ({ steps: newSteps }) =>
+  const handleUpdate = ({ steps: newSteps } = {}) =>
     // If new steps are returned from the modal
     // the user clicked the confirm button, if null it's cancel
-    newSteps &&
-    stepConfig.stepsUpdate(
-      newSteps,
-      // & also save to contentful
-      true
-    );
+    newSteps && stepConfig.stepsUpdate(newSteps);
 
   const onFieldClick = (field, step) =>
     showModal(sdk, { name: 'editor-modal' }, { steps: stepConfig.steps, step, field }).then(handleUpdate);

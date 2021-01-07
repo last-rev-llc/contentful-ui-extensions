@@ -195,7 +195,7 @@ function idIndexer(errors) {
  * Pass me an array of steps and I'll give you
  * back an object of `fieldId` => error
  * */
-export function validateSteps(steps) {
+export function validateSteps(steps = []) {
   const toReturn = steps
     .map((step) => {
       const { id, fields = [] } = step;

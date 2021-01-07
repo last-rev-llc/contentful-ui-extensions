@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { TextField } from '@contentful/forma-36-react-components';
-import { ErrorStyle } from '../../styles';
+import { ErrorStyle } from '../../StepList/styles';
 
-import { errorOfType, errorTypes } from '../../../validate';
+import { errorOfType, errorTypes } from '../../validate';
 
 function extractValue({ value }) {
   if (typeof value === 'string') return value;
