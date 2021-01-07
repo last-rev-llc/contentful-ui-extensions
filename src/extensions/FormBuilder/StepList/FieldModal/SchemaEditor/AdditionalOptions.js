@@ -10,7 +10,7 @@ import { schemaPropType } from './prop-types';
 const SchemaOptionsStyle = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
 
   flex-wrap: wrap;
 `;
@@ -21,9 +21,17 @@ function addDynamicWidth({ grow }) {
   return `flex-grow: ${grow};`;
 }
 
+const Spacer = styled.div`
+  flex-grow: 1;
+  width: 100%;
+`;
+
 const AdjustableTextField = styled(TextField)`
   width: auto;
   flex-grow: 1;
+  max-width: 180px;
+  margin-top: 1rem;
+  margin-right: 0.5rem;
 
   ${addDynamicWidth}
 `;
@@ -42,6 +50,9 @@ function buildTypeWithError(type, label, id, messageType) {
       type: 'string',
       label: 'Error message',
       id: `messages.${type}${messageType}`
+    },
+    {
+      type: 'spacer'
     }
   ];
 }
@@ -96,26 +107,30 @@ function AdditionalOptions({ field, updateField }) {
 
   return (
     <SchemaOptionsStyle>
-      {optionsForType.map(({ id, label, type, grow }) => (
-        <AdjustableTextField
-          key={id}
-          id={id}
-          name={id}
-          grow={grow}
-          labelText={label}
-          value={get(schema, id, '')}
-          type={inputTypeForFieldType(type)}
-          onChange={(event) => {
-            const { value } = event.currentTarget;
+      {optionsForType.map(({ id, label, type, grow }) => {
+        if (type === 'spacer') return <Spacer />;
 
-            // Convert to number/bool etc
-            const resolvedValue = resolveValue(value, type);
+        return (
+          <AdjustableTextField
+            key={id}
+            id={id}
+            name={id}
+            grow={grow}
+            labelText={label}
+            value={get(schema, id, '')}
+            type={inputTypeForFieldType(type)}
+            onChange={(event) => {
+              const { value } = event.currentTarget;
 
-            // Allow deep setting of schema key
-            updateField('schema', set(schema, id, resolvedValue));
-          }}
-        />
-      ))}
+              // Convert to number/bool etc
+              const resolvedValue = resolveValue(value, type);
+
+              // Allow deep setting of schema key
+              updateField('schema', set(schema, id, resolvedValue));
+            }}
+          />
+        );
+      })}
     </SchemaOptionsStyle>
   );
 }

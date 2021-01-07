@@ -88,7 +88,7 @@ function StepList({ activeId, autoexpand, stepConfig, fieldConfig, readOnly, onS
                 size="small"
                 buttonType="primary"
                 label="Add new field"
-                onClick={fieldAdd(step.id)}
+                onClick={() => fieldAdd(step.id)}
                 iconProps={{ icon: 'PlusCircle' }}
               />
             )}

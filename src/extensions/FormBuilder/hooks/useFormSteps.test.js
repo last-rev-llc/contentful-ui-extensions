@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { useFormSteps } from './hooks';
+import useFormSteps from './useFormSteps';
 
 describe('useFormSteps', () => {
   const defaultSteps = [{ id: '9b33fea9', fields: [] }];

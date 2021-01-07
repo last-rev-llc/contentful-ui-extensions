@@ -32,6 +32,8 @@ const ItemStyle = styled(Card)`
   align-items: center;
   user-select: none;
 
+  overflow: hidden;
+
   button {
     margin: 0;
     height: 100%;

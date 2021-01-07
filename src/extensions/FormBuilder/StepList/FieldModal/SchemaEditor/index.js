@@ -36,18 +36,6 @@ function SchemaEditor({ field, updateField }) {
 
   return (
     <SchemaWrapper>
-      <CheckboxField
-        id="field.required"
-        name="field.required"
-        checked={schema.required}
-        labelText={schema.required ? 'Field is required' : 'Field is optional'}
-        onChange={(event) =>
-          updateField('schema', {
-            ...schema,
-            required: event.target.checked
-          })
-        }
-      />
       <SelectField
         labelText="Validation"
         id="schema.type"
@@ -64,6 +52,18 @@ function SchemaEditor({ field, updateField }) {
           </Option>
         ))}
       </SelectField>
+      <CheckboxField
+        id="field.required"
+        name="field.required"
+        checked={schema.required}
+        labelText={schema.required ? 'Field is required' : 'Field is optional'}
+        onChange={(event) =>
+          updateField('schema', {
+            ...schema,
+            required: event.target.checked
+          })
+        }
+      />
       <AdditionalOptions field={field} updateField={updateField} />
     </SchemaWrapper>
   );

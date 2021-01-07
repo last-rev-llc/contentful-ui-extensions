@@ -52,6 +52,7 @@ const maxModalHeight = '75vh';
 export const LeftSection = styled(Col)`
   overflow-y: scroll;
   width: 50%;
+  max-width: 500px;
   max-height: ${maxModalHeight};
   overflow-y: scroll;
 
@@ -62,6 +63,7 @@ export const LeftSection = styled(Col)`
 
 export const RightSection = styled(Col)`
   width: 50%;
+  flex-grow: 1;
   bottom: 0;
 
   max-height: ${maxModalHeight};
