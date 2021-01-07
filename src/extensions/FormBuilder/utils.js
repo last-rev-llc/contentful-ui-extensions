@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 export function safeParse(maybeJson) {
   let parsed;
   try {
@@ -35,26 +33,4 @@ export const showModal = (sdk, modalProps = {}, parameters = {}) => {
   });
 };
 
-export function buildField({ name = 'no_name', type = 'hidden', value = false } = {}) {
-  return {
-    id: uuidv4(),
-    type,
-    name,
-    value
-  };
-}
-
-export function buildStep(title = 'Step title') {
-  return {
-    title,
-    id: uuidv4(),
-    fields: [
-      //
-      buildField({ name: 'first_field' })
-    ]
-  };
-}
-
-export const URL_TYPES = ['hubspot'];
-
-export default { buildStep, URL_TYPES };
+export default { showModal, safeParse };

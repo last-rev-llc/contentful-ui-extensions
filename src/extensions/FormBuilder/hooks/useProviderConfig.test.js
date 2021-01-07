@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 
-import { useProviderConfig } from './hooks';
+import useProviderConfig from './useProviderConfig';
 
 describe('useProviderConfig', () => {
   const type = 'test-type';
