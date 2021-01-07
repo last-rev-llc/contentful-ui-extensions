@@ -1,6 +1,18 @@
+import { useState } from 'react';
+import { clone, set } from 'lodash';
 import { renderHook, act } from '@testing-library/react-hooks';
 
 import useProviderConfig from './useProviderConfig';
+
+function getProviderHook(defaultProvider = {}) {
+  return renderHook(() => {
+    const [internalState, setInternalState] = useState({ provider: defaultProvider });
+
+    const setState = (key, value) => setInternalState(set(clone(internalState), key, value));
+
+    return useProviderConfig(setState, internalState);
+  });
+}
 
 describe('useProviderConfig', () => {
   const type = 'test-type';
@@ -11,24 +23,24 @@ describe('useProviderConfig', () => {
   const defaultResult = { type, formId, portalId };
 
   it('loads current provider', () => {
-    const { result } = renderHook(() => useProviderConfig(defaultProvider));
+    const { result } = getProviderHook(defaultProvider);
     expect(result.current).toMatchObject(defaultResult);
   });
 
   it('can change formId', () => {
-    const { result } = renderHook(() => useProviderConfig(defaultProvider));
+    const { result } = getProviderHook(defaultProvider);
     act(() => result.current.setFormId('test-change'));
     expect(result.current.formId).toEqual('test-change');
   });
 
   it('can change portalId', () => {
-    const { result } = renderHook(() => useProviderConfig(defaultProvider));
+    const { result } = getProviderHook(defaultProvider);
     act(() => result.current.setPortalId('test-change'));
     expect(result.current.portalId).toEqual('test-change');
   });
 
   it('can change type', () => {
-    const { result } = renderHook(() => useProviderConfig(defaultProvider));
+    const { result } = getProviderHook(defaultProvider);
 
     act(() => result.current.setFormId('custom'));
     act(() => result.current.setPortalId('custom'));
@@ -46,7 +58,7 @@ describe('useProviderConfig', () => {
   });
 
   it('preserves properties when changing to another url type', () => {
-    const { result } = renderHook(() => useProviderConfig(defaultProvider));
+    const { result } = getProviderHook(defaultProvider);
 
     act(() => result.current.setFormId('custom'));
     act(() => result.current.setPortalId('custom'));
@@ -61,21 +73,10 @@ describe('useProviderConfig', () => {
   });
 
   it('can update state', () => {
-    const { result } = renderHook(() => useProviderConfig(defaultProvider));
+    const { result } = getProviderHook(defaultProvider);
 
     act(() => result.current.update({ parameters: { formId: 'test', portalId: 'test2' }, type: 'hubspot' }));
 
     expect(result.current).toMatchObject({ formId: 'test', portalId: 'test2', type: 'hubspot' });
-  });
-
-  it('calls the onChange handler', (done) => {
-    const handleChange = (name, newType) => {
-      expect(typeof name).toEqual('string');
-      expect(typeof newType).toEqual('string');
-      done();
-    };
-
-    const { result } = renderHook(() => useProviderConfig(defaultProvider, handleChange));
-    act(() => result.current.setType('hubspot'));
   });
 });

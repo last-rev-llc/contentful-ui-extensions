@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import useFieldConfig from './useFieldConfig';
 
-import { getStepsStateShim } from './useFormSteps.test';
+import { getStepsStateShim } from './test.helpers';
 
 describe('useFieldConfig', () => {
   const defaultSteps = [

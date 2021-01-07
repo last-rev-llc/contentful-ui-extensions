@@ -54,6 +54,7 @@ export default function useFormSteps(onChange, { steps = [] } = {}) {
     stepsUpdate((oldSteps) => arrayMove(oldSteps, oldIndex, newIndex));
 
   return {
+    steps,
     stepAdd,
     stepEdit,
     stepRemove,
