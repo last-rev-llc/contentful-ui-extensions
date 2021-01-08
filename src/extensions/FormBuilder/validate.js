@@ -36,7 +36,7 @@ function fieldError(extra = {}) {
 /**
  * Validate a single field by missing or incorrect properties
  * */
-function validateField(field) {
+export function validateField(field) {
   const toReturn = [];
   const { id, name, stepId } = field;
 
