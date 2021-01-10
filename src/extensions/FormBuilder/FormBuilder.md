@@ -1,36 +1,33 @@
 # Table of Contents
 
-1.  [Tutorial](#org1320b3d)
-    1.  [General section](#orgdf96562)
-        1.  [Form type](#org9db0a23)
-        2.  [Edit & Copy buttons](#org8790fd8)
-    2.  [Form Setup section](#org04f7cc1)
-        1.  [Creating a step](#org3e8fb8f)
-        2.  [Creating a field](#org72629b4)
-    3.  [dependsOn](#org9518bf9)
-        1.  [Notes on usability](#org3dfb831)
-    4.  [Video](#org20427cf)
+1.  [Tutorial](#orgc9f910a)
+    1.  [General section](#orgef98c31)
+        1.  [Form type](#org6e71110)
+        2.  [Edit & Copy buttons](#org13ee6d9)
+    2.  [Form Setup section](#orgd95ffc7)
+    3.  [Form editor modal](#org1bc6446)
+        1.  [Creating a step](#orga260326)
+        2.  [Creating a field](#orgf7d9047)
+    4.  [dependsOn](#orgadd2178)
+        1.  [Notes on usability](#org1fb9cb3)
+    5.  [Video](#org306d1ce)
 
-<a id="org1320b3d"></a>
+<a id="orgc9f910a"></a>
 
 # Tutorial
 
-Upon loading the appropriate content model you should be greeted with something which looks similar to the following:
-
-![img](./images/overview.png)
-
-<a id="orgdf96562"></a>
+<a id="orgef98c31"></a>
 
 ## General section
 
-<a id="org9db0a23"></a>
+<a id="org6e71110"></a>
 
 ### Form type
 
-gives us the ability to select the form provider (where will the data get sent)
+gives us the ability to select the form provider (where will the form response be sent)
 Upon selecting specific providers we&rsquo;ll be able to input a formId or portalId (hubspot)
 
-<a id="org8790fd8"></a>
+<a id="org13ee6d9"></a>
 
 ### Edit & Copy buttons
 
@@ -39,16 +36,21 @@ to make a mistake while manually editing the form data.
 
 The copy button copies the raw JSON from the form to enable ease of pasting to another content model.
 
-<a id="org04f7cc1"></a>
+<a id="orgd95ffc7"></a>
 
 ## Form Setup section
 
-This is the real meat of our form builder software.
-The following image gives a breakdown of the components:
+[overview](./images/overview.png)
 
-![img](./images/overview_description.png)
+<a id="org1bc6446"></a>
 
-<a id="org3e8fb8f"></a>
+## Form editor modal
+
+When we click on an individual field (or the Edit Form button), we&rsquo;ll be greeted with a modal which looks similar to the following:
+
+[Modal Editor](./images/ModalEditor.png)
+
+<a id="orga260326"></a>
 
 ### Creating a step
 
@@ -59,7 +61,7 @@ Steps can be re-ordered by dragging the handle on the left side of the step.
 
 Steps can have `dependsOn` logic, please see the appropriate section
 
-<a id="org72629b4"></a>
+<a id="orgf7d9047"></a>
 
 ### Creating a field
 
@@ -77,7 +79,10 @@ For some field types, other input fields will appear automatically. For more inf
 
 [Field documentation](https://github.com/Impossible-Foods/impossiblefoods.com/blob/master/src/components/ModuleForm/DynamicForm/Fields/Fields.org)
 
-<a id="org9518bf9"></a>
+[Modal Field Editor](./images/ModalField.png)
+[Modal Field Editor 2](./images/ModalField2.png)
+
+<a id="orgadd2178"></a>
 
 ## dependsOn
 
@@ -115,13 +120,13 @@ Which would only enable the step or field if the following are true
 - User is male AND
 - User is in the USA
 
-<a id="org3dfb831"></a>
+<a id="org1fb9cb3"></a>
 
 ### Notes on usability
 
 In future we hope to create a simpler UI interface around the dependsOn system which will include commonly used functionality.
 
-<a id="org20427cf"></a>
+<a id="org306d1ce"></a>
 
 ## Video
 

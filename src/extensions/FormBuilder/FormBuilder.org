@@ -2,13 +2,9 @@
 
 * Tutorial
 
-Upon loading the appropriate content model you should be greeted with something which looks similar to the following:
-
-[[./images/overview.png]]
-
 ** General section
 *** Form type
-gives us the ability to select the form provider (where will the data get sent)
+gives us the ability to select the form provider (where will the form response be sent)
 Upon selecting specific providers we'll be able to input a formId or portalId (hubspot)
 
 *** Edit & Copy buttons
@@ -19,11 +15,13 @@ The copy button copies the raw JSON from the form to enable ease of pasting to a
 
 ** Form Setup section
 
-This is the real meat of our form builder software.
-The following image gives a breakdown of the components:
+[[./images/overview.png][overview]]
 
-[[./images/overview_description.png]]
+** Form editor modal
 
+When we click on an individual field (or the Edit Form button), we'll be greeted with a modal which looks similar to the following:
+
+[[./images/ModalEditor.png][Modal Editor]]
 
 *** Creating a step
 Clicking "Add step" adds a template step which can be edited by clicking anywhere on the main body of the step.
@@ -46,6 +44,9 @@ Fields can have ~dependsOn~ logic, please see the appropriate section
 For some field types, other input fields will appear automatically. For more information on field types please see the documentation here:
 
 [[https://github.com/Impossible-Foods/impossiblefoods.com/blob/master/src/components/ModuleForm/DynamicForm/Fields/Fields.org][Field documentation]]
+
+[[./images/ModalField.png][Modal Field Editor]]
+[[./images/ModalField2.png][Modal Field Editor 2]]
 
 ** dependsOn
 Fields & steps can be toggled on and off by using dependsOn logic.
