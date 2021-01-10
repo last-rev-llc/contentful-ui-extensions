@@ -15,13 +15,13 @@ The copy button copies the raw JSON from the form to enable ease of pasting to a
 
 ** Form Setup section
 
-[[./images/overview.png][overview]]
+[[./images/overview.png]]
 
 ** Form editor modal
 
 When we click on an individual field (or the Edit Form button), we'll be greeted with a modal which looks similar to the following:
 
-[[./images/ModalEditor.png][Modal Editor]]
+[[./images/ModalEditor.png]]
 
 *** Creating a step
 Clicking "Add step" adds a template step which can be edited by clicking anywhere on the main body of the step.
@@ -45,8 +45,8 @@ For some field types, other input fields will appear automatically. For more inf
 
 [[https://github.com/Impossible-Foods/impossiblefoods.com/blob/master/src/components/ModuleForm/DynamicForm/Fields/Fields.org][Field documentation]]
 
-[[./images/ModalField.png][Modal Field Editor]]
-[[./images/ModalField2.png][Modal Field Editor 2]]
+[[./images/ModalField.png]]
+[[./images/ModalField2.png]]
 
 ** dependsOn
 Fields & steps can be toggled on and off by using dependsOn logic.
