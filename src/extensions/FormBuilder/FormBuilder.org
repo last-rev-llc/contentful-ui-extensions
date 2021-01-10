@@ -45,8 +45,8 @@ For some field types, other input fields will appear automatically. For more inf
 
 [[https://github.com/Impossible-Foods/impossiblefoods.com/blob/master/src/components/ModuleForm/DynamicForm/Fields/Fields.org][Field documentation]]
 
-[[./images/ModalField.png]]
 [[./images/ModalField2.png]]
+[[./images/ModalField.png]]
 
 ** dependsOn
 Fields & steps can be toggled on and off by using dependsOn logic.
