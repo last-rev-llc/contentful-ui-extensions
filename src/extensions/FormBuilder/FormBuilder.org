@@ -48,6 +48,39 @@ For some field types, other input fields will appear automatically. For more inf
 [[./images/ModalField2.png]]
 [[./images/ModalField.png]]
 
+*** Field types
+
+Below are listed field types with implementation notes 
+
+| Type       | Custom Implementation |
+|------------+-----------------------|
+| Checkbox   | [x]                   |
+| Date       | [x]                   |
+| Date Range | [x]                   |
+| Date Time  | [x]                   |
+| Hidden     | [x]                   |
+| Select     | [x]                   |
+| Time Range | [x]                   |
+| Button     | []                    |
+| Color      | []                    |
+| Email      | []                    |
+| File       | []                    |
+| Image      | []                    |
+| Month      | []                    |
+| Number     | []                    |
+| Password   | []                    |
+| Radio      | []                    |
+| Range      | []                    |
+| Required   | []                    |
+| Reset      | []                    |
+| Search     | []                    |
+| String     | []                    |
+| Submit     | []                    |
+| Tel        | []                    |
+| Text       | []                    |
+| Time       | []                    |
+| Url        | []                    |
+
 ** dependsOn
 Fields & steps can be toggled on and off by using dependsOn logic.
 Currently we use [[http://jsonlogic.com/][jsonLogic]] which is a JSON enabled programming structure. In future we hope to improve this with a more user-friendly approach.
