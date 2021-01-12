@@ -51,6 +51,7 @@ function FieldTypeSelector({ errors, field, updateField }) {
         value={field.type}
         onChange={(e) =>
           updateField({
+            ...field,
             // Remove other stuff which was dependent on old field type
             schema: {},
             options: undefined,
