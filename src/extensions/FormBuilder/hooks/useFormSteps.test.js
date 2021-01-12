@@ -1,56 +1,57 @@
-import { renderHook, act } from '@testing-library/react-hooks';
-import useFormSteps from './useFormSteps';
+import { act } from '@testing-library/react-hooks';
+
+import { getStepsStateShim } from './test.helpers';
 
 describe('useFormSteps', () => {
   const defaultSteps = [{ id: '9b33fea9', fields: [] }];
 
   it('loads the steps correctly', () => {
-    const { result } = renderHook(() => useFormSteps(defaultSteps));
+    const { result } = getStepsStateShim(defaultSteps);
 
-    expect(result.current.steps).toMatchObject(defaultSteps);
+    expect(result.current.state.steps).toMatchObject(defaultSteps);
   });
 
   it('updates a single step correctly', () => {
-    const { result } = renderHook(() => useFormSteps(defaultSteps));
+    const { result } = getStepsStateShim(defaultSteps);
 
     const firstStep = defaultSteps[0];
-    act(() => result.current.stepEdit('9b33fea9', { ...firstStep, title: 'Test' }));
+    act(() => result.current.formSteps.stepEdit('9b33fea9', { ...firstStep, title: 'Test' }));
 
-    expect(result.current.steps[0]).toMatchObject({ ...firstStep, title: 'Test' });
+    expect(result.current.state.steps[0]).toMatchObject({ ...firstStep, title: 'Test' });
   });
 
   it('updates a single step correctly (functional)', () => {
-    const { result } = renderHook(() => useFormSteps(defaultSteps));
+    const { result } = getStepsStateShim(defaultSteps);
 
     const firstStep = defaultSteps[0];
-    act(() => result.current.stepEdit('9b33fea9', (oldStep) => ({ ...oldStep, title: 'Test' })));
+    act(() => result.current.formSteps.stepEdit('9b33fea9', (oldStep) => ({ ...oldStep, title: 'Test' })));
 
-    expect(result.current.steps[0]).toMatchObject({ ...firstStep, title: 'Test' });
+    expect(result.current.state.steps[0]).toMatchObject({ ...firstStep, title: 'Test' });
   });
 
   it('adds a new step', () => {
-    const { result } = renderHook(() => useFormSteps(defaultSteps));
+    const { result } = getStepsStateShim(defaultSteps);
 
-    act(() => result.current.stepAdd());
+    act(() => result.current.formSteps.stepAdd());
 
-    expect(result.current.steps.length).toEqual(2);
+    expect(result.current.state.steps.length).toEqual(2);
   });
 
   it('removes a step', () => {
-    const { result } = renderHook(() => useFormSteps(defaultSteps));
+    const { result } = getStepsStateShim(defaultSteps);
 
-    act(() => result.current.stepAdd());
-    act(() => result.current.stepRemove(defaultSteps[0]));
+    act(() => result.current.formSteps.stepAdd());
+    act(() => result.current.formSteps.stepRemove(result.current.state.steps[1]));
 
-    expect(result.current.steps.length).toEqual(1);
+    expect(result.current.state.steps.length).toEqual(1);
   });
 
   it('can reorder steps', () => {
-    const { result } = renderHook(() => useFormSteps(defaultSteps));
+    const { result } = getStepsStateShim(defaultSteps);
 
-    act(() => result.current.stepAdd());
-    act(() => result.current.stepReorder({ oldIndex: 0, newIndex: 1 }));
+    act(() => result.current.formSteps.stepAdd());
+    act(() => result.current.formSteps.stepReorder({ oldIndex: 0, newIndex: 1 }));
 
-    expect(result.current.steps[0].id).not.toEqual('9b33fea9');
+    expect(result.current.state.steps[0].id).not.toEqual('9b33fea9');
   });
 });

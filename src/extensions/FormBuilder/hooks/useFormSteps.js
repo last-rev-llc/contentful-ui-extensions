@@ -15,10 +15,11 @@ import { buildStep } from './utils';
 export default function useFormSteps(onChange, { steps = [] } = {}) {
   const stepsUpdate = (newValues) => {
     if (newValues instanceof Function) {
-      return onChange('steps', newValues(steps));
+      onChange('steps', newValues(steps));
+      return;
     }
 
-    return onChange('steps', newValues);
+    onChange('steps', newValues);
   };
 
   const stepAdd = () =>
