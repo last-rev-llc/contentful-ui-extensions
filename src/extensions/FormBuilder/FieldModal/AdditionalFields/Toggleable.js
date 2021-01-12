@@ -33,12 +33,17 @@ function Toggleable({ field, updateField }) {
       <SubfieldStyle>
         <FieldEditor
           field={subfield}
-          updateField={curry((key, newValue) =>
+          updateField={curry((maybeKey, newValue = undefined) => {
+            if (maybeKey instanceof Object) {
+              updateField('field', maybeKey);
+              return;
+            }
+
             updateField('field', {
               ...subfield,
-              [key]: newValue
-            })
-          )}
+              [maybeKey]: newValue
+            });
+          })}
         />
       </SubfieldStyle>
       <CheckboxField

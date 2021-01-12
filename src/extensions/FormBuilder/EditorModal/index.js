@@ -115,12 +115,21 @@ function EditorModal() {
     })
   );
 
-  const updateField = curry((key, newValue) =>
+  const updateField = (maybeKeyMaybeObject, newValue = null) => {
+    // Allow full object replacement (multiple keys)
+    if (maybeKeyMaybeObject instanceof Object) {
+      fieldConfig.fieldEdit(selected.step, {
+        ...getSelectedField(stepConfig.steps, selected),
+        ...maybeKeyMaybeObject
+      });
+      return;
+    }
+
     fieldConfig.fieldEdit(selected.step, {
       ...getSelectedField(stepConfig.steps, selected),
-      [key]: newValue
-    })
-  );
+      [maybeKeyMaybeObject]: newValue
+    });
+  };
 
   const handleCancel = () => sdk.close({ steps: null });
   const handleConfirm = () => sdk.close({ steps: value.steps });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { curry, omit } from 'lodash/fp';
+import { omit } from 'lodash/fp';
 import { Button, Heading } from '@contentful/forma-36-react-components';
 
 import { useSDK } from '../../../context';
@@ -31,12 +31,22 @@ function FieldModal() {
   const { invocation } = sdk.parameters;
   const [field, setField] = useState(omit(['modal'], invocation.field || {}));
 
-  const updateField = curry((key, newValue) => {
+  const updateField = (maybeKeyMaybeObject, newValue = null) => {
+    // Allow full object replacement (multiple keys)
+    if (maybeKeyMaybeObject instanceof Object) {
+      setField((prev) => ({
+        ...prev,
+        ...maybeKeyMaybeObject
+      }));
+      return;
+    }
+
+    // Allow setting by key & value
     setField((prev) => ({
       ...prev,
-      [key]: newValue
+      [maybeKeyMaybeObject]: newValue
     }));
-  });
+  };
 
   const handleCancel = () => sdk.close({ field: null });
   const handleSubmit = () => sdk.close({ field });

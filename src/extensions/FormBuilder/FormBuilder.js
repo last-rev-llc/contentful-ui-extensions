@@ -3,7 +3,7 @@ import copy from 'copy-to-clipboard';
 import { set } from 'lodash';
 import { curry, clone, omit } from 'lodash/fp';
 import styled from 'styled-components';
-import { Button, IconButton, Textarea } from '@contentful/forma-36-react-components';
+import { Button, Card, IconButton, Textarea } from '@contentful/forma-36-react-components';
 
 import { useSDK } from '../../context';
 
@@ -24,6 +24,19 @@ import { useFormConfig, useFieldConfig } from './hooks';
 const SectionHeaderWithButton = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const NothingHereYet = styled(Card)`
+  min-height: 4rem;
+
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  user-select: none;
+  background: whitesmoke;
+  box-shadow: inset 1px 1px 8px 0px rgba(217, 217, 217, 1);
 `;
 
 const QuickIcons = styled.div`
@@ -195,6 +208,9 @@ function FormBuilder() {
               fieldConfig={fieldConfig}
               onFieldClick={onFieldClick}
             />
+            {!stepConfig.steps.length && (
+              <NothingHereYet onClick={() => onFieldClick(null, null)}>Nothing here yet</NothingHereYet>
+            )}
           </SectionWrapper>
         </>
       )}

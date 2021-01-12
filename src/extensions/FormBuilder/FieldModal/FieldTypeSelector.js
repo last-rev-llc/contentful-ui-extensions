@@ -5,8 +5,6 @@ import { Option, SelectField } from '@contentful/forma-36-react-components';
 import AdditionalFields from './AdditionalFields';
 
 const fieldTypes = [
-  // prettier-no-wrap
-  { value: 'toggleable', label: 'Toggleable' },
   { value: 'business-search', label: 'Business Search' },
   { value: 'button', label: 'Button' },
   { value: 'checkbox', label: 'Checkbox' },
@@ -35,6 +33,7 @@ const fieldTypes = [
   { value: 'text-toggle', label: 'Text Toggle' },
   { value: 'time', label: 'Time' },
   { value: 'time-range', label: 'Time Range' },
+  { value: 'toggleable', label: 'Toggleable' },
   { value: 'url', label: 'Url' },
   { value: 'week', label: 'Week' },
   { value: 'country', label: 'Country' },
@@ -49,8 +48,15 @@ function FieldTypeSelector({ errors, field, updateField }) {
         id="type"
         name="type"
         labelText="Field Type"
-        defaultValue={field.type}
-        onChange={(e) => updateField('type', e.currentTarget.value)}>
+        value={field.type}
+        onChange={(e) =>
+          updateField({
+            // Remove other stuff which was dependent on old field type
+            schema: {},
+            options: undefined,
+            type: e.currentTarget.value
+          })
+        }>
         {fieldTypes.map(({ value: fieldType, label }) => (
           <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
             {label}
@@ -65,7 +71,8 @@ function FieldTypeSelector({ errors, field, updateField }) {
 FieldTypeSelector.propTypes = {
   updateField: PropTypes.func.isRequired,
   field: PropTypes.shape({
-    type: PropTypes.string
+    type: PropTypes.string,
+    options: PropTypes.arrayOf(PropTypes.object)
   }).isRequired,
 
   // eslint-disable-next-line react/forbid-prop-types
