@@ -5,8 +5,6 @@ import { Option, SelectField } from '@contentful/forma-36-react-components';
 import AdditionalFields from './AdditionalFields';
 
 const fieldTypes = [
-  // prettier-no-wrap
-  { value: 'toggleable', label: 'Toggleable' },
   { value: 'business-search', label: 'Business Search' },
   { value: 'button', label: 'Button' },
   { value: 'checkbox', label: 'Checkbox' },
@@ -35,6 +33,7 @@ const fieldTypes = [
   { value: 'text-toggle', label: 'Text Toggle' },
   { value: 'time', label: 'Time' },
   { value: 'time-range', label: 'Time Range' },
+  { value: 'toggleable', label: 'Toggleable' },
   { value: 'url', label: 'Url' },
   { value: 'week', label: 'Week' },
   { value: 'country', label: 'Country' },
@@ -49,7 +48,7 @@ function FieldTypeSelector({ errors, field, updateField }) {
         id="type"
         name="type"
         labelText="Field Type"
-        defaultValue={field.type}
+        value={field.type}
         onChange={(e) => updateField('type', e.currentTarget.value)}>
         {fieldTypes.map(({ value: fieldType, label }) => (
           <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
