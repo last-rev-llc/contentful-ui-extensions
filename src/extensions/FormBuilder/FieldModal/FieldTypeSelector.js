@@ -36,7 +36,9 @@ const fieldTypes = [
   { value: 'time', label: 'Time' },
   { value: 'time-range', label: 'Time Range' },
   { value: 'url', label: 'Url' },
-  { value: 'week', label: 'Week' }
+  { value: 'week', label: 'Week' },
+  { value: 'country', label: 'Country' },
+  { value: 'state', label: 'State (US)' }
 ];
 
 function FieldTypeSelector({ errors, field, updateField }) {
