@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { curry, omit } from 'lodash/fp';
+import { omit } from 'lodash/fp';
 import { Button, Heading } from '@contentful/forma-36-react-components';
 
 import { useSDK } from '../../../context';

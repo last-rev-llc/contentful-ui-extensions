@@ -11,11 +11,11 @@ function AdditionalFields({ field, updateField, ...props }) {
   const { type } = field;
   switch (type) {
     case 'hidden':
-      return <Hidden field={field} updateField={updateField} {...props} />;
+      return <Hidden key="hidden-field" field={field} updateField={updateField} {...props} />;
     case 'select':
-      return <Select field={field} updateField={updateField} {...props} />;
+      return <Select key="select-field" field={field} updateField={updateField} {...props} />;
     case 'toggleable':
-      return <Toggleable field={field} updateField={updateField} {...props} />;
+      return <Toggleable key="toggleable-field" field={field} updateField={updateField} {...props} />;
     default:
       return null;
   }

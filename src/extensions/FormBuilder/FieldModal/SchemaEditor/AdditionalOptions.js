@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -52,6 +53,7 @@ function buildTypeWithError(type, label, id, messageType) {
       id: `messages.${type}${messageType}`
     },
     {
+      id: uuidv4(),
       type: 'spacer'
     }
   ];
@@ -108,13 +110,15 @@ function AdditionalOptions({ field, updateField }) {
   return (
     <SchemaOptionsStyle>
       {optionsForType.map(({ id, label, type, grow }) => {
-        if (type === 'spacer') return <Spacer />;
+        const key = `${id}-${label}-${type}`;
+
+        if (type === 'spacer') return <Spacer key={key} />;
 
         return (
           <AdjustableTextField
-            key={id}
-            id={id}
-            name={id}
+            key={key}
+            id={key}
+            name={key}
             grow={grow}
             labelText={label}
             value={get(schema, id, '')}
