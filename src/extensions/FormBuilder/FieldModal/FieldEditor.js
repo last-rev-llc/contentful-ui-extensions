@@ -57,8 +57,8 @@ function FieldEditor({ errors, field, updateField }) {
       <DependsOn
         value={field.dependsOn}
         tests={field.dependsOnTests}
-        onChangeValue={updateField('dependsOn')}
-        onChangeTests={updateField('dependsOnTests')}
+        onChangeValue={(newValue) => updateField('dependsOn', newValue)}
+        onChangeTests={(newValue) => updateField('dependsOnTests', newValue)}
       />
     </FieldEditorWrapper>
   );

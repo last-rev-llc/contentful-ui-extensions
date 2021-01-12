@@ -44,7 +44,7 @@ function Select({ errors, field, updateField }) {
   const { options = [] } = field;
 
   // State changes
-  const updateOptions = (newOptions) => updateField('options')(newOptions);
+  const updateOptions = (newOptions) => updateField('options', newOptions);
   const removeOption = (indexToReplace) => options.filter((option, index) => index !== indexToReplace);
   const addEmptyOption = () => updateOptions(options.concat({ value: '', label: '' }));
   const replaceOption = (indexToReplace, newOption) =>
@@ -116,6 +116,7 @@ function Select({ errors, field, updateField }) {
 Select.propTypes = {
   updateField: PropTypes.func.isRequired,
   field: PropTypes.shape({
+    id: PropTypes.string,
     type: PropTypes.string.isRequired,
     options: PropTypes.arrayOf(
       PropTypes.shape({

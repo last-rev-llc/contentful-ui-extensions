@@ -49,14 +49,14 @@ function FieldTypeSelector({ errors, field, updateField }) {
         name="type"
         labelText="Field Type"
         value={field.type}
-        onChange={(e) => {
-          const newType = e.currentTarget.value;
-          updateField('type', newType);
-
-          // Remove other stuff which was dependent on old field type
-          updateField('schema', {});
-          if (field.options) updateField('options', []);
-        }}>
+        onChange={(e) =>
+          updateField({
+            // Remove other stuff which was dependent on old field type
+            schema: {},
+            options: undefined,
+            type: e.currentTarget.value
+          })
+        }>
         {fieldTypes.map(({ value: fieldType, label }) => (
           <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
             {label}
