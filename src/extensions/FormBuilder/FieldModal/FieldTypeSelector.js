@@ -49,7 +49,14 @@ function FieldTypeSelector({ errors, field, updateField }) {
         name="type"
         labelText="Field Type"
         value={field.type}
-        onChange={(e) => updateField('type', e.currentTarget.value)}>
+        onChange={(e) => {
+          const newType = e.currentTarget.value;
+          updateField('type', newType);
+
+          // Remove other stuff which was dependent on old field type
+          updateField('schema', {});
+          if (field.options) updateField('options', []);
+        }}>
         {fieldTypes.map(({ value: fieldType, label }) => (
           <Option key={fieldType} testId="cf-ui-select-option" value={fieldType}>
             {label}
@@ -64,7 +71,8 @@ function FieldTypeSelector({ errors, field, updateField }) {
 FieldTypeSelector.propTypes = {
   updateField: PropTypes.func.isRequired,
   field: PropTypes.shape({
-    type: PropTypes.string
+    type: PropTypes.string,
+    options: PropTypes.arrayOf(PropTypes.object)
   }).isRequired,
 
   // eslint-disable-next-line react/forbid-prop-types
