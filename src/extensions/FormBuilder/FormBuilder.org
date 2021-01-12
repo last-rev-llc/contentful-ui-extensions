@@ -1,0 +1,129 @@
+#+TITLE: Form Builder
+
+* Tutorial
+
+** General section
+*** Form type
+gives us the ability to select the form provider (where will the form response be sent)
+Upon selecting specific providers we'll be able to input a formId or portalId (hubspot)
+
+*** Edit & Copy buttons
+The edit button allows to manually edit the JSON, this is an advanced feature as it can be easy
+to make a mistake while manually editing the form data.
+
+The copy button copies the raw JSON from the form to enable ease of pasting to another content model.
+
+** Form Setup section
+
+[[./images/overview.png]]
+
+** Form editor modal
+
+When we click on an individual field (or the Edit Form button), we'll be greeted with a modal which looks similar to the following:
+
+[[./images/ModalEditor.png]]
+
+*** Creating a step
+Clicking "Add step" adds a template step which can be edited by clicking anywhere on the main body of the step.
+
+Clicking on the blue collapse children button will hide or show the children of the step, which can be useful when working on a larg form.
+Steps can be re-ordered by dragging the handle on the left side of the step.
+
+Steps can have ~dependsOn~ logic, please see the appropriate section
+
+*** Creating a field
+Clicking the small plus button below the last field adds a template field which can be edited by clicking anywhere on the main body of the field.
+
+Fields by default have the following attributes:
+ - Label (what will be displayed to the user)
+ - Key (where the value will be saved in the formState)
+ - Type (which type of field to render to the user)
+
+Fields can have ~dependsOn~ logic, please see the appropriate section
+
+For some field types, other input fields will appear automatically. For more information on field types please see the documentation here:
+
+[[https://github.com/Impossible-Foods/impossiblefoods.com/blob/master/src/components/ModuleForm/DynamicForm/Fields/Fields.org][Field documentation]]
+
+[[./images/ModalField2.png]]
+[[./images/ModalField.png]]
+
+*** Field types
+
+Below are listed field types with implementation notes 
+
+| Type       | Custom Implementation |
+|------------+-----------------------|
+| Checkbox   | [x]                   |
+| Date       | [x]                   |
+| Date Range | [x]                   |
+| Date Time  | [x]                   |
+| Hidden     | [x]                   |
+| Select     | [x]                   |
+| Time Range | [x]                   |
+| Button     | []                    |
+| Color      | []                    |
+| Email      | []                    |
+| File       | []                    |
+| Image      | []                    |
+| Month      | []                    |
+| Number     | []                    |
+| Password   | []                    |
+| Radio      | []                    |
+| Range      | []                    |
+| Required   | []                    |
+| Reset      | []                    |
+| Search     | []                    |
+| String     | []                    |
+| Submit     | []                    |
+| Tel        | []                    |
+| Text       | []                    |
+| Time       | []                    |
+| Url        | []                    |
+
+** dependsOn
+Fields & steps can be toggled on and off by using dependsOn logic.
+Currently we use [[http://jsonlogic.com/][jsonLogic]] which is a JSON enabled programming structure. In future we hope to improve this with a more user-friendly approach.
+
+To begin edit any step or field and click "Enable ~dependsOn~"
+
+You will see a few new text fields appear:
+
+- Depends on
+- Tests (if you have added some)
+
+An example of a depends on logic might be the following:
+
+#+BEGIN_SRC json
+{
+    "!!": { "var": "isCustomBusiness" }
+}
+#+END_SRC
+
+Which would enable the step or field when someone has selected ~isCustomBusiness~ (which would be set from another field key).
+
+This offers quite a robust and detailed process as we can toggle other items based on more complex logic such as:
+
+#+BEGIN_SRC json
+{
+  "and": [
+    { ">": [{ "var": "age" }, 20] },
+    { "==": [{ "var": "gender" }, "male"] },
+    { "==": [{ "var": "country" }, "USA"] }
+  ]
+}
+#+END_SRC
+
+Which would only enable the step or field if the following are true
+- User is older than 20 AND
+- User is male AND
+- User is in the USA
+
+*** Notes on usability
+
+In future we hope to create a simpler UI interface around the dependsOn system which will include commonly used functionality.
+
+** Video
+[[https://streamable.com/ufuns4]]
+
+

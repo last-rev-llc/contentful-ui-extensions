@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function ExtensionsList() {
   return (
@@ -33,6 +33,11 @@ export default function ExtensionsList() {
         <li>
           <Link to="/coveo-search" className="">
             Coveo Search
+          </Link>
+        </li>
+        <li>
+          <Link to="/seo" className="">
+            Seo
           </Link>
         </li>
         <li>
@@ -71,13 +76,13 @@ export default function ExtensionsList() {
           </Link>
         </li>
         <li>
-          <Link to="/seo" className="">
-            Seo
+          <Link to="/formstack" className="">
+            FormStack
           </Link>
         </li>
         <li>
-          <Link to="/formstack" className="">
-            FormStack
+          <Link to="/form-builder" className="">
+            Form Builder
           </Link>
         </li>
       </ul>
