@@ -16,9 +16,9 @@ import { URL_TYPES } from './utils';
  * */
 export default function useProviderConfig(onChangeField, { provider = {} } = {}) {
   const { parameters = {}, type = 'custom' } = provider;
-  const { formId = '', portalId = '' } = parameters;
+  const { formId = '', portalId = '', url = '' } = parameters;
 
-  const [values, setValues] = useState({ type, formId, portalId });
+  const [values, setValues] = useState({ type, formId, portalId, url });
 
   return {
     ...values,
@@ -50,6 +50,13 @@ export default function useProviderConfig(onChangeField, { provider = {} } = {})
       onChangeField('provider.parameters.portalId', newUrl);
 
       setValues((oldValues) => merge(oldValues)({ portalId: newUrl }));
+    },
+
+    setUrl: (newUrl) => {
+      // Save to contentful
+      onChangeField('provider.parameters.url', newUrl);
+
+      setValues((oldValues) => merge(oldValues)({ url: newUrl }));
     },
 
     update: ({ parameters: newParameters, type: newType }) =>

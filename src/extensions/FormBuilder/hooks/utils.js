@@ -28,7 +28,7 @@ export function buildStep(title = 'Step title') {
   };
 }
 
-export const URL_TYPES = ['hubspot'];
+export const URL_TYPES = ['hubspot', 'redirect'];
 
 export default {
   URL_TYPES,
