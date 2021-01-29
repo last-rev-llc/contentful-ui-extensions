@@ -4,10 +4,12 @@ import { FieldGroup, FormLabel, Select, Option } from '@contentful/forma-36-reac
 
 import SectionWrapper from '../SectionWrapper';
 
+import Custom from './Providers/Custom';
 import Hubspot from './Providers/Hubspot';
 import Redirect from './Providers/Redirect';
 
 const mappings = {
+  custom: Custom,
   hubspot: Hubspot,
   redirect: Redirect
 };
