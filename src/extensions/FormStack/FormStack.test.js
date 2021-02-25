@@ -64,5 +64,19 @@ describe('<FormStack sdk={sdk} />', () => {
         ).toBeTruthy();
       });
     });
+
+    test('renders correct default display and value', async () => {
+      const mockedData = mockData;
+      const defaultForm = mockedData[0];
+      const defaultId = defaultForm && defaultForm.id && defaultForm.id.toString();
+      const defaultName = defaultForm && defaultForm.name;
+      sdk.field.getValue = jest.fn(() => ({ formId: defaultId, formName: defaultName }));
+
+      await act(async () => {
+        const { getByTestId, getByDisplayValue } = render(<FormStack sdk={sdk} />);
+        await waitFor(() => expect(getByTestId('formstack-select').value).toBe(defaultId));
+        expect(getByDisplayValue(defaultName)).toBeTruthy();
+      });
+    });
   });
 });

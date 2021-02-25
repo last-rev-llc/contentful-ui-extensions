@@ -8,20 +8,24 @@ import './FormStack.scss';
 
 const API_URL = process.env.REACT_APP_FORMSTACK_FORMS_URI;
 
-export const labelText = 'Chose your Formstack Form';
+const labelText = 'Chose your Formstack Form';
 
 const FormStack = ({ sdk }) => {
-  const [fieldValue, setFieldValue] = useState('');
+  const [fieldValue, setFieldValue] = useState(undefined);
   const [allForms, setAllForms] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios(API_URL);
       const { forms } = response.data;
+      const getFormName = (id) => {
+        const form = (forms || []).filter((f) => f.id.toString() === id)[0];
+        return form && form.name;
+      };
       setAllForms(forms);
       const value = sdk.field.getValue();
-      if (value && value.formId) setFieldValue(value.formId);
-      else setFieldValue('');
+      if (value && value.formId) setFieldValue({ value: value.formId, label: getFormName(value.formId) });
+      else setFieldValue(undefined);
     };
     if (!API_URL) {
       setAllForms(mockForms(8));
@@ -32,11 +36,11 @@ const FormStack = ({ sdk }) => {
 
   const onSelectChange = (field) => {
     if (!field || !field.value || field.value === '') {
-      setFieldValue(null);
-      sdk.field.setValue({ formId: null });
+      setFieldValue(undefined);
+      sdk.field.setValue({ formId: undefined, formName: undefined });
     } else {
       setFieldValue(field);
-      sdk.field.setValue({ formId: field.value });
+      sdk.field.setValue({ formId: field.value, formName: field.label });
     }
   };
 
