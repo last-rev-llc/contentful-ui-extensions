@@ -3,7 +3,6 @@ import axios from 'axios';
 import Select from 'react-select';
 import PropTypes from 'prop-types';
 import { withLabel } from '../../shared/helpers/formControl';
-import './FormStack.scss';
 
 const API_URL = process.env.REACT_APP_FORMSTACK_FORMS_URI;
 
