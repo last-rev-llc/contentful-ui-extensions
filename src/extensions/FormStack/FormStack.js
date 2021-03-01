@@ -3,7 +3,6 @@ import axios from 'axios';
 import Select from 'react-select';
 import PropTypes from 'prop-types';
 import { withLabel } from '../../shared/helpers/formControl';
-import mockForms from './__mocks__/mockForms';
 import './FormStack.scss';
 
 const API_URL = process.env.REACT_APP_FORMSTACK_FORMS_URI;
@@ -13,9 +12,11 @@ const labelText = 'Chose your Formstack Form';
 const FormStack = ({ sdk }) => {
   const [fieldValue, setFieldValue] = useState(undefined);
   const [allForms, setAllForms] = useState([]);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setInitialized(true);
       const response = await axios(API_URL);
       const { forms } = response.data;
       const getFormName = (id) => {
@@ -24,15 +25,14 @@ const FormStack = ({ sdk }) => {
       };
       setAllForms(forms);
       const value = sdk.field.getValue();
-      if (value && value.formId) setFieldValue({ value: value.formId, label: getFormName(value.formId) });
-      else setFieldValue(undefined);
+      if (value && value.formId) {
+        setFieldValue({ value: value.formId, label: getFormName(value.formId) });
+      }
     };
-    if (!API_URL) {
-      setAllForms(mockForms(8));
-      return;
+    if (!initialized) {
+      fetchData();
     }
-    fetchData();
-  }, [sdk]);
+  }, [sdk.field, initialized]);
 
   const onSelectChange = (field) => {
     if (!field || !field.value || field.value === '') {
