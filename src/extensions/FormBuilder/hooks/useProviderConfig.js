@@ -71,7 +71,6 @@ export default function useProviderConfig(onChangeField, { provider = {} } = {})
     },
 
     update: ({ parameters: newParameters, type: newType }) =>
-      console.log({ newParameters, newType, values }) ||
       setValues({
         ...values,
         ...newParameters,
