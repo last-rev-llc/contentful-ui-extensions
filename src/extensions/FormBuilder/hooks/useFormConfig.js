@@ -14,6 +14,7 @@ export default function useFormConfig(handleFieldChange, initialState = {}) {
   const formConfig = useProviderConfig(handleFieldChange, initialState);
 
   const loadState = ({ steps = [], provider = {} }) => {
+    console.log('loadState', { steps, provider });
     if (steps && steps.length > 0) {
       stepConfig.stepsUpdate(ensureIds(steps));
     }
