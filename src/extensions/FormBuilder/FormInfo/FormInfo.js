@@ -1,11 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FieldGroup, FormLabel, TextInput, Select, Option } from '@contentful/forma-36-react-components';
+import { FieldGroup, FormLabel, Select, Option } from '@contentful/forma-36-react-components';
 
-import { URL_TYPES } from '../hooks/utils';
 import SectionWrapper from '../SectionWrapper';
 
+import Custom from './Providers/Custom';
+import Hubspot from './Providers/Hubspot';
+import Redirect from './Providers/Redirect';
+
+const mappings = {
+  custom: Custom,
+  hubspot: Hubspot,
+  redirect: Redirect
+};
+
 function FormInfo({ formConfig }) {
+  const Provider = mappings[formConfig.type];
+
   return (
     <SectionWrapper title="General">
       <FieldGroup>
@@ -18,32 +29,10 @@ function FormInfo({ formConfig }) {
           onChange={(e) => formConfig.setType(e.currentTarget.value)}>
           <Option value="custom">Custom</Option>
           <Option value="hubspot">Hubspot</Option>
+          <Option value="redirect">Redirect</Option>
         </Select>
       </FieldGroup>
-      {URL_TYPES.includes(formConfig.type) && (
-        <>
-          <FieldGroup>
-            <FormLabel htmlFor="name">Form ID</FormLabel>
-            <TextInput
-              required
-              id="formId"
-              name="formId"
-              value={formConfig.formId}
-              onChange={(e) => formConfig.setFormId(e.currentTarget.value)}
-            />
-          </FieldGroup>
-          <FieldGroup>
-            <FormLabel htmlFor="name">Portal ID</FormLabel>
-            <TextInput
-              required
-              id="portalId"
-              name="portalId"
-              value={formConfig.portalId}
-              onChange={(e) => formConfig.setPortalId(e.currentTarget.value)}
-            />
-          </FieldGroup>
-        </>
-      )}
+      {Provider && <Provider formConfig={formConfig} />}
     </SectionWrapper>
   );
 }
