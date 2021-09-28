@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { TextInput, IconButton, FormLabel } from '@contentful/forma-36-react-components';
+import { TextInput, IconButton, FormLabel, CheckboxField } from '@contentful/forma-36-react-components';
 
 import { ErrorStyle } from '../../StepList/styles';
 import { errorOfType, errorTypes } from '../../validate';
@@ -41,7 +41,7 @@ const Hidden = styled.div`
 `;
 
 function Select({ errors, field, updateField }) {
-  const { options = [] } = field;
+  const { options = [], isMulti } = field;
 
   // State changes
   const updateOptions = (newOptions) => updateField('options', newOptions);
@@ -56,6 +56,7 @@ function Select({ errors, field, updateField }) {
 
   return (
     <div>
+      <CheckboxField checked={isMulti} onChange={() => updateField('isMulti', !isMulti)} labelText="Multiple Select" />
       {options.length > 0 && (
         <Row>
           <TypeTitle htmlFor="label-header">Label</TypeTitle>
@@ -118,6 +119,7 @@ Select.propTypes = {
   field: PropTypes.shape({
     id: PropTypes.string,
     type: PropTypes.string.isRequired,
+    isMulti: PropTypes.bool.isRequired,
     options: PropTypes.arrayOf(
       PropTypes.shape({
         label: PropTypes.string,
