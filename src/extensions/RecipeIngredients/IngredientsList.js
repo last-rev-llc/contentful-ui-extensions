@@ -5,7 +5,6 @@ import { getIngredientsTable } from './helpers';
 import { getIconButton } from '../../shared/helpers';
 import { openDialog } from './dialogs';
 
-
 const IngredientsList = ({ sdk }) => {
   const [ingredientList, setIngredientList] = useState([]);
 
@@ -33,6 +32,18 @@ const IngredientsList = ({ sdk }) => {
     addIngredient(result);
   };
 
+  const copyFromDefaultField = async () => {
+    const defaultLocale = sdk.locales.default;
+    const { _value } = sdk.entry.fields.ingredients._fieldLocales[defaultLocale];
+    sdk.field.setValue(_value);
+    setIngredientList(_value);
+  };
+
+  const deleteItems = () => {
+    sdk.field.setValue([]);
+    setIngredientList([]);
+  };
+
   const editIngredient = (ingredient, ingredientIndex) => {
     const ingredients = [...ingredientList];
     if (ingredient && ingredients[ingredientIndex]) {
@@ -58,12 +69,14 @@ const IngredientsList = ({ sdk }) => {
   return (
     <>
       {getIngredientsTable(ingredientList, openEditModal, deleteStep)}
-      <div id='add-table-row-wrap'>
+      <div id="add-table-row-wrap">
         {getIconButton('Click to add a new row', 'positive', 'PlusCircle', 'large', openAddModal)}
+        {ingredientList.length === 0
+          ? getIconButton('Copy rows to another locale', 'positive', 'Copy', 'large', copyFromDefaultField)
+          : getIconButton('Delete all rows', 'negative', 'Delete', 'large', deleteItems)}
       </div>
     </>
   );
-
 };
 
 IngredientsList.propTypes = {
@@ -78,8 +91,17 @@ IngredientsList.propTypes = {
       getValue: PropTypes.func.isRequired,
       setValue: PropTypes.func.isRequired
     }),
+    locales: PropTypes.shape({
+      default: PropTypes.string
+    }),
+    entry: PropTypes.shape({
+      fields: PropTypes.shape({
+        ingredients: PropTypes.shape({
+          _fieldLocales: PropTypes.shape()
+        })
+      })
+    })
   }).isRequired
 };
 
 export default IngredientsList;
-
