@@ -8,14 +8,14 @@ const StepList = ({ sdk }) => {
   const [steps, setSteps] = useState([]);
 
   useEffect(() => {
-    if(sdk.field.getValue()) {
+    if (sdk.field.getValue()) {
       setSteps(sdk.field.getValue());
     }
   }, [sdk.field]);
 
   const addStep = (step) => {
     if (step) {
-      const updatedSteps = [ ...steps ];
+      const updatedSteps = [...steps];
       updatedSteps.push(step);
       sdk.field.setValue(updatedSteps);
       setSteps(updatedSteps);
@@ -27,8 +27,20 @@ const StepList = ({ sdk }) => {
     addStep(result);
   };
 
+  const copyFromDefaultField = async () => {
+    const defaultLocale = sdk.locales.default;
+    const { _value } = sdk.entry.fields.steps._fieldLocales[defaultLocale];
+    sdk.field.setValue(_value);
+    setSteps(_value);
+  };
+
+  const deleteItems = () => {
+    sdk.field.setValue([]);
+    setSteps([]);
+  };
+
   const editStep = (step, stepIndex) => {
-    const updatedSteps = [ ...steps ];
+    const updatedSteps = [...steps];
     if (step && updatedSteps[stepIndex]) {
       updatedSteps[stepIndex] = step;
       sdk.field.setValue(updatedSteps);
@@ -57,12 +69,14 @@ const StepList = ({ sdk }) => {
   return (
     <>
       {getStepsTable(steps, openEditModal, deleteStep)}
-      <div id='add-table-row-wrap'>
+      <div id="add-table-row-wrap">
         {getIconButton('Click to add a new row', 'positive', 'PlusCircle', 'large', openAddModal)}
+        {steps.length === 0
+          ? getIconButton('Copy rows to another locale', 'positive', 'Copy', 'large', copyFromDefaultField)
+          : getIconButton('Delete all rows', 'negative', 'Delete', 'large', deleteItems)}
       </div>
     </>
   );
-  
 };
 
 StepList.propTypes = {
@@ -77,8 +91,17 @@ StepList.propTypes = {
       getValue: PropTypes.func.isRequired,
       setValue: PropTypes.func.isRequired
     }),
+    locales: PropTypes.shape({
+      default: PropTypes.string
+    }),
+    entry: PropTypes.shape({
+      fields: PropTypes.shape({
+        steps: PropTypes.shape({
+          _fieldLocales: PropTypes.shape()
+        })
+      })
+    })
   }).isRequired
 };
 
 export default StepList;
-
