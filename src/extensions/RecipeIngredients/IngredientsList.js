@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
@@ -40,8 +41,20 @@ const IngredientsList = ({ sdk }) => {
   };
 
   const deleteItems = () => {
-    sdk.field.setValue([]);
-    setIngredientList([]);
+    sdk.dialogs
+      .openConfirm({
+        title: ' Delete Recipie Ingredients',
+        message: 'Are you sure you want to delete all of these ingredients? This can not be undone',
+        intent: 'positive',
+        confirmLabel: 'Yes, Delete',
+        cancelLabel: 'No'
+      })
+      .then((result) => {
+        if (result) {
+          sdk.field.setValue([]);
+          setIngredientList([]);
+        }
+      });
   };
 
   const editIngredient = (ingredient, ingredientIndex) => {
@@ -58,6 +71,19 @@ const IngredientsList = ({ sdk }) => {
     editIngredient(result, ingredientIndex);
   };
 
+  const openBulkEditModal = async () => {
+    const result = await openDialog(
+      sdk,
+      'Bulk Edit Ingredient',
+      { rows: ingredientList, dialogType: 'bulk-edit' },
+      'fullWidth'
+    );
+    if (result && result.length > 0) {
+      sdk.field.setValue(result);
+      setIngredientList(result);
+    }
+  };
+
   const deleteStep = (ingredientIndex) => {
     if (ingredientIndex > -1) {
       const ingredients = ingredientList.filter((ingredient, i) => i !== ingredientIndex);
@@ -66,14 +92,32 @@ const IngredientsList = ({ sdk }) => {
     }
   };
 
+  const getBulkEditButton = () => {
+    if (ingredientList.length > 0) {
+      return getIconButton('Click to add a new row', 'positive', 'Edit', 'large', openBulkEditModal);
+    }
+  };
+
+  const getDeleteButton = () => {
+    if (ingredientList.length > 0) {
+      return getIconButton('Delete all rows', 'negative', 'Delete', 'large', deleteItems);
+    }
+  };
+
+  const getCopyButton = () => {
+    if (ingredientList.length === 0 && sdk.field.locale !== sdk.locales.default) {
+      return getIconButton('Copy rows to another locale', 'positive', 'Copy', 'large', copyFromDefaultField);
+    }
+  };
+
   return (
     <>
       {getIngredientsTable(ingredientList, openEditModal, deleteStep)}
       <div id="add-table-row-wrap">
         {getIconButton('Click to add a new row', 'positive', 'PlusCircle', 'large', openAddModal)}
-        {ingredientList.length === 0
-          ? getIconButton('Copy rows to another locale', 'positive', 'Copy', 'large', copyFromDefaultField)
-          : getIconButton('Delete all rows', 'negative', 'Delete', 'large', deleteItems)}
+        {getBulkEditButton()}
+        {getCopyButton()}
+        {getDeleteButton()}
       </div>
     </>
   );
@@ -85,11 +129,13 @@ IngredientsList.propTypes = {
       updateHeight: PropTypes.func.isRequired
     }),
     dialogs: PropTypes.shape({
-      openExtension: PropTypes.func.isRequired
+      openExtension: PropTypes.func.isRequired,
+      openConfirm: PropTypes.func.isRequired
     }),
     field: PropTypes.shape({
       getValue: PropTypes.func.isRequired,
-      setValue: PropTypes.func.isRequired
+      setValue: PropTypes.func.isRequired,
+      locale: PropTypes.string.isRequired
     }),
     locales: PropTypes.shape({
       default: PropTypes.string

@@ -3,21 +3,25 @@ import PropTypes from 'prop-types';
 import { locations } from 'contentful-ui-extensions-sdk';
 import IngredientsList from './IngredientsList';
 import './RecipeIngredients.scss';
-import { IngredientDialog } from './dialogs';
+import { IngredientDialog, BulkEditIngredients } from './dialogs';
 
+const renderDialog = (sdk) => {
+  const { dialogType } = sdk.parameters.invocation;
+  switch (dialogType) {
+    case 'bulk-edit':
+      return <BulkEditIngredients sdk={sdk} />;
+    default:
+      return <IngredientDialog sdk={sdk} />;
+  }
+};
 const RecipeIngredients = ({ sdk }) => {
-  return !sdk.location.is(locations.LOCATION_DIALOG) 
-    ? (
-      <>
-        <IngredientsList sdk={sdk} />
-      </>
-    ) 
-    : (
-      <>
-        <IngredientDialog sdk={sdk} />
-      </>
-    );
-
+  return !sdk.location.is(locations.LOCATION_DIALOG) ? (
+    <>
+      <IngredientsList sdk={sdk} />
+    </>
+  ) : (
+    <>{renderDialog(sdk)}</>
+  );
 };
 
 RecipeIngredients.propTypes = {
