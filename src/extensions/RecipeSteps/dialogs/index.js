@@ -1,7 +1,5 @@
-import openDialog from './openDialog';
+import openDialog from '../../../shared/helpers/openDialog';
 import StepDialog from './StepDialog';
+import BulkEditSteps from './BulkEditSteps';
 
-export {
-  openDialog,
-  StepDialog
-};
+export { openDialog, StepDialog, BulkEditSteps };

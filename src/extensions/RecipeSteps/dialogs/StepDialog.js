@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Form,
-  FieldGroup,
-} from '@contentful/forma-36-react-components';
+import { Form, FieldGroup } from '@contentful/forma-36-react-components';
 import { getTextAreaWithLabel } from '../helpers';
 import { getButton, getTextField } from '../../../shared/helpers';
 
@@ -30,28 +27,31 @@ const StepDialog = ({ sdk }) => {
     const errorMessage = 'This item is required';
     if (step && title) {
       sdk.close({ step: +step, title, body });
-    }
-    else {
+    } else {
       setStepErrorMessage(!step ? errorMessage : '');
       setTitleErrorMessage(!title ? errorMessage : '');
     }
-
   };
 
   return (
-    <div id='dialog-step-wrap'
-      data-testid="StepDialog">
-      <Form spacing="default"
-        data-testid="StepDialog-Form">
+    <div id="dialog-step-wrap" data-testid="StepDialog">
+      <Form spacing="default" data-testid="StepDialog-Form">
         <FieldGroup>
-          {getTextField(step, (event) => setStep(event.currentTarget.value), stepErrorMessage, { id: 'stepNumber', type: 'number', labelText: 'Step Number', required: true })}
+          {getTextField(step, (event) => setStep(event.currentTarget.value), stepErrorMessage, {
+            id: 'stepNumber',
+            type: 'number',
+            labelText: 'Step Number',
+            required: true
+          })}
         </FieldGroup>
         <FieldGroup>
-          {getTextField(step, (event) => setTitle(event.currentTarget.value), titleErrorMessage, { id: 'title', labelText: 'Title', required: true })}
+          {getTextField(title, (event) => setTitle(event.currentTarget.value), titleErrorMessage, {
+            id: 'title',
+            labelText: 'Title',
+            required: true
+          })}
         </FieldGroup>
-        <FieldGroup>
-          {getTextAreaWithLabel(body, 'Body', (event) => setBody(event.currentTarget.value))}
-        </FieldGroup>
+        <FieldGroup>{getTextAreaWithLabel(body, 'Body', (event) => setBody(event.currentTarget.value))}</FieldGroup>
         <FieldGroup row>
           {getButton('Save', 'positive', saveStep)}
           {getButton('Cancel', 'muted', closeDialog)}
@@ -59,7 +59,6 @@ const StepDialog = ({ sdk }) => {
       </Form>
     </div>
   );
-
 };
 
 StepDialog.propTypes = {
@@ -78,4 +77,3 @@ StepDialog.propTypes = {
 };
 
 export default StepDialog;
-
