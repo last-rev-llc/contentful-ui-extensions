@@ -9,7 +9,7 @@ function BulkEditSteps({ sdk }) {
   const { rows } = sdk.parameters.invocation;
   const [stepsList, setStepsList] = useState(rows);
 
-  const headers = _.keys(stepsList[0]);
+  const headers = ['step', 'title', 'body'];
 
   const handleFieldChange = (event) => {
     const identifyFieldArray = event.target.id.split('-');

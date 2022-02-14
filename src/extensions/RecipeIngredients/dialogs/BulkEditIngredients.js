@@ -9,7 +9,7 @@ function BulkEditIngredients({ sdk }) {
   const { rows } = sdk.parameters.invocation;
   const [ingredientList, setIngredientList] = useState(rows);
 
-  const headers = _.keys(ingredientList[0]);
+  const headers = ['step', 'ingredient', 'imperialMeasure', 'imperialQuantity', 'metricMeasure', 'metricQuantity'];
 
   const handleFieldChange = (event) => {
     const identifyFieldArray = event.target.id.split('-');

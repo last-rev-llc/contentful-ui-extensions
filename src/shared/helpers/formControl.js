@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 import {
   Button,
   IconButton,
@@ -130,10 +129,10 @@ const getTextField = (
   );
 };
 
-const getTableRow = (row, rowIndex, getTableCell) => {
+const getTableRow = (row, rowIndex, getTableCell, headers) => {
   return (
     <TableRow key={`${rowIndex}`}>
-      {_.keys(row).map((key) => {
+      {headers.map((key) => {
         return <TableCell key={`${rowIndex}-${key}`}>{getTableCell(row, key, rowIndex)}</TableCell>;
       })}
     </TableRow>
@@ -158,7 +157,7 @@ const getBulkEditingTable = (headers, rows, getTableCell) => {
         </TableHead>
         <TableBody>
           {rows.map((row, index) => {
-            return getTableRow(row, index, getTableCell);
+            return getTableRow(row, index, getTableCell, headers);
           })}
         </TableBody>
       </Table>
