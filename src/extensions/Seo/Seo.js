@@ -21,12 +21,6 @@ const Seo = ({ sdk }) => {
   const [seoObject, setSeoObject] = useState(sdk.field.getValue());
   const [selected, setSelected] = useState('preview');
 
-  const {
-    parameters: { instance }
-  } = sdk;
-
-  const { titleCharacterLimit = 60 } = instance;
-
   const onFieldChange = (field) => {
     sdk.field
       .setValue({
@@ -143,7 +137,7 @@ const Seo = ({ sdk }) => {
           labelText="Page Title"
           helpText="Browser tab and search engine result display."
           textInputProps={{
-            maxLength: titleCharacterLimit,
+            maxLength: 120,
             onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
             testId: 'Seo-tabpanel-general-title'
@@ -359,11 +353,6 @@ const Seo = ({ sdk }) => {
 
 Seo.propTypes = {
   sdk: PropTypes.shape({
-    parameters: PropTypes.shape({
-      instance: PropTypes.shape({
-        titleCharacterLimit: PropTypes.number
-      })
-    }),
     field: PropTypes.shape({
       getValue: PropTypes.func.isRequired,
       setValue: PropTypes.func.isRequired,
