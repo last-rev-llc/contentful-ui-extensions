@@ -137,7 +137,7 @@ const Seo = ({ sdk }) => {
           labelText="Page Title"
           helpText="Browser tab and search engine result display."
           textInputProps={{
-            maxLength: 60,
+            maxLength: 120,
             onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
             testId: 'Seo-tabpanel-general-title'
