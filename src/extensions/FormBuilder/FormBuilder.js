@@ -95,12 +95,12 @@ function FormBuilder() {
         //
         // Check the content model validation in Contentful
         // we have specified at least 2 properties in the JSON
-        sdk.field.setValue({ error: newFieldValue });
+        sdk.field.setValue({ ...newFieldValue, errors });
       }
 
       // We should be able to publish without issue
       else {
-        sdk.field.setValue(omit(['error'], newFieldValue));
+        sdk.field.setValue(omit(['errors'], newFieldValue));
       }
     }),
 
@@ -218,10 +218,12 @@ function FormBuilder() {
         <JsonInput
           value={JSON.stringify(getEditableValue(), null, 2)}
           onChange={(event) => {
+            const { provider } = sdk.field.getValue() || {};
             const newFormState = safeParse(event.currentTarget.value);
             if (newFormState) {
-              sdk.field.setValue(newFormState);
-              loadState(newFormState);
+              const newValue = { provider, ...newFormState };
+              sdk.field.setValue(newValue);
+              loadState(newValue);
             }
           }}
         />

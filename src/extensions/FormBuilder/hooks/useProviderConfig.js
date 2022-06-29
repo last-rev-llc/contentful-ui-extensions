@@ -74,7 +74,7 @@ export default function useProviderConfig(onChangeField, { provider = {} } = {})
       setValues({
         ...values,
         ...newParameters,
-        type: newType
+        ...(newType && { type: newType })
       })
   };
 }
