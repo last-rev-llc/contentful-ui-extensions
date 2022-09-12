@@ -9,7 +9,7 @@ import {
   RadioButtonField,
   FormLabel,
   Note,
-  HelpText
+  HelpText,
 } from '@contentful/forma-36-react-components';
 import { get, isEmpty, omit, debounce } from 'lodash';
 import '@contentful/forma-36-react-components/dist/styles.css';
@@ -187,10 +187,10 @@ const Seo = ({ sdk }) => {
           labelText="Canonical URL"
           helpText="Canonical specifies to search engines your preferred URL. Default is current page URL."
           textInputProps={{
-            maxLength: 60,
+            maxLength: 256,
             onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
-            testId: 'Seo-tabpanel-general-canonical'
+            testId: 'Seo-tabpanel-general-canonical',
           }}
           value={
             isEmpty(get(seoObject, 'canonical.value'))
