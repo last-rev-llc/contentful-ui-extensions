@@ -20,7 +20,6 @@ import SingleAssetWithButton from '../../shared/components/SingleAssetWithButton
 const Seo = ({ sdk }) => {
   const [seoObject, setSeoObject] = useState(sdk.field.getValue());
   const [selected, setSelected] = useState('preview');
-  const [showCanonicalWarning, setShowCanonicalWarning] = useState(false);
 
   const onFieldChange = (field) => {
     sdk.field
@@ -37,16 +36,6 @@ const Seo = ({ sdk }) => {
   };
 
   const onFieldChangeDebounce = debounce(
-    (field) => {
-      return onFieldChange(field);
-    },
-    500,
-    {
-      leading: false
-    }
-  );
-
-  const onFieldChangeDebounceCanonical = debounce(
     (field) => {
       return onFieldChange(field);
     },
@@ -202,13 +191,6 @@ const Seo = ({ sdk }) => {
             onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
             testId: 'Seo-tabpanel-general-canonical',
-            onChange: (e) => {
-              if (e.currentTarget?.value?.length > 60) {
-                setShowCanonicalWarning(true);
-              } else {
-                setShowCanonicalWarning(false);
-              }
-            }
           }}
           value={
             isEmpty(get(seoObject, 'canonical.value'))
@@ -218,11 +200,6 @@ const Seo = ({ sdk }) => {
           countCharacters
           className="fieldset"
         />
-        {showCanonicalWarning && (
-          <HelpText style={{ color: 'orange' }}>
-            Best practices call for canonical URLs to be 60 characters or less.
-          </HelpText>
-        )}
         <FieldGroup className="fieldset">
           <FormLabel className="fieldset" htmlFor="robots">
             Would you like this content to be indexed by search engines?
