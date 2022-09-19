@@ -20,6 +20,7 @@ import SingleAssetWithButton from '../../shared/components/SingleAssetWithButton
 const Seo = ({ sdk }) => {
   const [seoObject, setSeoObject] = useState(sdk.field.getValue());
   const [selected, setSelected] = useState('preview');
+  const [showWarning, setShowWarning] = useState(false);
 
   const onFieldChange = (field) => {
     sdk.field
@@ -137,11 +138,19 @@ const Seo = ({ sdk }) => {
           labelText="Page Title"
           helpText="Browser tab and search engine result display."
           textInputProps={{
-            maxLength: 120,
+            maxLength: 256,
             onKeyPress: (e) => onFieldChangeDebounce(e.currentTarget),
             onBlur: (e) => onFieldChange(e.currentTarget),
             testId: 'Seo-tabpanel-general-title'
           }}
+          onChange={
+            (e) => {
+              if (e.currentTarget?.value?.length > 60) {
+                return setShowWarning(true);
+              }
+              return setShowWarning(false);
+            }
+          }
           value={
             isEmpty(get(seoObject, 'title.value'))
               ? get(sdk, 'parameters.installation.siteName', '')
@@ -150,6 +159,11 @@ const Seo = ({ sdk }) => {
           countCharacters
           className="fieldset"
         />
+        {showWarning && (
+          <HelpText style={{ color: 'orange' }}>
+            Best practices call for page titles to be 60 characters or less.
+          </HelpText>
+        )}
         <TextField
           id="description"
           textarea
