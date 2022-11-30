@@ -13,8 +13,9 @@ function AdditionalFields({ field, updateField, ...props }) {
     case 'hidden':
       return <Hidden key="hidden-field" field={field} updateField={updateField} {...props} />;
     case 'select':
-    case 'radio':
       return <Select key="select-field" field={field} updateField={updateField} {...props} />;
+    case 'radio':
+      return <Select key="select-field" field={field} updateField={updateField} showMultiSelect={false} {...props} />;
     case 'toggleable':
       return <Toggleable key="toggleable-field" field={field} updateField={updateField} {...props} />;
     default:
