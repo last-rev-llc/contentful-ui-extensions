@@ -40,7 +40,7 @@ const Hidden = styled.div`
   opacity: 0;
 `;
 
-function Select({ errors, field, updateField }) {
+function Select({ errors, field, updateField, showMultiSelect }) {
   const { options = [], isMulti } = field;
 
   // State changes
@@ -56,7 +56,13 @@ function Select({ errors, field, updateField }) {
 
   return (
     <div>
-      <CheckboxField checked={isMulti} onChange={() => updateField('isMulti', !isMulti)} labelText="Multiple Select" />
+      {showMultiSelect && (
+        <CheckboxField
+          checked={isMulti}
+          onChange={() => updateField('isMulti', !isMulti)}
+          labelText="Multiple Select"
+        />
+      )}
       {options.length > 0 && (
         <Row>
           <TypeTitle htmlFor="label-header">Label</TypeTitle>
@@ -116,6 +122,7 @@ function Select({ errors, field, updateField }) {
 
 Select.propTypes = {
   updateField: PropTypes.func.isRequired,
+  showMultiSelect: PropTypes.bool,
   field: PropTypes.shape({
     id: PropTypes.string,
     type: PropTypes.string.isRequired,
@@ -133,7 +140,8 @@ Select.propTypes = {
 };
 
 Select.defaultProps = {
-  errors: {}
+  errors: {},
+  showMultiSelect: true
 };
 
 export default Select;
