@@ -1,11 +1,12 @@
 /* eslint-disable react/forbid-prop-types */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import jsonLogic from 'json-logic-js';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { IconButton, FieldGroup, FormLabel, Textarea, CheckboxField } from '@contentful/forma-36-react-components';
 
+import { update } from 'lodash';
 import { safeParse } from '../utils';
 
 const Row = styled.div`
@@ -87,17 +88,52 @@ function DependsOn({ value: initialValue, tests: initialTests, onChangeValue, on
   const dependsOnError = isValidJson(value) === false;
   const [enabled, setEnabled] = useState(Object.keys(initialValue).length > 0);
 
-  if (!enabled) {
-    return (
-      <CheckboxField
-        checked={enabled}
-        id="dependsOnEnabled"
-        name="dependsOnEnabled"
-        labelText="Enable dependsOn logic"
-        onClick={() => setEnabled((prev) => !prev)}
-      />
-    );
-  }
+  console.log('DependsOn', {
+    logic: value,
+    initialValue,
+    initialTests,
+    onChangeValue,
+    onChangeTests,
+    value,
+    tests
+  });
+
+  const jsonLogicRef = useRef(null);
+
+  const updateJson = (newValue) => {
+    setValue(newValue);
+
+    if (isValidJson(newValue)) {
+      onChangeValue(JSON.parse(newValue));
+    }
+  };
+
+  useEffect(() => {
+    if (enabled) {
+      updateJson(jsonLogicRef.current.value);
+    } else {
+      updateJson('{}');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
+
+  // if (!value) {
+  //   return (
+  //     <CheckboxField
+  //       checked={value}
+  //       id="dependsOnEnabled"
+  //       name="dependsOnEnabled"
+  //       labelText="Enable dependsOn logic"
+  //       onClick={() =>
+  //         setValue((prev) => {
+  //           console.log('setValue');
+  //           onChangeValue(!prev);
+  //           return !prev;
+  //         })
+  //       }
+  //     />
+  //   );
+  // }
 
   return (
     <>
@@ -106,31 +142,17 @@ function DependsOn({ value: initialValue, tests: initialTests, onChangeValue, on
         name="dependsOnEnabled"
         labelText="Disable dependsOn logic"
         checked={enabled}
-        onClick={() =>
-          setEnabled((prev) => {
-            if (!prev) {
-              return true;
-            }
-
-            // Disable the dependsOn entirely
-            onChangeValue({});
-            onChangeTests([]);
-            return false;
-          })
-        }
+        onClick={() => setEnabled((prev) => !prev)}
       />
       <FieldGroup>
         <FormLabel htmlFor="title">Depends On logic</FormLabel>
         <JsonTextArea
+          textareaRef={jsonLogicRef}
           required
-          defaultValue={value}
+          value={value}
           onChange={(e) => {
             const { value: newValue } = e.currentTarget;
-            setValue(newValue);
-
-            if (isValidJson(newValue)) {
-              onChangeValue(JSON.parse(newValue));
-            }
+            updateJson(newValue);
           }}
           $hasError={dependsOnError}
         />
@@ -203,7 +225,6 @@ function DependsOn({ value: initialValue, tests: initialTests, onChangeValue, on
 DependsOn.propTypes = {
   onChangeValue: PropTypes.func.isRequired,
   onChangeTests: PropTypes.func.isRequired,
-
   // our dependsOn object (jsonLogic)
   tests: PropTypes.arrayOf(PropTypes.object),
   value: PropTypes.object

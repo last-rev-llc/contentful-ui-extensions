@@ -98,7 +98,15 @@ function EditorModal() {
   // We can then build out our state management system as normal.
   // When we close the modal window the parent will handle updating the steps there
   // The parent will also handle updating the state in contentful
-  const stepConfig = useFormSteps((key, newValue) => setValue(set(clone(value), key, newValue)), value);
+  const tempValue = (key, newValue) => {
+    console.log('tempValue => ', key, newValue);
+    const newValue2 = set(clone(value), key, newValue);
+    const newValue3 = { ...value, [key]: newValue };
+    console.log('tempValue2', newValue2);
+    console.log('tempValue3', newValue3);
+    return setValue(set(clone(value), key, newValue));
+  };
+  const stepConfig = useFormSteps(tempValue, value);
   const fieldConfig = useFieldConfig(stepConfig.stepEdit);
 
   const { step = null, field = null } = sdk.parameters.invocation;
@@ -125,6 +133,11 @@ function EditorModal() {
       return;
     }
 
+    console.log('updateField => ', maybeKeyMaybeObject, newValue);
+    console.log({
+      ...getSelectedField(stepConfig.steps, selected),
+      [maybeKeyMaybeObject]: newValue
+    });
     fieldConfig.fieldEdit(selected.step, {
       ...getSelectedField(stepConfig.steps, selected),
       [maybeKeyMaybeObject]: newValue
@@ -132,7 +145,10 @@ function EditorModal() {
   };
 
   const handleCancel = () => sdk.close({ steps: null });
-  const handleConfirm = () => sdk.close({ steps: value.steps });
+  const handleConfirm = () => {
+    console.log('step on confirm => ', value.steps);
+    return sdk.close({ steps: value.steps });
+  };
 
   return (
     <EditorStyle>
