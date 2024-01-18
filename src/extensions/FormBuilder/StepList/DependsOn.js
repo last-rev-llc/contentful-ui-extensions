@@ -87,6 +87,15 @@ function DependsOn({ value: initialValue, tests: initialTests, onChangeValue, on
   const dependsOnError = isValidJson(value) === false;
   const [enabled, setEnabled] = useState(Object.keys(initialValue).length > 0);
 
+  React.useEffect(() => {
+    if (!isValidJson(value)) return;
+    const obj = JSON.parse(value);
+    const keys = Object.keys(obj);
+    if (!keys.length && !!tests.length && !enabled) {
+      onChangeTests([]);
+    }
+  }, [value, tests, enabled, onChangeTests]);
+
   if (!enabled) {
     return (
       <CheckboxField
@@ -114,7 +123,6 @@ function DependsOn({ value: initialValue, tests: initialTests, onChangeValue, on
 
             // Disable the dependsOn entirely
             onChangeValue({});
-            onChangeTests([]);
             return false;
           })
         }
